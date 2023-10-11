@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../utils/auth";
-import "../../src/assets/css/dashboard.css";
 // authenticate user
 async function isAuthenticated() {
   let authStatus = await auth();
@@ -43,6 +42,7 @@ export const Dashboard = () => {
         const authenticatedUsername = authenticated.user;
         const authenticatedId = authenticated.id;
         localStorage.setItem("id", authenticatedId);
+        localStorage.setItem('username', authenticatedUsername)
         setUser(authenticatedUsername);
       } else {
         navigate("/login");

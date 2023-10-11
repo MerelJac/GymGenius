@@ -2,12 +2,9 @@ import React, { useState } from "react";
 import { searchFunction } from "../utils/searchFunction";
 import { OneRepMaxStats } from "./FoundExerciseResult";
 import { NotFoundExerciseDiv } from "./NotFoundExerciseResult";
-
-import "../../src/assets/css/startWorkout.css";
+import searchIcon from "../assets/images/search.png";
 
 import { suggestionsGrip } from "../utils/suggestionsGrip";
-
-
 
 export const SearchBar = (props) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,42 +12,42 @@ export const SearchBar = (props) => {
   // const [searchMax, setSearchResultMax] = useState("");
   const [currentSearchExercise, setCurrentSearchExercise] = useState();
 
-
   const handleInputChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
   const handleSearch = async () => {
     const response = await searchFunction(searchTerm);
-    console.log(response) 
+    console.log(response);
     if (response === false) {
       const notFoundSearchExercise = (
-        <NotFoundExerciseDiv full_name={`Haven't hit that lift yet.`}/>)
+        <NotFoundExerciseDiv full_name={`Haven't hit that lift yet.`} />
+      );
       setCurrentSearchExercise(notFoundSearchExercise);
     } else {
       const newSearchExercise = (
-        <OneRepMaxStats full_name={response.full_name} one_rep_max={response.one_rep_max} />
+        <OneRepMaxStats
+          full_name={response.full_name}
+          one_rep_max={response.one_rep_max}
+        />
       );
       setCurrentSearchExercise(newSearchExercise);
     }
   };
 
-
   return (
     <>
-      <section className="search">
+      <section className="search-outline flex flex-row ">
         <input
-          id="create-search"
           type="search"
           placeholder={props.placeholder}
           value={searchTerm}
           onChange={handleInputChange}
-        ></input>
-        <button onClick={handleSearch}>Search</button>
+        >
+        </input>
+        <img className="w-2" onClick={handleSearch} alt="search-icon" src={searchIcon} />
       </section>
-      <section className="flex justify-center">
-        {currentSearchExercise}
-      </section>
+      <section className="flex justify-center">{currentSearchExercise}</section>
     </>
   );
 };

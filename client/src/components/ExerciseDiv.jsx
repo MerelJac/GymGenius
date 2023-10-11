@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "../assets/css/exerciseDiv.css";
-import "../assets/css/startWorkout.css";
 import { Modal } from "./Modal";
 
 export const ExerciseDiv = (props) => {

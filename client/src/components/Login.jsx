@@ -17,14 +17,14 @@ async function loginUser(credentials, setMessage) {
 
     if (response.status === 200) {
       const data = await response.json();
-      localStorage.clear()
+      localStorage.clear();
       localStorage.setItem("token", JSON.stringify(data));
-      window.location.href = "/"
+      window.location.href = "/";
     } else if (response.status === 401) {
       setMessage("Incorrect username or password");
     }
   } catch (err) {
-    setMessage("An error occurred while logging in. ")
+    setMessage("An error occurred while logging in. ");
   }
 }
 
@@ -55,35 +55,38 @@ export const Login = () => {
         </h1>
         <p>{message}</p>
       </header>
+      <div className="flex flex-col justify-end">
+        <form className="column-right" onSubmit={handleSubmit}>
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            placeholder="Email"
+            id="email"
+            name="email"
+          />
 
-      <form className="column-right" onSubmit={handleSubmit}>
-        <input className="mr-3"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          placeholder="Email"
-          id="email"
-          name="email"
-        />
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+            placeholder="Password"
+            id="password"
+            name="password"
+          />
 
-        <input className="mr-3"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          type="password"
-          placeholder="Password"
-          id="password"
-          name="password"
-        />
+          <button id="login" type="submit">
+            Login
+          </button>
+        </form>
 
-        <button id="login" type="submit">Login</button>
-      </form>
-
-      <button
-        className="small-footer ml-3 mb-1"
-        onClick={() => (window.location.href = "/register")}
-      >
-        Don't have an account? Register here.
-      </button>
+        <button
+          className="flex justify-end text-sm"
+          onClick={() => (window.location.href = "/register")}
+        >
+          Don't have an account? Register here.
+        </button>
+      </div>
     </div>
   );
 };

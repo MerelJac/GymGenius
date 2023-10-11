@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ExerciseDiv } from "./ExerciseDiv";
 import { capitalizeFunction } from "../utils/capitalizeFunction";
-import "../../src/assets/css/startWorkout.css";
 import { useNavigate } from "react-router-dom";
 
 export const Create = () => {
@@ -123,7 +122,7 @@ export const Create = () => {
     <>
       <div id="start-workout">
         <h1 className="right-align">
-          new<span className="bold">WORKOUT</span>
+          New<span className="bold">Workout</span>
         </h1>
       </div>
       <div>

@@ -1,40 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../../src/assets/css/header.css";
 // TODO should include user info eventally
+
+// TODO - get inital from logged in user. only show account if logged in is true
+
 
 
 export const Header = (props) => {
   const navigate = useNavigate();
+  const [userInital, setUserInital] = useState('')
   const returnHome = () => {
     navigate("/");
   };
 
-  const accountInfo = () => {
-    navigate("/account-info");
-  };
+  useEffect(() => {
+    const username = localStorage.getItem('username')
+    console.log('username', username)
 
-  const previousExercises = () => {
-    navigate("/previous-exercises");
-  };
+    setUserInital(username.charAt(0))
+  }, [])
 
-  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <>
-      <div className="header p-3 mr-5">
-        <h1 onClick={returnHome} id="title">
-          fitness<span className="bold">Application</span>
+      <div className="header">
+        <h1 onClick={returnHome}>
+          Gym<span className="bold">Genius</span>
         </h1>
         <div className="relative flex flex-col items-center">
-        <button onClick={()=> setIsOpen((prev) => !prev)} className="flex items-center justify-center  
-        h-12 w-12 rounded-full bg-gray-600 mr-2 mt-2 account">A</button>
-        {isOpen && ( <div className="flex flex-col">
-          <button className="menu-account text-sm" onClick={accountInfo}>Account</button>
-          <button className="menu-saved-exercises text-sm" onClick={previousExercises}>Workouts</button>
-        </div>)}
+          {(props.auth === true) && (
+            <>
+              <button
+                onClick={() => {navigate('/account-info')}}
+                className="flex items-center justify-center  
+        h-12 w-12 rounded-full bg-gray-600 account"
+              >
+               {userInital}
+              </button>
+            </>
+          )}
         </div>
       </div>
-      
     </>
   );
 };
