@@ -33,7 +33,7 @@ export const Header = (props) => {
               <button
                 onClick={() => {navigate('/account-info')}}
                 className="flex items-center justify-center  
-        h-12 w-12 rounded-full bg-gray-600 account"
+        h-12 w-12 rounded-full bg-white opacity-70 text-black"
               >
                {userInital}
               </button>

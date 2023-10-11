@@ -125,7 +125,7 @@ export const Create = () => {
           New<span className="bold">Workout</span>
         </h1>
       </div>
-      <div>
+      <div className="flex flex-row justify-center">
         <input
           id="create-search"
           type="search"

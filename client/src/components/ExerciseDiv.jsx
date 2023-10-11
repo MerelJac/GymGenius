@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import "../assets/css/exerciseDiv.css";
 import { Modal } from "./Modal";
 
 export const ExerciseDiv = (props) => {
@@ -97,8 +96,8 @@ export const ExerciseDiv = (props) => {
 
   return (
     <>
-      <div className="exerciseDiv" id={props.id}>
-        <section className="row">
+      <div className="text-black flex flex-col items-center background-exercise-div" id={props.id}>
+        <section className="w-[100%] grid grid-cols-2 gap-4 row justify-between">
           {props.gifyLink && (
             <div onClick={toggleModal}>
               i
@@ -113,29 +112,29 @@ export const ExerciseDiv = (props) => {
               />
             </div>
           )}
-          <div className="exercise-text">
-            <h2 className="bold">{props.title}</h2>
+          <div>
+            <h2 className="bold text-start">{props.title}</h2>
           </div>
-          <div className="inline-block;">
+          <div className="grid grid-cols-3 gap-2">
             <input
-              className="mb-2 text-sm font-small text-gray-900 dark:text-black lbs-input"
+              className="mb-2 text-sm font-small text-gray-900 w-[10vw] lbs-input"
               placeholder={weightInputPlaceholder}
               value={weightInput}
               onChange={(e) => equationSetWeight(e.target.value)}
             ></input>
             <input
-              className="mb-2 text-sm font-small text-gray-900 dark:text-black reps-input"
+              className="mb-2 text-sm font-small text-gray-900 w-[10vw] reps-input"
               placeholder={repsInputPlaceholder}
               value={repsInput}
               onChange={(e) => equationSetReps(e.target.value)}
             ></input>
+            <button className="submitRep" type="submit" onClick={setInfo}>
+              Go
+            </button>
           </div>
-          <button className="submitRep" type="submit" onClick={setInfo}>
-            Go
-          </button>
         </section>
-        <section className="set-print-section">
-          <ul className="flex flex-row">{listOfSets}</ul>
+        <section className="flex text-end">
+          <ul className="flex flex-row justify-end">{listOfSets}</ul>
         </section>
       </div>
     </>
