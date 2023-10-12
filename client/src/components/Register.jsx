@@ -55,6 +55,15 @@ export const Register = (props) => {
         <p>{message}</p>
       </section>
       <form className="column-right" onSubmit={handleSubmit}>
+      <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          type="text"
+          placeholder="First Name"
+          id="name"
+          name="name"
+          className="text-end rounded"
+        />
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -62,15 +71,6 @@ export const Register = (props) => {
           placeholder="Email"
           id="email"
           name="email"
-          className="text-end rounded"
-        />
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          type="text"
-          placeholder="First Name"
-          id="name"
-          name="name"
           className="text-end rounded"
         />
         <input

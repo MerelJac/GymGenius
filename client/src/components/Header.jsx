@@ -15,7 +15,6 @@ export const Header = (props) => {
 
   useEffect(() => {
     const username = localStorage.getItem('username')
-    console.log('username', username)
 
     if (username) {
       setUserInital(username.charAt(0))

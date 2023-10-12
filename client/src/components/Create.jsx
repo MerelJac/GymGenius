@@ -17,7 +17,6 @@ export const Create = () => {
 
   useEffect(() => {
     const userId = localStorage.getItem('id')
-    console.log(userId)
     setUserId(userId)
   }, [userId])
 
@@ -153,7 +152,6 @@ export const Create = () => {
           id="create-search"
           className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-900 rounded-lg bg-gray-90 focus:ring-black-500 focus:border-black-500 dark:bg-gray-700"
           placeholder="Exercise name"
-          required          
           onSubmit={searchFunction}
         />
         <button
