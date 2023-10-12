@@ -92,45 +92,54 @@ export const ExerciseDiv = (props) => {
     }
   };
 
-  const listOfSets = sets.map((each, index) => <li className="px-2" key={index}>{each}</li>);
+  const listOfSets = sets.map((each, index) => (
+    <li className="px-2" key={index}>
+      {each}
+    </li>
+  ));
 
   return (
     <>
-      <div className="text-black flex flex-col items-center background-exercise-div px-4 py-2 my-2" id={props.id}>
-        <section className="w-[100%] grid grid-cols-2 gap-4 row justify-between">
-          {props.gifyLink && (
-            <div onClick={toggleModal}>
-              i
-              <Modal
-                closeFunction={toggleModal}
-                key={props.id}
-                className={modalClass}
-                gif={props.gifyLink}
-                targetMuscle={props.targetMuscle}
-                equip={props.equip}
-                title={props.title}
-              />
+      <div
+        className="text-black flex flex-col items-center background-exercise-div px-4 py-2 my-2"
+        id={props.id}
+      >
+        <section className="w-full grid grid-cols-[60%_30%_auto]">
+          <div className="flex flex-row gap-4 justify-between grid grid-cols-[60%_30%_auto]">
+            {props.gifyLink && (
+              <div onClick={toggleModal}>
+                i
+                <Modal
+                  closeFunction={toggleModal}
+                  key={props.id}
+                  className={modalClass}
+                  gif={props.gifyLink}
+                  targetMuscle={props.targetMuscle}
+                  equip={props.equip}
+                  title={props.title}
+                />
+              </div>
+            )}
+            <div className="grid grid-cols-1">
+              <h2 className="bold text-start break-words">{props.title}</h2>
             </div>
-          )}
-          <div>
-            <h2 className="bold text-start">{props.title}</h2>
-          </div>
-          <div className="grid grid-cols-3 gap-2">
-            <input
-              className="mb-2 text-sm font-small text-white text-center w-[15vw]"
-              placeholder={weightInputPlaceholder}
-              value={weightInput}
-              onChange={(e) => equationSetWeight(e.target.value)}
-            ></input>
-            <input
-              className="mb-2 text-sm font-small text-white text-center w-[15vw]"
-              placeholder={repsInputPlaceholder}
-              value={repsInput}
-              onChange={(e) => equationSetReps(e.target.value)}
-            ></input>
-            <button className="submitRep" type="submit" onClick={setInfo}>
-              Go
-            </button>
+            <div className="flex flex-row ">
+              <input
+                className="mb-2 text-sm font-small text-white text-center w-[15vw] max-h-[5vh]"
+                placeholder={weightInputPlaceholder}
+                value={weightInput}
+                onChange={(e) => equationSetWeight(e.target.value)}
+              ></input>
+              <input
+                className="mb-2 text-sm font-small text-white text-center w-[15vw] max-h-[5vh]"
+                placeholder={repsInputPlaceholder}
+                value={repsInput}
+                onChange={(e) => equationSetReps(e.target.value)}
+              ></input>
+              <button className="submitRep" type="submit" onClick={setInfo}>
+                Go
+              </button>
+            </div>
           </div>
         </section>
         <section className="flex justify-end w-[100%]">
