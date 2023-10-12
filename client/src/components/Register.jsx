@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const Register = (props) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
@@ -28,12 +28,12 @@ export const Register = (props) => {
       });
       if (response.status === 200) {
         const data = await response.json();
-        console.log(data)
+        console.log(data);
         // remove current token
-        localStorage.clear()
-        // set new token 
+        localStorage.clear();
+        // set new token
         localStorage.setItem("token", JSON.stringify(data));
-        navigate('/')
+        navigate("/");
       } else if (response.status === 400) {
         setMessage("Already making gains with that email.");
       } else {
@@ -47,20 +47,12 @@ export const Register = (props) => {
 
   return (
     // all info goes in here
-    <div className="auth-form-container bottom-div">
+    <div className="auth-form-container fixed bottom-0 left-0 right-0 p-3 flex flex-col justify-between">
       <section className="flex justify-between">
-        <h2 className="right-align">Welcome</h2>
+        <h2 className="right-align">Welcome<span className="bold">Hottie</span></h2>
         <p>{message}</p>
       </section>
       <form className="column-right" onSubmit={handleSubmit}>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          type="name"
-          placeholder="First name"
-          id="name"
-          name="name"
-        />
         <input
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -68,6 +60,14 @@ export const Register = (props) => {
           placeholder="Email"
           id="email"
           name="email"
+        />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          type="text"
+          placeholder="First Name"
+          id="name"
+          name="name"
         />
         <input
           value={password}
@@ -82,7 +82,7 @@ export const Register = (props) => {
       </form>
 
       <button
-        className="small-footer"
+        className="text-sm flex justify-end"
         onClick={() => (window.location.href = "/login")}
       >
         Already have an account? Login here.

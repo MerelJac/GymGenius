@@ -92,11 +92,11 @@ export const ExerciseDiv = (props) => {
     }
   };
 
-  const listOfSets = sets.map((each, index) => <li key={index}>{each}</li>);
+  const listOfSets = sets.map((each, index) => <li className="px-2" key={index}>{each}</li>);
 
   return (
     <>
-      <div className="text-black flex flex-col items-center background-exercise-div" id={props.id}>
+      <div className="text-black flex flex-col items-center background-exercise-div px-4 py-2 my-2" id={props.id}>
         <section className="w-[100%] grid grid-cols-2 gap-4 row justify-between">
           {props.gifyLink && (
             <div onClick={toggleModal}>
@@ -117,13 +117,13 @@ export const ExerciseDiv = (props) => {
           </div>
           <div className="grid grid-cols-3 gap-2">
             <input
-              className="mb-2 text-sm font-small text-gray-900 w-[10vw] lbs-input"
+              className="mb-2 text-sm font-small text-white text-center w-[15vw]"
               placeholder={weightInputPlaceholder}
               value={weightInput}
               onChange={(e) => equationSetWeight(e.target.value)}
             ></input>
             <input
-              className="mb-2 text-sm font-small text-gray-900 w-[10vw] reps-input"
+              className="mb-2 text-sm font-small text-white text-center w-[15vw]"
               placeholder={repsInputPlaceholder}
               value={repsInput}
               onChange={(e) => equationSetReps(e.target.value)}
@@ -133,7 +133,7 @@ export const ExerciseDiv = (props) => {
             </button>
           </div>
         </section>
-        <section className="flex text-end">
+        <section className="flex justify-end w-[100%]">
           <ul className="flex flex-row justify-end">{listOfSets}</ul>
         </section>
       </div>

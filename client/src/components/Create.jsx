@@ -120,23 +120,58 @@ export const Create = () => {
 
   return (
     <>
-      <div id="start-workout">
+      <div id="start-workout" className="p-4">
         <h1 className="right-align">
           New<span className="bold">Workout</span>
         </h1>
       </div>
       <div className="flex flex-row justify-center">
+      <form className="w-full px-4 py-2">
+      <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">
+        Search
+      </label>
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg
+            className="w-4 h-4 text-gray-900"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 20 20"
+          >
+            <path
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+            />
+          </svg>
+        </div>
         <input
-          id="create-search"
           type="search"
-          placeholder="Search"
+          id="create-search"
+          className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-900 rounded-lg bg-gray-90 focus:ring-black-500 focus:border-black-500 dark:bg-gray-700"
+          placeholder="Exercise name"
+          required          
           onSubmit={searchFunction}
-        ></input>
-        <button onClick={searchFunction}>Search</button>
+        />
+        <button
+          type="submit"
+          className="text-white absolute right-2.5 bottom-2.5 bg-gray-700 hover:bg-black-800 focus:ring-4 focus:outline-none focus:ring-black-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-black-600 dark:hover-bg-black-700 dark:focus-ring-black-800"
+          onClick={searchFunction}
+        >
+          Search
+        </button>
       </div>
-      {exerciseDivs}
-      <div className="flex justify-center">
-      <button className="small-footer bottom-div save-workout" onClick={saveWorkout}>
+    </form>
+      </div>
+<section className="p-4">
+{exerciseDivs}
+</section>
+
+      <div className="flex justify-center p-4">
+      <button className="small-footer bottom-div save-workout text-white bg-gray-700 hover:bg-black-800 focus:ring-4 focus:outline-none focus:ring-black-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-black-600 dark:hover-bg-black-700 dark:focus-ring-black-800" onClick={saveWorkout}>
         Save Workout
       </button></div>
     </>

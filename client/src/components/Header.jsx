@@ -17,13 +17,17 @@ export const Header = (props) => {
     const username = localStorage.getItem('username')
     console.log('username', username)
 
-    setUserInital(username.charAt(0))
-  }, [])
+    if (username) {
+      setUserInital(username.charAt(0))
+    }
+
+
+  }, [userInital])
 
 
   return (
     <>
-      <div className="header">
+      <div className="header p-4">
         <h1 onClick={returnHome}>
           Gym<span className="bold">Genius</span>
         </h1>

@@ -7,7 +7,8 @@ body {
   color: white;
   background: linear-gradient(45deg, gray, black);
   background-repeat: no-repeat;
-  height: 100vh;
+  min-height: 100vh;
+  height: 100%;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -37,15 +38,14 @@ input {
     padding: 10px;
     margin-bottom: 10px;
     color: black;
+    background-color: black;
 }
 
 .background-exercise-div {
   opacity: 70%;
   border-radius: 10px;
   color: black;
-  background-color: gray;
-  margin: 10px;
-  padding: 10px;
+  background-color: white;
 }
 
 .search-outline {
@@ -73,9 +73,9 @@ input {
 }
 
 .bottom-div {
-  position: absolute;
+  position: fixed;
   bottom: 0;
-  width: 100%;
-  right: 0;
-  left: 0;
+  width: fit-content;
+  left: 50%;
+  transform: translate(-50%, -50%)
 }

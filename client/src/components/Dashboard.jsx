@@ -59,7 +59,7 @@ export const Dashboard = () => {
 
   return (
     <>
-      <div className="bottom-div">
+      <div className="fixed bottom-0 left-0 right-0 p-3 flex flex-col justify-between">
         <h1 className="right-align" id="welcome-user-name">
           Welcome<span className="bold">{user}</span>
         </h1>

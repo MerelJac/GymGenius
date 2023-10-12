@@ -29,10 +29,13 @@ async function loginUser(credentials, setMessage) {
 }
 
 export const Login = () => {
-  // useState to capture email / password
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+
+
+
+
 
   // handleSubmit function
   const handleSubmit = async (e) => {
@@ -46,9 +49,10 @@ export const Login = () => {
     );
   };
 
+
   return (
     // all info goes in here
-    <div className="auth-form-container bottom-div">
+    <div className="auth-form-container fixed bottom-0 left-0 right-0 p-3 flex flex-col justify-between">
       <header className="flex justify-between">
         <h1 className="right-align ml-3">
           Welcome<span className="bold">Back</span>
@@ -81,7 +85,7 @@ export const Login = () => {
         </form>
 
         <button
-          className="flex justify-end text-sm"
+          className="text-sm flex justify-end"
           onClick={() => (window.location.href = "/register")}
         >
           Don't have an account? Register here.
