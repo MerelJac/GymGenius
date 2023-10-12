@@ -94,7 +94,7 @@ export const RandomExerciseDiv = (props) => {
 
   return (
     <>
-      <div className="exerciseDiv" id={props.id}>
+      <div className="text-black flex flex-col items-center background-exercise-div px-4 py-2 my-2" id={props.id}>
         <section className="row">
           <img alt="attributeImg" src={dotsImg}></img>
           <div className="exercise-text">
@@ -115,7 +115,7 @@ export const RandomExerciseDiv = (props) => {
             ></input>
           </div>
           <button className="submitRep" type="submit" onClick={setInfo}>
-            Go
+            hi
           </button>
         </section>
         <section className="set-print-section">

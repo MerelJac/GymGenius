@@ -6,7 +6,9 @@ import { useNavigate } from "react-router-dom";
 export const RandomGenerator = () => {
   const [selectedOption, setSelectedOption] = useState("");
   const [arrayOfExercises, setArrayOfExercises] = useState([]);
-  const [arrayOfUpdatedOneRepMaxes, setArrayOfUpdatedOneRepMaxes] = useState([])
+  const [arrayOfUpdatedOneRepMaxes, setArrayOfUpdatedOneRepMaxes] = useState(
+    []
+  );
   const [userId, setUserId] = useState("");
   const navigate = useNavigate();
 
@@ -82,7 +84,6 @@ export const RandomGenerator = () => {
       const data = await response.json();
 
       if (data.message === "Yes") {
-
         return (
           <ExerciseDiv
             passData={passData}
@@ -160,11 +161,11 @@ export const RandomGenerator = () => {
   const putWorkout = async (array) => {
     await array.forEach((object) => {
       const requestOptions = {
-        method: "PUT", 
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(object),
       };
-      fetch(`http://localhost:3002/api/exercise/${object.id}`, requestOptions) 
+      fetch(`http://localhost:3002/api/exercise/${object.id}`, requestOptions)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -172,7 +173,7 @@ export const RandomGenerator = () => {
           return response.json();
         })
         // .then((data) => console.log(data))
-        .catch((error) => console.error("Error:", error)); 
+        .catch((error) => console.error("Error:", error));
     });
   };
 
@@ -182,7 +183,7 @@ export const RandomGenerator = () => {
 
   const saveWorkout = () => {
     putWorkout(arrayOfUpdatedOneRepMaxes);
-    navigate('/')
+    navigate("/");
   };
 
   useEffect(() => {
@@ -194,7 +195,10 @@ export const RandomGenerator = () => {
   return (
     <>
       <section>
-        <form>
+        <h2 className="right-align flex justify-center">
+          Whatcha<span className="bold">Workin?</span>
+        </h2>
+        <form className="flex justify-center flex-row">
           <label>
             <input
               type="radio"
@@ -224,10 +228,11 @@ export const RandomGenerator = () => {
           </label>
         </form>
       </section>
-      {arrayOfExercises}
+
+      <section className="p-4">{arrayOfExercises}</section>
       <div className="flex justify-center">
         <button
-          className="small-footer bottom-div save-workout"
+          className="small-footer bottom-div save-workout text-white bg-gray-700 hover:bg-black-800 focus:ring-4 focus:outline-none focus:ring-black-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-black-600 dark:hover-bg-black-700 dark:focus-ring-black-800"
           onClick={saveWorkout}
         >
           Save Workout

@@ -49,7 +49,9 @@ export const Register = (props) => {
     // all info goes in here
     <div className="auth-form-container fixed bottom-0 left-0 right-0 p-3 flex flex-col justify-between">
       <section className="flex justify-between">
-        <h2 className="right-align">Welcome<span className="bold">Hottie</span></h2>
+        <h2 className="right-align">
+          Hey<span className="bold">Hottie</span>
+        </h2>
         <p>{message}</p>
       </section>
       <form className="column-right" onSubmit={handleSubmit}>
@@ -60,6 +62,7 @@ export const Register = (props) => {
           placeholder="Email"
           id="email"
           name="email"
+          className="text-end"
         />
         <input
           value={name}
@@ -68,6 +71,7 @@ export const Register = (props) => {
           placeholder="First Name"
           id="name"
           name="name"
+          className="text-end"
         />
         <input
           value={password}
@@ -76,6 +80,7 @@ export const Register = (props) => {
           placeholder="Password"
           id="password"
           name="password"
+          className="text-end"
         />
 
         <button type="submit">Register</button>

@@ -68,6 +68,8 @@ export const Login = () => {
             placeholder="Email"
             id="email"
             name="email"
+            className="text-end"
+
           />
 
           <input
@@ -77,6 +79,8 @@ export const Login = () => {
             placeholder="Password"
             id="password"
             name="password"
+            className="text-end"
+
           />
 
           <button id="login" type="submit">
