@@ -30,36 +30,44 @@ export const OneRepMaxStats = (props) => {
     let weight = (-0.0278 * e + 1.0278) * props.one_rep_max;
     setTimeout(() => {
       setWeightInputPlaceholder(Math.floor(weight));
-    }, 500);
+    });
   };
 
   return (
     <>
-      <div className="exerciseDiv">
-        <section className="row">
-          <div className="exercise-text">
-            <h2 className="bold">{props.full_name}</h2>
-          </div>
-          <div className="flex justify-center">
-            <div className="flex flex-col">
+      <div
+        className=" w-full text-black flex flex-col items-center background-exercise-div px-4 py-2 mx-4 my-2"
+        id={props.id}
+      >
+        <section className="w-full">
+          <div className="flex flex-row gap-4 justify-between">
+            <div>
+              <h2 className="bold text-start text-black break-words">{props.full_name}</h2>
+            </div>
+            <div className="flex flex-row gap-2">
+              <div className="flex flex-col text-end">
               <input
-                className="text-center w-[60px] weight"
+                className="mb-2 text-sm font-small text-white text-center w-[15vw] max-h-[5vh]"
                 placeholder={weightInputPlaceholder}
                 onChange={(e) => equationSetWeight(e.target.value)}
               ></input>
               <p>lbs</p>
-            </div>
-            <div className="flex flex-col">
+              </div>
+
+              <div className="flex flex-col text-end">
               <input
-                className="text-center w-[60px] reps"
+                className="mb-2 text-sm font-small text-white text-center w-[15vw] max-h-[5vh]"
                 placeholder={repsInputPlaceholder}
                 onChange={(e) => equationSetReps(e.target.value)}
               ></input>
               <p>reps</p>
+                </div>
+
             </div>
           </div>
         </section>
       </div>
+
     </>
   );
 };

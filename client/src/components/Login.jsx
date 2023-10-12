@@ -68,7 +68,7 @@ export const Login = () => {
             placeholder="Email"
             id="email"
             name="email"
-            className="text-end"
+            className="text-end rounded"
 
           />
 
@@ -79,7 +79,7 @@ export const Login = () => {
             placeholder="Password"
             id="password"
             name="password"
-            className="text-end"
+            className="text-end rounded"
 
           />
 

@@ -62,7 +62,7 @@ export const Register = (props) => {
           placeholder="Email"
           id="email"
           name="email"
-          className="text-end"
+          className="text-end rounded"
         />
         <input
           value={name}
@@ -71,7 +71,7 @@ export const Register = (props) => {
           placeholder="First Name"
           id="name"
           name="name"
-          className="text-end"
+          className="text-end rounded"
         />
         <input
           value={password}
@@ -80,7 +80,7 @@ export const Register = (props) => {
           placeholder="Password"
           id="password"
           name="password"
-          className="text-end"
+          className="text-end rounded"
         />
 
         <button type="submit">Register</button>

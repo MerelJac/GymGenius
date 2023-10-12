@@ -14,13 +14,10 @@ export const searchFunction = async (searchTerm) => {
 
         const data = await response.json()
           if (data.message === 'Yes') {
-              console.log(data.exercise.full_name, data.exercise.one_rep_max, data.exercise) 
               return data.exercise
           } else if (data.message === 'No') {
-              console.log('Nope') 
               return false
           } else {
-              console.log('Something went wrong') 
               return 'There was an error'
           }
     
