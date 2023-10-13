@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/gymgenius/static/css/main.eba91d4f.css",
+    "main.js": "/gymgenius/static/js/main.27aa3d5a.js",
+    "static/js/787.e1616e38.chunk.js": "/gymgenius/static/js/787.e1616e38.chunk.js",
+    "index.html": "/gymgenius/index.html",
+    "main.eba91d4f.css.map": "/gymgenius/static/css/main.eba91d4f.css.map",
+    "main.27aa3d5a.js.map": "/gymgenius/static/js/main.27aa3d5a.js.map",
+    "787.e1616e38.chunk.js.map": "/gymgenius/static/js/787.e1616e38.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.eba91d4f.css",
+    "static/js/main.27aa3d5a.js"
+  ]
+}
