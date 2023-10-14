@@ -7,7 +7,7 @@ export const Modal = (props) => {
         <div
           tabIndex="-1"
           role="dialog"
-          className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
+          className="fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-auto overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
         >
           <div className="relative w-full max-w-2xl max-h-full">
             <div className="relative bg-white bg-opacity-100 rounded-lg">
@@ -40,7 +40,7 @@ export const Modal = (props) => {
                 </button>
               </div>
               <div className="p-6 space-y-6 flex flex-row">
-                <img src={props.gif} alt="Exercise GIF" />
+                <img className="w-[100px] md:w-[200px] lg:w-[300px]" src={props.gif} alt="Exercise GIF" />
                 <div className="flex flex-col">
                   {" "}
                   <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400">

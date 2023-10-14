@@ -27,7 +27,7 @@ export const ExerciseDiv = (props) => {
     setRepsInputPlaceholder("reps");
 
     if (newExercise) {
-      let reps = (e / props.oneRepMax) / (1.0278 -0.0278);
+      let reps = e / props.oneRepMax / (1.0278 - 0.0278);
 
       setRepsInputPlaceholder(Math.floor(reps));
     }
@@ -68,6 +68,8 @@ export const ExerciseDiv = (props) => {
       setSets([...sets, `${weight}lbs x ${reps}`]);
       setWeightInput("");
       setRepsInput("");
+      setRepsInputPlaceholder("reps");
+      setWeightInputPlaceholder("lbs");
     } else {
       console.log("nothing happened");
     }
@@ -78,7 +80,7 @@ export const ExerciseDiv = (props) => {
   };
 
   const modalClass = isShown
-    ? "fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
+    ? "fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-hidden outline-none focus:outline-none transform -translate-x-1/2 left-1/2 h-[100%]"
     : "hidden";
 
   const oneRepMaxFunction = (weight, reps) => {
@@ -105,22 +107,26 @@ export const ExerciseDiv = (props) => {
       >
         <section className="w-full">
           <div className="flex flex-row gap-4 justify-between">
-            {props.gifyLink && (
-              <div onClick={toggleModal}>
-                i
-                <Modal
-                  closeFunction={toggleModal}
-                  key={props.id}
-                  className={modalClass}
-                  gif={props.gifyLink}
-                  targetMuscle={props.targetMuscle}
-                  equip={props.equip}
-                  title={props.title}
-                />
+            <div className="flex flex-row justify-start">
+              {props.gifyLink && (
+                <div className="mr-4" onClick={toggleModal}>
+                  i
+                  <Modal
+                    closeFunction={toggleModal}
+                    key={props.id}
+                    className={modalClass}
+                    gif={props.gifyLink}
+                    targetMuscle={props.targetMuscle}
+                    equip={props.equip}
+                    title={props.title}
+                  />
+                </div>
+              )}
+              <div className="grid grid-cols-1">
+                <h2 className="bold text-start break-words flex justify-end">
+                  {props.title}
+                </h2>
               </div>
-            )}
-            <div className="grid grid-cols-1">
-              <h2 className="bold text-start break-words flex justify-end">{props.title}</h2>
             </div>
             <div className="flex flex-row ">
               <input
@@ -135,7 +141,11 @@ export const ExerciseDiv = (props) => {
                 value={repsInput}
                 onChange={(e) => equationSetReps(e.target.value)}
               ></input>
-              <button className="ml-2 mb-2 text-sm font-small text-white text-center w-[5vw] h-[5vh] submit-rep" type="submit" onClick={setInfo}>
+              <button
+                className="ml-2 mb-2 text-sm font-small text-white text-center w-[5vw] h-[5vh] submit-rep"
+                type="submit"
+                onClick={setInfo}
+              >
                 Go
               </button>
             </div>

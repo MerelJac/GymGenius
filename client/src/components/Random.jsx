@@ -65,6 +65,19 @@ export const RandomGenerator = () => {
   };
 
   const fetchAndProcessExercise = async (exercise) => {
+    console.log(exercise.name)
+    let sanitizeName;
+    if (exercise.name.includes('female')) {
+      sanitizeName = exercise.name.replace('female', '');
+    } else if (exercise.name.includes('male')) {
+      sanitizeName = exercise.name.replace('male', '');
+    } else if (exercise.name.includes('back pov')) {
+      sanitizeName = exercise.name.replace('back pov', '');
+    } else if (exercise.name.includes('side pov')) {
+      sanitizeName = exercise.name.replace('side pov', '');
+    }else {
+      sanitizeName = exercise.name
+    }
     const saveItem = exercise;
     const parsed_name = exercise.name.split(" ");
     const searchTitle = exercise.name.replace(/\s/g, "");
@@ -98,7 +111,7 @@ export const RandomGenerator = () => {
         );
       } else if (data.message === "No") {
         const newExercise = {
-          full_name: saveItem.name,
+          full_name: sanitizeName,
           parsed_name: parsed_name,
           search_name: searchTitle,
           one_rep_max: 0,

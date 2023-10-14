@@ -9,7 +9,7 @@ import { Register } from "./components/Register";
 import { Dashboard } from "./components/Dashboard";
 import { Header } from "./components/Header";
 import { Create } from "./components/Create";
-import { AccountInfo } from "./components/AccountInfo";
+import { AccountOptions } from "./components/AccountOptions";
 import { SeeStatsPage } from "./components/SeeStats";
 import { NotFound } from "./components/NotFound";
 import { PreviousWorkouts } from "./components/PreviousWorkouts";
@@ -43,7 +43,7 @@ function App() {
               <Route exact path="/create" element={<Create />} />
               <Route exact path="/random" element={<RandomGenerator />} />
               <Route exact path="/stats" element={<SeeStatsPage />} />
-              <Route exact path="/account-info" element={<AccountInfo />} />
+              <Route exact path="/account-info" element={<AccountOptions />} />
               <Route
                 path="/previous-exercises"
                 element={<PreviousWorkouts />}
