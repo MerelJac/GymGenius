@@ -9,14 +9,18 @@ export const suggestionsBench = (array) => {
       benchCount[grip] = 0;
     });
   
+  
     array.forEach((exercise) => {
-      const words = exercise.split(' ');
-      // Loop through the words and check if they match any grips
-      words.forEach((word) => {
-        if (benchArray.includes(word)) {
-          benchCount[word]++;
-        }
-      });
+      if (exercise) {
+        const words = exercise.split(' ');
+        // Loop through the words and check if they match any grips
+        words.forEach((word) => {
+          if (benchArray.includes(word)) {
+            benchCount[word]++;
+          }
+        });
+      }
+
     });
   
   benchArray.sort((a,b) => benchCount[a] - benchCount[b])

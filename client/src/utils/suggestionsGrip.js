@@ -9,7 +9,11 @@ export const suggestionsGrip = (array) => {
     gripCounts[grip] = 0;
   });
 
+
+    
+
   array.forEach((exercise) => {
+    if (exercise) {
     const words = exercise.split(' ');
     // Loop through the words and check if they match any grips
     words.forEach((word) => {
@@ -17,6 +21,7 @@ export const suggestionsGrip = (array) => {
         gripCounts[word]++;
       }
     });
+  }
   });
 
 gripArray.sort((a,b) => gripCounts[a] - gripCounts[b])
