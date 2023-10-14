@@ -60,8 +60,8 @@ export const SuggestionsComponent = () => {
 
   return (
     <>
-      <h2 className="p-3">Exercises to try:</h2>
-      <div>{suggestions}</div>
+      <h2 className="p-3 font-bold">Exercises to try:</h2>
+      <div className="p-4">{suggestions}</div>
     </>
   );
 };

@@ -28,6 +28,7 @@ export const Create = () => {
   };
 
   const searchFunction = (e) => {
+    e.preventDefault()
     // find elements
     const searchBar = document.querySelector("#create-search");
     let searchValue = searchBar.value;

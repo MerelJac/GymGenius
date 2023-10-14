@@ -10,7 +10,6 @@ export const SeeStatsPage = () => {
         <>
         <SearchBar placeholder={"Search Exercise for 1RM"}/>
         <SuggestionsComponent/>
-
         </>
     )
 }
