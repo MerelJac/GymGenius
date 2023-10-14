@@ -78,7 +78,7 @@ export const ExerciseDiv = (props) => {
   };
 
   const modalClass = isShown
-    ? "fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
+    ? "fixed top-0 left-0 right-0 z-50 w-full p-4 overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full"
     : "hidden";
 
   const oneRepMaxFunction = (weight, reps) => {
@@ -103,8 +103,8 @@ export const ExerciseDiv = (props) => {
         className="text-black flex flex-col items-center background-exercise-div px-4 py-2 my-2"
         id={props.id}
       >
-        <section className="w-full grid grid-cols-[60%_30%_auto]">
-          <div className="flex flex-row gap-4 justify-between grid grid-cols-[60%_30%_auto]">
+        <section className="w-full">
+          <div className="flex flex-row gap-4 justify-between">
             {props.gifyLink && (
               <div onClick={toggleModal}>
                 i
@@ -120,22 +120,22 @@ export const ExerciseDiv = (props) => {
               </div>
             )}
             <div className="grid grid-cols-1">
-              <h2 className="bold text-start break-words">{props.title}</h2>
+              <h2 className="bold text-start break-words flex justify-end">{props.title}</h2>
             </div>
             <div className="flex flex-row ">
               <input
-                className="mb-2 text-sm font-small text-white text-center w-[15vw] max-h-[5vh]"
+                className="ml-2 mb-2 text-sm font-small text-white text-center w-[15vw] h-[5vh]"
                 placeholder={weightInputPlaceholder}
                 value={weightInput}
                 onChange={(e) => equationSetWeight(e.target.value)}
               ></input>
               <input
-                className="mb-2 text-sm font-small text-white text-center w-[15vw] max-h-[5vh]"
+                className="ml-2 mb-2 text-sm font-small text-white text-center w-[15vw] h-[5vh]"
                 placeholder={repsInputPlaceholder}
                 value={repsInput}
                 onChange={(e) => equationSetReps(e.target.value)}
               ></input>
-              <button className="submitRep" type="submit" onClick={setInfo}>
+              <button className="ml-2 mb-2 text-sm font-small text-white text-center w-[5vw] h-[5vh] submit-rep" type="submit" onClick={setInfo}>
                 Go
               </button>
             </div>
