@@ -54,10 +54,9 @@ input {
 }
 
 .background-exercise-div {
-  opacity: 70%;
   border-radius: 10px;
   color: black;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.7);;
 }
 
 .search-outline {

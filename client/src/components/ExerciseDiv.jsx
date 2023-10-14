@@ -100,7 +100,7 @@ export const ExerciseDiv = (props) => {
   return (
     <>
       <div
-        className="text-black flex flex-col items-center background-exercise-div px-4 py-2 my-2"
+        className="background-exercise-div text-black flex flex-col items-center px-4 py-2 my-2"
         id={props.id}
       >
         <section className="w-full">
