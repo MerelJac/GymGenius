@@ -14,15 +14,11 @@ The Fitness App is a web application designed to help users create and manage th
 
 - **Workout Suggestions**: Based on their past workout history, users receive workout suggestions to keep their routines fresh and challenging.
 
-<video src="/client/src/assets/videos/GymGenius-demo.mov" controls="controls" style="max-width: 730px;">
-</video>
-
 ## Getting Started
 
 To get started with the Fitness App, follow these steps:
 
 1. **Clone the Repository**: Clone the project repository to your local machine.
-
 
 
 2. **Install Dependencies**: Navigate to the project's root directory and install the required dependencies using npm.
