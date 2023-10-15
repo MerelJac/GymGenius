@@ -78,18 +78,6 @@ export const SearchBar = (props) => {
         </form>
       </div>
       <section className="flex justify-center">{currentSearchExercise}</section>
-      {/*       
-      <section className="search-outline flex flex-row ">
-        <input
-          type="search"
-          placeholder={props.placeholder}
-          value={searchTerm}
-          onChange={handleInputChange}
-        >
-        </input>
-        <img className="w-2" onClick={handleSearch} alt="search-icon" />
-      </section>
-      <section className="flex justify-center">{currentSearchExercise}</section> */}
     </>
   );
 };

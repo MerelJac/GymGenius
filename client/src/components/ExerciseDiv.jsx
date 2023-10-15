@@ -21,13 +21,15 @@ export const ExerciseDiv = (props) => {
   }, [props.oneRepMax]);
 
   const equationSetWeight = (e) => {
+    console.log(e)
     setWeightInput(e);
 
+  
     // Reset the repsInputPlaceholder to 'reps'
     setRepsInputPlaceholder("reps");
 
     if (newExercise) {
-      let reps = e / props.oneRepMax / (1.0278 - 0.0278);
+    let reps = (e / props.one_rep_max - 1.0278) / -0.0278;
 
       setRepsInputPlaceholder(Math.floor(reps));
     }
@@ -42,7 +44,6 @@ export const ExerciseDiv = (props) => {
     // Error handling
     if (newExercise) {
       let weight = (-0.0278 * e + 1.0278) * props.oneRepMax;
-
       setWeightInputPlaceholder(Math.floor(weight));
     }
   };

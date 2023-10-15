@@ -65,22 +65,21 @@ export const RandomGenerator = () => {
   };
 
   const fetchAndProcessExercise = async (exercise) => {
-    console.log(exercise.name)
     let sanitizeName;
-    if (exercise.name.includes('female')) {
-      sanitizeName = exercise.name.replace('female', '');
-    } else if (exercise.name.includes('male')) {
-      sanitizeName = exercise.name.replace('male', '');
-    } else if (exercise.name.includes('back pov')) {
-      sanitizeName = exercise.name.replace('back pov', '');
-    } else if (exercise.name.includes('side pov')) {
-      sanitizeName = exercise.name.replace('side pov', '');
-    }else {
-      sanitizeName = exercise.name
+    if (exercise.name.includes("(female)")) {
+      sanitizeName = exercise.name.replace("(female)", "");
+    } else if (exercise.name.includes("(male)")) {
+      sanitizeName = exercise.name.replace("(male)", "");
+    } else if (exercise.name.includes("(back pov)")) {
+      sanitizeName = exercise.name.replace("(back pov)", "");
+    } else if (exercise.name.includes("(side pov)")) {
+      sanitizeName = exercise.name.replace("(side pov)", "");
+    } else {
+      sanitizeName = exercise.name;
     }
     const saveItem = exercise;
-    const parsed_name = exercise.name.split(" ");
-    const searchTitle = exercise.name.replace(/\s/g, "");
+    const parsed_name = sanitizeName.split(" ");
+    const searchTitle = sanitizeName.replace(/\s/g, "");
 
     const requestOptions = {
       method: "POST",
