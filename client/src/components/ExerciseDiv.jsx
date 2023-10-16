@@ -28,11 +28,9 @@ export const ExerciseDiv = (props) => {
     // Reset the repsInputPlaceholder to 'reps'
     setRepsInputPlaceholder("reps");
 
-    if (newExercise) {
     let reps = (e / props.one_rep_max - 1.0278) / -0.0278;
 
       setRepsInputPlaceholder(Math.floor(reps));
-    }
   };
 
   const equationSetReps = (e) => {

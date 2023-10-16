@@ -14,15 +14,12 @@ export const Header = (props) => {
   };
 
   useEffect(() => {
-    const username = localStorage.getItem('username')
+      setUserInital(localStorage.getItem('username') || "");
+  }, [])
 
-    if (username) {
-      setUserInital(username.charAt(0))
-    }
-
+  useEffect(() => {
 
   }, [userInital])
-
 
   return (
     <>
@@ -38,7 +35,7 @@ export const Header = (props) => {
                 className="flex items-center justify-center  
         h-12 w-12 rounded-full bg-white opacity-70 text-black"
               >
-               {userInital}
+               {userInital ? userInital.charAt(0) : ""}
               </button>
             </>
           )}
