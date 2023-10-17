@@ -12,7 +12,6 @@ import { Create } from "./components/Create";
 import { AccountOptions } from "./components/AccountOptions";
 import { SeeStatsPage } from "./components/SeeStats";
 import { NotFound } from "./components/NotFound";
-import { PreviousWorkouts } from "./components/PreviousWorkouts";
 import { RandomGenerator } from "./components/Random";
 
 import { auth } from "./utils/auth";
@@ -44,10 +43,6 @@ function App() {
               <Route exact path="/random" element={<RandomGenerator />} />
               <Route exact path="/stats" element={<SeeStatsPage />} />
               <Route exact path="/account-info" element={<AccountOptions />} />
-              <Route
-                path="/previous-exercises"
-                element={<PreviousWorkouts />}
-              />
             </>
           )}
           {/* Add a 404 Not Found route */}
