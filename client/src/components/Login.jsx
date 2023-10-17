@@ -5,7 +5,7 @@ import "../assets/css/login.css";
 async function loginUser(credentials, setMessage) {
   try {
     const response = await fetch(
-      "./api/user-routes/login",
+      "http://localhost:3002/api/user-routes/login",
       {
         method: "POST",
         headers: {
