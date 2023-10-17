@@ -89,7 +89,7 @@ export const RandomGenerator = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:3002/api/exercise/${searchTitle}`,
+        `/api/exercise/${searchTitle}`,
         requestOptions
       );
 
@@ -177,7 +177,7 @@ export const RandomGenerator = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(object),
       };
-      fetch(`http://localhost:3002/api/exercise/${object.id}`, requestOptions)
+      fetch(`/api/exercise/${object.id}`, requestOptions)
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);

@@ -10,7 +10,7 @@ export const searchFunction = async (searchTerm) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ title: searchTitle }),
         };
-        const response = await fetch(`http://localhost:3002/api/exercise/${searchTitle}`, requestOptions)
+        const response = await fetch(`/api/exercise/${searchTitle}`, requestOptions)
 
         const data = await response.json()
           if (data.message === 'Yes') {

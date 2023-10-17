@@ -1,6 +1,6 @@
 export const getAllExercisesForOneUser = async () => {
   try {
-    const response = await fetch(`http://localhost:3002/api/exercise/`);
+    const response = await fetch(`/api/exercise/`);
 
     const data = await response.json();
     if (data) {

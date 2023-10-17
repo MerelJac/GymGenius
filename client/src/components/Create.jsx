@@ -45,7 +45,7 @@ export const Create = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: searchTitle }),
     };
-    fetch(`http://localhost:3002/api/exercise/${searchTitle}`, requestOptions)
+    fetch(`/api/exercise/${searchTitle}`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -100,7 +100,7 @@ export const Create = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(object),
       };
-      fetch(`http://localhost:3002/api/exercise/${object.id}`, requestOptions) 
+      fetch(`/api/exercise/${object.id}`, requestOptions) 
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);

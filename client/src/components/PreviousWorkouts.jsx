@@ -7,7 +7,7 @@ export const PreviousWorkouts = () => {
     // Fetch previous exercises based on user ID using GraphQL query (to be implemented)
     // For now, simulate fetching data
     const userId = localStorage.getItem('id');
-    fetch(`http://localhost:3002/api/previous-exercises/${userId}`)
+    fetch(`/api/previous-exercises/${userId}`)
       .then((response) => response.json())
       .then((data) => {
         setPreviousExercises(data);
