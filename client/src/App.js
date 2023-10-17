@@ -38,7 +38,7 @@ function App() {
           <Route exact path="/register" element={<Register />} />
           {authStatus && (
             <>
-              <Route exact path="/" element={<Dashboard />} />
+              <Route exact path="/home" element={<Dashboard />} />
               <Route exact path="/create" element={<Create />} />
               <Route exact path="/random" element={<RandomGenerator />} />
               <Route exact path="/stats" element={<SeeStatsPage />} />

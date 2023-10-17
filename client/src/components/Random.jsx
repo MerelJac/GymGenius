@@ -195,7 +195,7 @@ export const RandomGenerator = () => {
 
   const saveWorkout = () => {
     putWorkout(arrayOfUpdatedOneRepMaxes);
-    navigate("/");
+    navigate("/home");
   };
 
   useEffect(() => {

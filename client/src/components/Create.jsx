@@ -115,7 +115,7 @@ export const Create = () => {
 
   const saveWorkout = () => {
     putWorkout(arrayOfUpdatedOneRepMaxes);
-    navigate('/')
+    navigate('/home')
   };
 
   return (

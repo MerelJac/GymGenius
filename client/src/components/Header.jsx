@@ -10,7 +10,7 @@ export const Header = (props) => {
   const navigate = useNavigate();
   const [userInital, setUserInital] = useState('')
   const returnHome = () => {
-    navigate("/");
+    navigate("/home");
   };
 
   useEffect(() => {

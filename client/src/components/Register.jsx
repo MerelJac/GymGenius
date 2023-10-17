@@ -33,7 +33,7 @@ export const Register = (props) => {
         localStorage.clear();
         // set new token
         localStorage.setItem("token", JSON.stringify(data));
-        navigate("/");
+        navigate("/home");
       } else if (response.status === 400) {
         setMessage("Already making gains with that email.");
       } else {
@@ -88,7 +88,7 @@ export const Register = (props) => {
 
       <button
         className="text-sm flex justify-end"
-        onClick={() => (window.location.href = "/login")}
+        onClick={() => navigate("/login")}
       >
         Already have an account? Login here.
       </button>
