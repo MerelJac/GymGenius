@@ -1,25 +1,23 @@
 import React, { useState } from "react";
 import "../assets/css/login.css";
+import { useNavigate } from "react-router-dom";
 
 // login function to send to API / backend
-async function loginUser(credentials, setMessage) {
+async function loginUser(credentials, setMessage, navigate) {
   try {
-    const response = await fetch(
-      "/api/user-routes/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      }
-    );
+    const response = await fetch("/api/user-routes/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(credentials),
+    });
 
     if (response.status === 200) {
       const data = await response.json();
       localStorage.clear();
       localStorage.setItem("token", JSON.stringify(data));
-      window.location.href = "/";
+      navigate('/')
     } else if (response.status === 401) {
       setMessage("Incorrect username or password");
     }
@@ -32,10 +30,7 @@ export const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
-
-
-
-
+  const navigate = useNavigate();
 
   // handleSubmit function
   const handleSubmit = async (e) => {
@@ -45,10 +40,10 @@ export const Login = () => {
         email: email,
         password: password,
       },
-      setMessage
+      setMessage, 
+      navigate
     );
   };
-
 
   return (
     // all info goes in here
@@ -69,7 +64,6 @@ export const Login = () => {
             id="email"
             name="email"
             className="text-end rounded"
-
           />
 
           <input
@@ -80,7 +74,6 @@ export const Login = () => {
             id="password"
             name="password"
             className="text-end rounded"
-
           />
 
           <button id="login" type="submit">
@@ -90,7 +83,7 @@ export const Login = () => {
 
         <button
           className="text-sm flex justify-end"
-          onClick={() => (window.location.href = "/register")}
+          onClick={() => navigate("/register")}
         >
           Don't have an account? Register here.
         </button>
