@@ -5,7 +5,7 @@ import "../assets/css/login.css";
 async function loginUser(credentials, setMessage) {
   try {
     const response = await fetch(
-      "https://gymgenius-web-458d0480d63d.herokuapp.com/api/user-routes/login",
+      "./api/user-routes/login",
       {
         method: "POST",
         headers: {
