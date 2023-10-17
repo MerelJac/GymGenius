@@ -67,7 +67,7 @@ export const Dashboard = () => {
           <h3
             className="create-new-workout"
             onClick={() => {
-              window.location.href = "/create";
+              navigate('/create')
             }}
           >
             Create Your Workout
@@ -75,7 +75,7 @@ export const Dashboard = () => {
           <h3
             className="random-workout"
             onClick={() => {
-              window.location.href = "/random";
+              navigate('/random')
             }}
           >
             Workout Generator
@@ -83,7 +83,7 @@ export const Dashboard = () => {
           <h3
             className="see-stats"
             onClick={() => {
-              window.location.href = "/stats";
+              navigate('/stats')
             }}
           >
             See Stats
