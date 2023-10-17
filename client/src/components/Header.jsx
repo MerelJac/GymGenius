@@ -17,9 +17,6 @@ export const Header = (props) => {
       setUserInital(localStorage.getItem('username') || "");
   }, [])
 
-  useEffect(() => {
-
-  }, [userInital])
 
   return (
     <>

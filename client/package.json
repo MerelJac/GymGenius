@@ -1,8 +1,7 @@
 {
-  "name": "coachmerel",
+  "name": "gymgenius",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://mereljac.github.io/gymgenius",
   "dependencies": {
     "@babel/plugin-proposal-private-property-in-object": "7.21.11",
     "@material-tailwind/react": "^2.1.2",

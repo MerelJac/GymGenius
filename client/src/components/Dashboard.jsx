@@ -9,7 +9,7 @@ async function isAuthenticated() {
     try {
       // send token info
       const findUser = await fetch(
-        "http://localhost:3002/api/user-routes/check-token",
+        "/api/user-routes/check-token",
         {
           headers: {
             "Content-Type": "application/json",
