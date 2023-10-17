@@ -14,10 +14,8 @@ export const OneRepMaxStats = (props) => {
 
     // Error handling
     let reps = (e / props.one_rep_max - 1.0278) / -0.0278;
+    setRepsInputPlaceholder(Math.floor(reps));
 
-    setTimeout(() => {
-      setRepsInputPlaceholder(Math.floor(reps));
-    });
   };
 
   const equationSetReps = (e) => {
