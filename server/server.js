@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path')
 //import mongo
 const db = require('./config/mongo.config');
 // import routes
@@ -17,6 +18,13 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json())
+
+app.use(express.static(path.join(__dirname, '../client/build')))
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build/index.html'))
+})
+
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: true }))
 // routes middleware must be last
