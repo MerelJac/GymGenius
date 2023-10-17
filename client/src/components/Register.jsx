@@ -18,11 +18,11 @@ export const Register = (props) => {
     };
     console.log(user);
     try {
-      const response = await fetch("http://localhost:3002/api/user-routes", {
+      const response = await fetch("/api/user-routes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Origin: "http://localhost:3000",
+          // Origin: "http://localhost:3000",
         },
         body: JSON.stringify(user),
       });

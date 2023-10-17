@@ -73,7 +73,7 @@ export const Create = () => {
               userID: userId
             }),
           };
-          fetch("http://localhost:3002/api/exercise", requestOptions)
+          fetch("/api/exercise", requestOptions)
             .then((response) => response.json())
             .then((data) => {
               newExerciseDiv = (

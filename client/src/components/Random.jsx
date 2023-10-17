@@ -150,7 +150,7 @@ export const RandomGenerator = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:3002/api/exercise",
+        "/api/exercise",
         requestOptions
       );
 
