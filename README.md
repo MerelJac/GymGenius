@@ -36,6 +36,24 @@ To get started with the Fitness App, follow these steps:
 
 4. **Access the App**: Open your web browser and go to `http://localhost:3000` to access the Fitness App.
 
+## Deployed Application 
+
+Create Workout Page
+
+![alt text](./client/src/assets/images/pic1.png)
+
+Suggestions & Stats Page
+
+![alt text](./client/src/assets/images/pic2.png)
+
+Randomly Generated Workout
+
+![alt text](./client/src/assets/images/pic3.png)
+
+Create User Page
+
+![alt text](./client/src/assets/images/pic4.png)
+
 ## Future Developments
 
 The Fitness App is continually evolving. Here are some potential future developments and features that we plan to add:
