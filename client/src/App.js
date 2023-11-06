@@ -5,6 +5,7 @@ import "./assets/css/form.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { Login } from "./components/Login";
+
 import { Register } from "./components/Register";
 import { Dashboard } from "./components/Dashboard";
 import { Header } from "./components/Header";
@@ -15,6 +16,7 @@ import { NotFound } from "./components/NotFound";
 import { RandomGenerator } from "./components/Random";
 
 import { auth } from "./utils/auth";
+import { AllPrograms } from "./components/AllPrograms/AllPrograms";
 
 function App() {
   const [authStatus, setAuthStatus] = useState(false);
@@ -40,6 +42,7 @@ function App() {
             <>
               <Route exact path="/home" element={<Dashboard />} />
               <Route exact path="/create" element={<Create />} />
+              <Route exact path='/program' element={<AllPrograms />} />
               <Route exact path="/random" element={<RandomGenerator />} />
               <Route exact path="/stats" element={<SeeStatsPage />} />
               <Route exact path="/account-info" element={<AccountOptions />} />

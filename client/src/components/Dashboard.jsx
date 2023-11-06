@@ -8,15 +8,12 @@ async function isAuthenticated() {
     const token = await JSON.parse(localStorage.getItem("token"));
     try {
       // send token info
-      const findUser = await fetch(
-        "/api/user-routes/check-token",
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token,
-          },
-        }
-      );
+      const findUser = await fetch("/api/user-routes/check-token", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token,
+        },
+      });
       // if successful, proceed with useEffect
       if (findUser.status === 200) {
         const user = await findUser.json();
@@ -42,7 +39,7 @@ export const Dashboard = () => {
         const authenticatedUsername = authenticated.user;
         const authenticatedId = authenticated.id;
         localStorage.setItem("id", authenticatedId);
-        localStorage.setItem('username', authenticatedUsername)
+        localStorage.setItem("username", authenticatedUsername);
         setUser(authenticatedUsername);
       } else {
         navigate("/login");
@@ -58,38 +55,44 @@ export const Dashboard = () => {
   }, [authenticated, navigate]);
 
   return (
-    <>
-      <div className="fixed bottom-0 left-0 right-0 p-3 flex flex-col justify-between">
-        <h1 className="right-align" id="welcome-user-name">
-          Welcome<span className="bold">{user}</span>
-        </h1>
-        <section className="column-right" id="create-new-workout">
-          <h3
-            className="create-new-workout"
-            onClick={() => {
-              navigate('/create')
-            }}
-          >
-            Create Your Workout
-          </h3>
-          <h3
-            className="random-workout"
-            onClick={() => {
-              navigate('/random')
-            }}
-          >
-            Workout Generator
-          </h3>
-          <h3
-            className="see-stats"
-            onClick={() => {
-              navigate('/stats')
-            }}
-          >
-            See Stats
-          </h3>
-        </section>
-      </div>
-    </>
+    <div className="fixed bottom-0 left-0 right-0 p-3 flex flex-col justify-between">
+      <h1 className="right-align" id="welcome-user-name">
+        Welcome<span className="bold">{user}</span>
+      </h1>
+      <section className="column-right" id="create-new-workout">
+        <h3
+          className="create-new-workout"
+          onClick={() => {
+            navigate("/create");
+          }}
+        >
+          Create Your Workout
+        </h3>
+        <h3
+          className="program-workout"
+          onClick={() => {
+            navigate("/program");
+          }}
+        >
+          Programs
+        </h3>
+        <h3
+          className="random-workout"
+          onClick={() => {
+            navigate("/random");
+          }}
+        >
+          Workout Generator
+        </h3>
+        <h3
+          className="see-stats"
+          onClick={() => {
+            navigate("/stats");
+          }}
+        >
+          See Stats
+        </h3>
+      </section>
+    </div>
   );
 };
