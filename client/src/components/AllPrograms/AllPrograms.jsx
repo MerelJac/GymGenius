@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { ProgramSelect } from "../ProgramSelect/ProgramSelect";
 
 export const AllPrograms = (props) => {
-  // use state to gather exercise divs?
-  const [programs, setPrograms] = useState([])
-  // use effect to call database?
+  const [programs, setPrograms] = useState([]);
 
   useEffect(() => {
     getAllPrograms();
@@ -11,10 +10,12 @@ export const AllPrograms = (props) => {
 
   const getAllPrograms = () => {
     fetch(`/api/program`)
-      .then((response) => response.json)
+      .then((response) => response.json())
       .then((data) => {
-        console.log(data)
-        setPrograms(data)
+        const newPrograms = data.map((element) => (
+          <ProgramSelect title={element.title} id={element.program_id} />
+        ));
+        setPrograms(newPrograms);
       })
       .catch((err) => console.error(err));
   };
@@ -23,11 +24,11 @@ export const AllPrograms = (props) => {
     <>
       <h2>Select Program</h2>
       <div>
-        {/* <ul>
-          {programs.map((program) =>  (
-            <li key={program.id}>{program.title}</li>
+        <ul>
+          {programs.map((program) => (
+            <li key={program.length}>{program}</li>
           ))}
-        </ul> */}
+        </ul>
       </div>
     </>
   );

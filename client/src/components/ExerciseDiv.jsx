@@ -99,7 +99,6 @@ export const ExerciseDiv = (props) => {
   ));
 
   return (
-    <>
       <div
         className="background-exercise-div text-black flex flex-col items-center px-4 py-2 my-2"
         id={props.id}
@@ -154,6 +153,5 @@ export const ExerciseDiv = (props) => {
           <ul className="flex flex-row justify-end">{listOfSets}</ul>
         </section>
       </div>
-    </>
   );
 };

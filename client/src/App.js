@@ -17,6 +17,7 @@ import { RandomGenerator } from "./components/Random";
 
 import { auth } from "./utils/auth";
 import { AllPrograms } from "./components/AllPrograms/AllPrograms";
+import { ProgramRenderWorkouts } from "./components/ProgramRenderWorkout/ProgramRenderWorkout";
 
 function App() {
   const [authStatus, setAuthStatus] = useState(false);
@@ -43,6 +44,7 @@ function App() {
               <Route exact path="/home" element={<Dashboard />} />
               <Route exact path="/create" element={<Create />} />
               <Route exact path='/program' element={<AllPrograms />} />
+              <Route exact path='/start-program/:id' element={<ProgramRenderWorkouts />} />
               <Route exact path="/random" element={<RandomGenerator />} />
               <Route exact path="/stats" element={<SeeStatsPage />} />
               <Route exact path="/account-info" element={<AccountOptions />} />

@@ -25,4 +25,23 @@ router.post("/:id", async (req, res) => {
     }
 });
 
+// delete program by id
+router.delete("/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const deleteProgram = await Programs.findOneAndDelete({ program_id: id });
+
+    if (!deleteProgram) {
+      return res.status(404).json({ message: "Program not found." });
+    }
+    res.status(200).json({ message: "Program deleted successfully." });
+  } catch (err) {
+    console.error(err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while deleting the program." });
+  }
+});
+
+
 module.exports = router;
