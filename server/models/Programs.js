@@ -16,13 +16,15 @@ const programSchema = new Schema({
 const Programs = model("Programs", programSchema);
 
 Programs.create({
-  program_id: "6548604831fdb24902aa00b4",
+  program_id: "6548604831fdb24902aa00b6",
   title: "Fall Back",
   workouts: [
-    "Barbell Hip Thrusts",
-    "High Plank Mountain Climbers",
-    "Heels Elevated Front Squats",
-    "Lateral Lunge to Balance",
+    {
+      day_1: ["Barbell Hip Thrusts", "High Plank Mountain Climbers", "Heels Elevated Front Squats", "Lateral Lunge to Balance"]
+    },
+    {
+      day_2: ["Barbell Hip Thrusts", "High Plank Mountain Climbers", "Heels Elevated Front Squats", "Lateral Lunge to Balance"]
+    }
   ],
 })
   .then((result) => console.log("Program 1 seeded", result))
