@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-// import { ExerciseDiv } from "./ExerciseDiv";
+import { ExerciseDiv } from "../ExerciseDiv";
 import { useNavigate, useParams } from "react-router-dom";
 
 export const ProgramRenderWorkouts = () => {
-    const { id } = useParams();
+  const { id } = useParams();
+  const [arrayOfUpdatedOneRepMaxes, setArrayOfUpdatedOneRepMaxes] = useState([])
   const [userId, setUserId] = useState("");
+  const [exerciseDivs, setExerciseDivs] = useState([])
   const navigate = useNavigate();
+  let newExerciseDiv;
 
   useEffect(() => {
     const userId = localStorage.getItem("id");
@@ -15,129 +18,102 @@ export const ProgramRenderWorkouts = () => {
 
   const findProgram = (id) => {
     try {
-        const requestOptions = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          };
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      };
       fetch(`/api/program/${id}`, requestOptions)
         .then((response) => response.json())
         .then((data) => {
-            console.log(data)
-            // for each exercise , either new or create 
-            // push to array 
-            // render array in div 
+          console.log(data);
+          const workoutData = data.data.workouts;
+          queryWorkout(workoutData);
+          // for each exercise , either new or create
+          // push to array
+          // render array in div
         });
     } catch (err) {
       console.error(err);
     }
   };
 
+  const queryWorkout = (workoutArray) => {
+    Object.keys(workoutArray).forEach((key) => {
+      console.log(`key: ${key}, value: ${workoutArray[key]}`);
+      let title = JSON.stringify(workoutArray[key]);
+      console.log(title)
+      console.log(typeof(title))
+      let searchName = title.replace(/\s/g, "");
+      searchDbForTitle(searchName, title);
 
-//   const fetchAndProcessExercises = async (option) => {
-//     try {
-//       const data = await fetchExerciseAPIData(option);
-//       let limitedExercises;
+      if (typeof workoutArray[key] === "object" && workoutArray[key] !== null) {
+        queryWorkout(workoutArray[key]);
+      }
+    });
+  };
 
-//       const exercisePromises = limitedExercises.map((exercise) =>
-//         fetchAndProcessExercise(exercise)
-//       );
+  // add user to this query
+  const searchDbForTitle = (string, title) => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: string }),
+    };
 
-//       Promise.all(exercisePromises).then((exerciseDivs) => {
-//         setArrayOfExercises(exerciseDivs);
-//       });
-//     } catch (error) {
-//       console.error("Error fetching exercise data:", error);
-//     }
-//   };
+    try {
+      fetch(`/api/exercise/${string}`, requestOptions)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          if (data.message === "Yes") {
+            newExerciseDiv = (
+              <ExerciseDiv
+                passData={passData}
+                id={data.exercise._id}
+                key={data.length}
+                title={data.exercise.full_name}
+                oneRepMax={data.exercise.one_rep_max}
+              />
+            );
+            return setExerciseDivs([ newExerciseDiv, ...exerciseDivs])
+          } else if (data.message === 'No') {
+            const requestOptions = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  full_name: title,
+                  search_name: string,
+                  one_rep_max: 0,
+                  userID: userId,
+                }),
+              };
+              fetch("/api/exercise", requestOptions)
+              .then((response) => response.json())
+              .then((data) => {
+                newExerciseDiv = (
+                  <ExerciseDiv
+                    passData={passData}
+                    id={data._id}
+                    key={exerciseDivs.length}
+                    title={title}
+                    oneRepMax={data.one_rep_max}
+                  />
+                );
+                return setExerciseDivs([newExerciseDiv, ...exerciseDivs]);
+              }); 
+          }
+        });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  // query DB for exercise
 
-//   const fetchAndProcessExercise = async (exercise) => {
-//     const saveItem = exercise;
-
-//     const requestOptions = {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify({ title: searchTitle }),
-//     };
-
-//     try {
-//       const response = await fetch(
-//         `/api/exercise/${searchTitle}`,
-//         requestOptions
-//       );
-
-//       const data = await response.json();
-
-//       if (data.message === "Yes") {
-//         return (
-//           <ExerciseDiv
-//             passData={passData}
-//             key={data.exercise.id}
-//             gifyLink={saveItem.link}
-//             equip={saveItem.equip}
-//             targetMuscle={saveItem.target}
-//             id={data.exercise.id}
-//             title={data.exercise.full_name}
-//             oneRepMax={data.exercise.one_rep_max}
-//           />
-//         );
-//       } else if (data.message === "No") {
-//         const newExercise = {
-//           full_name: sanitizeName,
-//           parsed_name: parsed_name,
-//           search_name: searchTitle,
-//           one_rep_max: 0,
-//           userID: userId,
-//         };
-
-//         const createdExercise = await createExercise(newExercise);
-
-//         return (
-//           <ExerciseDiv
-//             passData={passData}
-//             key={createdExercise.id}
-//             gifyLink={saveItem.link}
-//             equip={saveItem.equip}
-//             targetMuscle={saveItem.target}
-//             id={createdExercise.id}
-//             title={createdExercise.full_name}
-//             oneRepMax={createdExercise.one_rep_max}
-//           />
-//         );
-//       } else {
-//         console.log("error");
-//         return null;
-//       }
-//     } catch (error) {
-//       console.error("Error fetching exercise data:", error);
-//       return null;
-//     }
-//   };
-
-//   const createExercise = async (exercise) => {
-//     const requestOptions = {
-//       method: "POST",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify(exercise),
-//     };
-
-//     try {
-//       const response = await fetch("/api/exercise", requestOptions);
-
-//       const data = await response.json();
-//       return data;
-//     } catch (error) {
-//       console.error("Error creating exercise:", error);
-//     }
-//   };
-
-//   const passData = (data) => {
-//     const id = data.id;
-//     const update1RM = data.new1RM;
-//     setArrayOfUpdatedOneRepMaxes((arrayOfUpdatedOneRepMaxes) => [
-//       ...arrayOfUpdatedOneRepMaxes,
-//       { id, update1RM },
-//     ]);
-//   };
+    const passData = (data) => {
+        const id = data.id;
+        const update1RM = data.new1RM;
+        setArrayOfUpdatedOneRepMaxes((arrayOfUpdatedOneRepMaxes) => [...arrayOfUpdatedOneRepMaxes, { id, update1RM }]);
+      };
 
   const putWorkout = async (array) => {
     await array.forEach((object) => {
@@ -163,7 +139,6 @@ export const ProgramRenderWorkouts = () => {
     navigate("/home");
   };
 
-
   return (
     <>
       <section>
@@ -173,7 +148,7 @@ export const ProgramRenderWorkouts = () => {
         <p>day?</p>
       </section>
 
-      <section className="p-4">test</section>
+      <section className="p-4">{exerciseDivs}</section>
       <div className="flex justify-center">
         <button
           className="small-footer bottom-div save-workout text-white bg-gray-700 hover:bg-black-800 focus:ring-4 focus:outline-none focus:ring-black-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-black-600 dark:hover-bg-black-700 dark:focus-ring-black-800"
