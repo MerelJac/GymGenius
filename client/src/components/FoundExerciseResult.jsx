@@ -32,7 +32,7 @@ export const OneRepMaxStats = (props) => {
   };
 
   return (
-    <>
+
       <div
         className=" w-full text-black flex flex-col items-center background-exercise-div px-4 py-2 mx-4 my-2"
         id={props.id}
@@ -65,7 +65,5 @@ export const OneRepMaxStats = (props) => {
           </div>
         </section>
       </div>
-
-    </>
   );
 };

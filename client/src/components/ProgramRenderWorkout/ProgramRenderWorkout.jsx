@@ -151,7 +151,7 @@ export const ProgramRenderWorkouts = () => {
   };
 
   const saveWorkout = () => {
-    putWorkout();
+    putWorkout(arrayOfUpdatedOneRepMaxes);
     navigate("/home");
   };
 
