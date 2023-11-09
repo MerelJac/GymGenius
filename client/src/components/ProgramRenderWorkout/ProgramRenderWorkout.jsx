@@ -4,9 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 
 export const ProgramRenderWorkouts = () => {
   const { id } = useParams();
-  const [arrayOfUpdatedOneRepMaxes, setArrayOfUpdatedOneRepMaxes] = useState([])
+  const [arrayOfUpdatedOneRepMaxes, setArrayOfUpdatedOneRepMaxes] = useState([]);
   const [userId, setUserId] = useState("");
-  const [exerciseDivs, setExerciseDivs] = useState([])
+  const [exerciseDivs, setExerciseDivs] = useState([]);
   const navigate = useNavigate();
   let newExerciseDiv;
 
@@ -26,94 +26,111 @@ export const ProgramRenderWorkouts = () => {
         .then((response) => response.json())
         .then((data) => {
           console.log(data);
+          const day = 0;
           const workoutData = data.data.workouts;
-          queryWorkout(workoutData);
-          // for each exercise , either new or create
-          // push to array
-          // render array in div
+          fetchAndProcessExercises(workoutData[day]);
         });
     } catch (err) {
       console.error(err);
     }
   };
 
-  const queryWorkout = (workoutArray) => {
-    Object.keys(workoutArray).forEach((key) => {
-      console.log(`key: ${key}, value: ${workoutArray[key]}`);
-      let title = JSON.stringify(workoutArray[key]);
-      console.log(title)
-      console.log(typeof(title))
-      let searchName = title.replace(/\s/g, "");
-      searchDbForTitle(searchName, title);
+  const fetchAndProcessExercises = async (workoutArray) => {
+    try {
+      const exercisePromises = workoutArray.map((exerciseTitle) =>
+        fetchAndProcessExercise(exerciseTitle)
+      );
 
-      if (typeof workoutArray[key] === "object" && workoutArray[key] !== null) {
-        queryWorkout(workoutArray[key]);
-      }
-    });
+      Promise.all(exercisePromises).then((exerciseDivs) => {
+        setExerciseDivs(exerciseDivs);
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  // add user to this query
-  const searchDbForTitle = (string, title) => {
+  const fetchAndProcessExercise = async (exerciseTitle) => {
+    const searchTitle = exerciseTitle.replace(/\s/g, "");
+
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: string }),
+      body: JSON.stringify({ title: searchTitle }),
     };
 
     try {
-      fetch(`/api/exercise/${string}`, requestOptions)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          if (data.message === "Yes") {
-            newExerciseDiv = (
-              <ExerciseDiv
-                passData={passData}
-                id={data.exercise._id}
-                key={data.length}
-                title={data.exercise.full_name}
-                oneRepMax={data.exercise.one_rep_max}
-              />
-            );
-            return setExerciseDivs([ newExerciseDiv, ...exerciseDivs])
-          } else if (data.message === 'No') {
-            const requestOptions = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  full_name: title,
-                  search_name: string,
-                  one_rep_max: 0,
-                  userID: userId,
-                }),
-              };
-              fetch("/api/exercise", requestOptions)
-              .then((response) => response.json())
-              .then((data) => {
-                newExerciseDiv = (
-                  <ExerciseDiv
-                    passData={passData}
-                    id={data._id}
-                    key={exerciseDivs.length}
-                    title={title}
-                    oneRepMax={data.one_rep_max}
-                  />
-                );
-                return setExerciseDivs([newExerciseDiv, ...exerciseDivs]);
-              }); 
-          }
-        });
-    } catch (err) {
-      console.error(err);
+      const response = await fetch(
+        `/api/exercise/${searchTitle}`,
+        requestOptions
+      );
+
+      const data = await response.json();
+
+      if (data.message === "Yes") {
+        return (
+          <ExerciseDiv
+            passData={passData}
+            id={data.exercise._id}
+            key={data.exercise._id}
+            title={data.exercise.full_name}
+            oneRepMax={data.exercise.one_rep_max}
+          />
+        );
+      } else if (data.message === "No") {
+        const newExercise = {
+          full_name: exerciseTitle,
+          search_name: searchTitle,
+          one_rep_max: 0,
+          userID: userId,
+        };
+
+        const createdExercise = await createExercise(newExercise);
+
+        return (
+          <ExerciseDiv
+            passData={passData}
+            key={createdExercise.id}
+            id={createdExercise.id}
+            title={createdExercise.full_name}
+            oneRepMax={createdExercise.one_rep_max}
+          />
+        );
+      } else {
+        console.log("error");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching exercise data:", error);
+      return null;
     }
   };
-  // query DB for exercise
 
-    const passData = (data) => {
-        const id = data.id;
-        const update1RM = data.new1RM;
-        setArrayOfUpdatedOneRepMaxes((arrayOfUpdatedOneRepMaxes) => [...arrayOfUpdatedOneRepMaxes, { id, update1RM }]);
-      };
+  const createExercise = async (exercise) => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(exercise),
+    };
+
+    try {
+      const response = await fetch("/api/exercise", requestOptions);
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating exercise:", error);
+    }
+  };
+
+  // query DB for exercise
+  const passData = (data) => {
+    const id = data.id;
+    const update1RM = data.new1RM;
+    setArrayOfUpdatedOneRepMaxes((arrayOfUpdatedOneRepMaxes) => [
+      ...arrayOfUpdatedOneRepMaxes,
+      { id, update1RM },
+    ]);
+  };
 
   const putWorkout = async (array) => {
     await array.forEach((object) => {
@@ -129,7 +146,6 @@ export const ProgramRenderWorkouts = () => {
           }
           return response.json();
         })
-        // .then((data) => console.log(data))
         .catch((error) => console.error("Error:", error));
     });
   };
