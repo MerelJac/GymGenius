@@ -7,10 +7,6 @@ export const Create = () => {
   const [exerciseDivs, setExerciseDivs] = useState([]);
   const [userId, setUserId] = useState('')
   const navigate = useNavigate()
-
-
-
-
   const [arrayOfUpdatedOneRepMaxes, setArrayOfUpdatedOneRepMaxes] = useState([])
   // global variable
   let newExerciseDiv;
