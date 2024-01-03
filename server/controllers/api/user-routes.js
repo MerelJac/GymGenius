@@ -66,7 +66,6 @@ router.delete("/:id", async (req, res) => {
 
 // Login / Set Token
 router.post("/login", async (req, res) => {
-  console.log('login hit')
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
