@@ -68,6 +68,7 @@ export const Dashboard = () => {
             className="create-new-workout"
             onClick={() => {
               navigate('/create')
+
             }}
           >
             Create Your Workout
