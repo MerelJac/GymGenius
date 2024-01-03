@@ -1,4 +1,5 @@
-const { connect, connection } = require('mongoose');
+import pkg from 'mongoose';
+const { connect, connection } = pkg;
 
 // Wrap Mongoose around local connection to MongoDB
 const connectionString =
@@ -6,4 +7,4 @@ const connectionString =
 
 connect(connectionString);
 
-module.exports = connection;
+export default connection;

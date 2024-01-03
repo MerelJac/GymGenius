@@ -1,9 +1,12 @@
 const router = require("express").Router();
 
-const userRoutes = require("./user-routes");
-const exerciseRoutes = require('./exercise-routes')
+import userRoutes from "./user-routes";
+import exerciseRoutes from './exercise-routes';
 
 router.use("/user-routes", userRoutes);
 router.use("/exercise", exerciseRoutes)
 
+// module.exports = router;;
 module.exports = router;
+export * from './user-routes.js';
+export * from './exercise-routes.js';

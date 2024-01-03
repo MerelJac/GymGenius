@@ -1,8 +1,8 @@
 const router = require("express").Router();
-const withAuth = require("../../config/auth.config")
+import withAuth from "../../config/auth.config";
 // goes to folder / index file, not direct path
-const { User } = require("../../models");
-const jwt = require("jsonwebtoken");
+import { User } from "../../models";
+import { sign, verify } from "jsonwebtoken";
 // for env secret
 require("dotenv").config();
 // for JWT
@@ -30,7 +30,7 @@ router.post("/", async (req, res) => {
           first_name: newUser.first_name,
         },
       };
-      const token = jwt.sign(payload, secret, {
+      const token = sign(payload, secret, {
         expiresIn: "1h",
       });
       res.json(token);
@@ -82,7 +82,7 @@ router.post("/login", async (req, res) => {
     } else {
       // issue token
       const payload = { user };
-      const token = jwt.sign(payload, secret, {
+      const token = sign(payload, secret, {
         expiresIn: "1h",
       });
       res.json(token);
@@ -101,7 +101,7 @@ const verifyToken = (req, res, next) => {
     return res.status(401).json({ message: "Authorization token is missing." });
   }
 
-  jwt.verify(token, secret, (err, decoded) => {
+  verify(token, secret, (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: "Invalid token.", err });
     }
@@ -122,4 +122,5 @@ router.get("/check-token", verifyToken, (req, res) => {
   res.json(returnObject);
 });
 
-module.exports = router;
+module.exports = router;;
+

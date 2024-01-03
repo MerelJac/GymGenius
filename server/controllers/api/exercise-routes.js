@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Exercise } = require('../../models')
+import { Exercise } from '../../models';
 
 
 // TODO - add user foreign keys
@@ -68,4 +68,5 @@ router.put('/:id', async (req, res) => {
     }
   });
   
+// module.exports = router;;
 module.exports = router;

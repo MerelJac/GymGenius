@@ -65,3 +65,5 @@ The Fitness App is continually evolving. Here are some potential future developm
 - **Fitness Tracker Integration**: We aim to integrate fitness trackers to provide users with real-time data on their workouts and physical activity.
 
 We're committed to improving and expanding the Fitness App to better serve your fitness goals and needs. Stay tuned for these exciting updates!
+
+
