@@ -1,6 +1,19 @@
 import React, { useState } from "react";
 import "../assets/css/login.css";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+
+const handleLogin = async () => {
+  try {
+    // Gets authentication url from backend server
+    const { data: { url } } = await axios.get(`/auth/url`);
+    // Navigate to consent screen
+    window.location.assign(url);
+  } catch (err) {
+    console.error(err);
+  }
+}
 
 // login function to send to API / backend
 async function loginUser(credentials, setMessage, navigate) {
@@ -87,6 +100,7 @@ export const Login = () => {
         >
           Don't have an account? Register here.
         </button>
+        <button onClick={handleLogin}><h1>Welcome<span className="bold">Back</span></h1></button>
       </div>
     </div>
   );

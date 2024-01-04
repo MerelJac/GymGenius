@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext, user } from "../App";
 // TODO should include user info eventally
 
 // TODO - get inital from logged in user. only show account if logged in is true
-
 
 
 export const Header = (props) => {
