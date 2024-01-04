@@ -14,6 +14,8 @@ The Fitness App is a web application designed to help users create and manage th
 
 - **Workout Suggestions**: Based on their past workout history, users receive workout suggestions to keep their routines fresh and challenging.
 
+[View the Deployed Application](http://www.thegymgenius.com)
+
 ## Getting Started
 
 To get started with the Fitness App, follow these steps:
