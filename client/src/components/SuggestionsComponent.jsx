@@ -8,13 +8,19 @@ import { getAllExercisesForOneUser } from "../utils/searchFunctionAllExercises";
 import { suggestionsGrip } from "../utils/suggestionsGrip";
 import { suggestionsBench } from "../utils/suggestionsBench";
 import { suggestionsBalance } from "../utils/suggestionsBalance";
+import { suggestionTempo } from "../utils/suggestionTempo";
 //get all exercises for that user, run this function with useEffect and print suggestions
 
 export const SuggestionsComponent = () => {
   const [balance, setBalance] = useState("");
   const [grip, setGrip] = useState("");
   const [bench, setBench] = useState("");
+  const [tempo, setTempo] = useState("");
   const [open, setOpen] = React.useState(1);
+  const [gripText, setGripText] = useState("");
+  const [balanceText, setBalanceText] = useState("");
+  const [benchText, setBenchText] = useState("");
+  const [tempoText, setTempoText] = useState("");
 
   const handleOpen = (value) => setOpen(open === value ? 0 : value);
 
@@ -28,56 +34,153 @@ export const SuggestionsComponent = () => {
           arrayForSuggestions.push(element.full_name);
         });
         const gripSuggestions = suggestionsGrip(arrayForSuggestions);
-        console.log(gripSuggestions[0])
         setGrip(gripSuggestions[0]);
+        findGripText(gripSuggestions[0]);
         const benchSuggestions = suggestionsBench(arrayForSuggestions);
         setBench(benchSuggestions[0]);
+        findBenchText(benchSuggestions[0]);
+        const tempoSuggestions = suggestionTempo(arrayForSuggestions);
+        setTempo(tempoSuggestions[0]);
+        findTempoText(tempoSuggestions[0]);
         const balanceSuggestions = suggestionsBalance(arrayForSuggestions);
         if (balanceSuggestions[0] === "Single") {
           setBalance(`Single Side`);
+          setBalanceText(
+            "Training one side at a time will help with some inbalances."
+          );
         } else {
           setBalance(balanceSuggestions[0]);
+          findBalanceText(balanceSuggestions[0]);
         }
       } catch (err) {
-        console.log('error', err)
+        console.log("error", err);
         console.error(err);
       }
     };
     fetchData();
   }, []);
 
+  const findBalanceText = (balance) => {
+    switch (balance) {
+      case "Single":
+        setBalanceText(
+          "Training one side at a time will help with some inbalances"
+        );
+        break;
+      case "Alternating":
+        setBalanceText("Work opposites");
+        break;
+      case "Reciprocating":
+        setBalanceText(
+          "Think alternating but like a pulley system - you'll feel it in your core, as well"
+        );
+        break;
+      case "Unilateral":
+        setBalanceText("Train one side at a time. Focus!");
+        break;
+      default:
+        setBalanceText("");
+    }
+  };
+
+  const findBenchText = (bench) => {
+    switch (bench) {
+      case "Decline":
+        setBenchText(
+          "For example, a delcine push up is when your feet are on a bench."
+        );
+        break;
+      case "Incline":
+        setBenchText(
+          "For example, position the bench to slightly lean back for a chest/shoulder press and target more of the front of the shoulder."
+        );
+        break;
+      case "Flat":
+        setBenchText("Keep it classic.");
+        break;
+      default:
+        setBenchText("");
+    }
+  };
+
+  const findGripText = (grip) => {
+    switch (grip) {
+      case "Close":
+        setGripText("Keep your hands or feet close to eachother.");
+        break;
+      case "Narrow":
+        setGripText("Keep your hands or feet close to eachother.");
+        break;
+      case "Nautral":
+        setGripText("Position just about shoulder width apart.");
+        break;
+      case "Wide":
+        setGripText("Keep your hands or feet far apart!");
+        break;
+      case "Reverse":
+        setGripText(
+          "Alternative what's normal. For exaxmple: a reverse bicep curl has your palms facing the floor."
+        );
+        break;
+      default:
+        setGripText("");
+    }
+  };
+
+  const findTempoText = (tempo) => {
+    switch (tempo) {
+      case "Eccentric":
+        setTempoText(
+          "Whenever you lower the move, go super slow. Increase time under tension."
+        );
+        break;
+      case "Slow":
+        setTempoText(
+          "Whenever you lower the move, go super slow. Increase time under tension."
+        );
+        break;
+      case "Pulse":
+        setTempoText("Quick and small movements - feel the burn.");
+        break;
+      case "Nautral":
+        setTempoText("Position just about shoulder width apart.");
+        break;
+      case "Pulsing":
+        setTempoText("Quick and small movements - feel the burn.");
+        break;
+      default:
+        setTempoText("");
+    }
+  };
+
   return (
     <>
       <Accordion open={open === 1}>
-        <AccordionHeader onClick={() => handleOpen(1)}>
-          Bench
-        </AccordionHeader>
-        <AccordionBody>Suggestion: {bench} Bench <br></br>
-        Sit back, relax, and your incline bench will kick your ass. Elevate your toes in a squat or deadlift. The options are endless. 
+        <AccordionHeader onClick={() => handleOpen(1)}>Bench</AccordionHeader>
+        <AccordionBody>
+          Suggestion: {bench} Bench <br></br>
+          {benchText}
         </AccordionBody>
       </Accordion>
       <Accordion open={open === 2}>
-        <AccordionHeader onClick={() => handleOpen(2)}>
-          Grip
-        </AccordionHeader>
-        <AccordionBody>Suggestion: {grip} Grip <br></br>
-        Try a bicep curl with your palms facing the floor (reverse grip) or a chest press with your hands really close together (close grip). Feel the difference & keep checking your suggestions. 
+        <AccordionHeader onClick={() => handleOpen(2)}>Grip</AccordionHeader>
+        <AccordionBody>
+          Suggestion: {grip} Grip <br></br>
+          {gripText}
         </AccordionBody>
       </Accordion>
       <Accordion open={open === 3}>
-        <AccordionHeader onClick={() => handleOpen(3)}>
-          Balance
-        </AccordionHeader>
-        <AccordionBody>Suggestion: {balance} <br></br>
-        Strengthen your balance and stability by working one side of your body at a time, or balancing on one leg. This will help strengthen your ankles and prevent risk of injury over time. 
+        <AccordionHeader onClick={() => handleOpen(3)}>Balance</AccordionHeader>
+        <AccordionBody>
+          Suggestion: {balance} <br></br>
+          {balanceText}
         </AccordionBody>
       </Accordion>
       <Accordion open={open === 4}>
-        <AccordionHeader onClick={() => handleOpen(4)}>
-          Tempo
-        </AccordionHeader>
-        <AccordionBody><span className="font-bold">Slowww</span>: Have you tried going really slow on the way down? You can gain a lot of strengh if you control the lowering of the weight. Example: slowly squat down or slowly lower the bicep curl. It's called 'Eccentric'!<br></br>
-        <span className="font-bold">Speed it the f*** up: </span>Add some power & feel the burn!
+        <AccordionHeader onClick={() => handleOpen(4)}>Tempo</AccordionHeader>
+        <AccordionBody>
+          Suggestion: {tempo} <br></br>
+          {tempoText}
         </AccordionBody>
       </Accordion>
     </>
