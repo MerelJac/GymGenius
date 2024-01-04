@@ -32,7 +32,9 @@ export const Register = (props) => {
         // remove current token
         localStorage.clear();
         // set new token
-        localStorage.setItem("token", JSON.stringify(data));
+        localStorage.setItem("token", JSON.stringify(data.token));
+        localStorage.setItem("id", JSON.stringify(data.newUserId));
+
         navigate("/home");
       } else if (response.status === 400) {
         setMessage("Already making gains with that email.");

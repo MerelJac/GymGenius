@@ -16,7 +16,9 @@ async function loginUser(credentials, setMessage, navigate) {
     if (response.status === 200) {
       const data = await response.json();
       localStorage.clear();
-      localStorage.setItem("token", JSON.stringify(data));
+      localStorage.setItem("token", JSON.stringify(data.token));
+      localStorage.setItem("id", JSON.stringify(data.userId));
+
       navigate('/home')
     } else if (response.status === 401) {
       setMessage("Incorrect username or password");

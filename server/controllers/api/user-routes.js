@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const newUser = await User.create(req.body);
-    console.log("new user was created: " + newUser);
+    const newUserId = newUser.id
     // issue token
     if (!newUser) {
       res.json({ message: "Error creating user" });
@@ -33,7 +33,7 @@ router.post("/", async (req, res) => {
       const token = jwt.sign(payload, secret, {
         expiresIn: "1h",
       });
-      res.json(token);
+      res.status(200).json({token, newUserId});
     }
   } catch (error) {
     if (error.code === 11000) {
@@ -69,6 +69,7 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
+    const userId = user._id;
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password." });
     }
@@ -84,7 +85,7 @@ router.post("/login", async (req, res) => {
       const token = jwt.sign(payload, secret, {
         expiresIn: "1h",
       });
-      res.json(token);
+      res.json({token, userId});
     }
   } catch (error) {
     return res

@@ -39,9 +39,10 @@ export const Dashboard = () => {
     isAuthenticated().then((authenticated) => {
       if (authenticated) {
         setAuthenticated(authenticated);
+        console.log(authenticated)
         const authenticatedUsername = authenticated.user;
         const authenticatedId = authenticated.id;
-        localStorage.setItem("id", authenticatedId);
+        // localStorage.setItem("id", authenticatedId);
         localStorage.setItem('username', authenticatedUsername)
         setUser(authenticatedUsername);
       } else {
