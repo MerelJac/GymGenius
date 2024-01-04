@@ -10,6 +10,7 @@ export const Create = () => {
   const [arrayOfUpdatedOneRepMaxes, setArrayOfUpdatedOneRepMaxes] = useState([])
   // global variable
   let newExerciseDiv;
+  const userIdLocal = localStorage.getItem('id')
 
   useEffect(() => {
     const userId = localStorage.getItem('id')
@@ -39,7 +40,7 @@ export const Create = () => {
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: searchTitle }),
+      body: JSON.stringify({ title: searchTitle, userIdNumber: userIdLocal }),
     };
     fetch(`/api/exercise/${searchTitle}`, requestOptions)
       .then((response) => response.json())
@@ -66,7 +67,7 @@ export const Create = () => {
               parsed_name: parsed_name,
               search_name: searchTitle,
               one_rep_max: 0,
-              userID: userId
+              userID: userIdLocal
             }),
           };
           fetch("/api/exercise", requestOptions)

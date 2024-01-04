@@ -29,11 +29,13 @@ router.post('/', async (req, res) => {
     }
 })
 
-// find exercise by name
+// find exercise by name and user
 router.post('/:title', async (req, res) => {
     try{
-    const exerciseName = req.params.title
-    const exercise = await Exercise.findOne({search_name: exerciseName});
+    const exerciseName = req.params.title;
+    const userIdNum = req.body.userIdNumber
+    console.log(userIdNum)
+    const exercise = await Exercise.findOne({search_name: exerciseName, userID: userIdNum});
     if (exercise) {
         res.json({message: 'Yes', exercise})
     } else {
