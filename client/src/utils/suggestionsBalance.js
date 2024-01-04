@@ -24,3 +24,5 @@ export const suggestionsBalance = (array) => {
   balanceArray.sort((a, b) => balanceCount[a] - balanceCount[b]);
   return balanceArray;
 };
+
+
