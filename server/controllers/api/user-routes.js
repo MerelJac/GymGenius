@@ -115,7 +115,6 @@ const verifyToken = (req, res, next) => {
 // Example protected route
 router.get("/check-token", verifyToken, (req, res) => {
   // Access user data from req.user
-  console.log(req);
   const username = req.user.first_name;
   const userId = req.user.id;
   const returnObject = {user: username, id: userId}

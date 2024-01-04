@@ -30,7 +30,7 @@ async function isAuthenticated() {
   }
 }
 
-export const Dashboard = () => {
+export const Dashboard = ({setUsername}) => {
   const navigate = useNavigate(); // initalize function
   const [authenticated, setAuthenticated] = useState(isAuthenticated());
   const [user, setUser] = useState("");
@@ -39,11 +39,8 @@ export const Dashboard = () => {
     isAuthenticated().then((authenticated) => {
       if (authenticated) {
         setAuthenticated(authenticated);
-        console.log(authenticated)
         const authenticatedUsername = authenticated.user;
-        const authenticatedId = authenticated.id;
-        // localStorage.setItem("id", authenticatedId);
-        localStorage.setItem('username', authenticatedUsername)
+        setUsername(authenticatedUsername)
         setUser(authenticatedUsername);
       } else {
         navigate("/login");
