@@ -23,12 +23,12 @@ function AppContent() {
   const [authStatus, setAuthStatus] = useState(false);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const [username, setUsername] = useState("")
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const response = await auth();
-        console.log(response);
         if (response) {
           setAuthStatus(true);
         }
@@ -36,9 +36,8 @@ function AppContent() {
         setLoading(false);
       }
     };
-
     checkAuth();
-  }, [location.pathname]); // Run the effect whenever the pathname changes
+  }, [location.pathname, username, authStatus]); // Run the effect whenever the pathname changes
 
   if (loading) {
     // TODO: show a loading spinner or something while checking auth
@@ -47,14 +46,14 @@ function AppContent() {
 
   return (
     <div className="App">
-      <Header auth={authStatus} />
+      <Header auth={authStatus}  username={username}/>
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {authStatus ? (
           <>
-            <Route path="/home" element={<Dashboard />} />
+            <Route path="/home" element={<Dashboard setUsername={setUsername} />} />
             <Route path="/create" element={<Create />} />
             <Route path="/random" element={<RandomGenerator />} />
             <Route path="/stats" element={<SeeStatsPage />} />
