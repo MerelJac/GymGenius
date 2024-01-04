@@ -7,7 +7,6 @@ const exerciseSchema = new Schema(
     },
     full_name: {
       type: String,
-      unique: true,
     },
     parsed_name: {
       type: Array,
@@ -26,6 +25,9 @@ const exerciseSchema = new Schema(
     collection: "Exercise",
   }
 );
+
+// ensure each user can only have one exercise of the same title
+exerciseSchema.index({ userID: 1, full_name: 1 }, { unique: true });
 
 // initalize
 const Exercise = model("Exercise", exerciseSchema);
