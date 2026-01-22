@@ -44,6 +44,7 @@ model User {
   exercises         Exercise[]
   scheduledWorkouts ScheduledWorkout[]
   workoutLogs       WorkoutLog[]
+  invitesSent       Invite[]
 }
 
 model Profile {
@@ -181,4 +182,16 @@ model Message {
   content      String
   workoutLogId String?
   createdAt    DateTime @default(now())
+}
+
+model Invite {
+  id        String @id @default(uuid())
+  token     String @unique
+  email     String
+  trainerId String
+  trainer   User   @relation(fields: [trainerId], references: [id])
+
+  accepted  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
 }
