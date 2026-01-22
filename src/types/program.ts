@@ -8,5 +8,5 @@ export type Program = {
   isTemplate?: boolean // future-proofing (duplication)
   version?: number     // for later versioning
 
-  createdAt?: string
+  createdAt?: Date
 }

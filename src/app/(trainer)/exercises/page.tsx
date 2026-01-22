@@ -10,7 +10,7 @@ export default async function ExerciseLibraryPage() {
     <div>
       <div className="flex justify-between mb-4">
         <h1 className="text-xl font-semibold">Exercise Library</h1>
-        <a href="/trainer/exercises/new">Add Exercise</a>
+        <a href="/exercises/new">Add Exercise</a>
       </div>
 
       <ul className="space-y-2">
@@ -21,7 +21,7 @@ export default async function ExerciseLibraryPage() {
               <div className="text-sm text-gray-500">{ex.type}</div>
             </div>
 
-            <a href={`/trainer/exercises/${ex.id}/edit`}>Edit</a>
+            <a href={`/exercises/${ex.id}/edit`}>Edit</a>
           </li>
         ))}
       </ul>

@@ -12,7 +12,7 @@ export default function NewProgramPage() {
       },
     })
 
-    redirect(`/trainer/programs/${program.id}`)
+    redirect(`/programs/${program.id}`)
   }
 
   return (

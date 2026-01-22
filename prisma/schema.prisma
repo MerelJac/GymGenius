@@ -68,11 +68,13 @@ model Exercise {
   videoUrl    String?
   notes       String?
 
-  trainerId String? // null = global default
+  trainerId String?
   trainer   User?   @relation(fields: [trainerId], references: [id])
 
   workoutExercises WorkoutExercise[]
   exerciseLogs     ExerciseLog[]     @relation("ExerciseToLogs")
+
+  @@unique([name, trainerId], name: "exercise_name_trainer_unique")
 }
 
 model Program {
