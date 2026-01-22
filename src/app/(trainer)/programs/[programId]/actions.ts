@@ -5,6 +5,10 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 
+function runRevalidate(programId: string) {
+  revalidatePath(`/trainer/programs/${programId}`)
+}
+
 export async function createWorkout(programId: string) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) throw new Error("Unauthorized")
@@ -21,20 +25,22 @@ export async function createWorkout(programId: string) {
     },
   })
 
-    revalidatePath(`/programs/${programId}`);
+  runRevalidate(programId)
 }
 
-export async function updateWorkoutName(
-  workoutId: string,
-  name: string
+export async function deleteWorkoutExercise(
+  programId: string,
+  workoutExerciseId: string
 ) {
-  await prisma.workoutTemplate.update({
-    where: { id: workoutId },
-    data: { name },
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) throw new Error("Unauthorized")
+
+  await prisma.workoutExercise.delete({
+    where: { id: workoutExerciseId },
   })
+
+  runRevalidate(programId)
 }
-
-
 
 export async function addWorkoutExercise(
   programId: string,
@@ -58,6 +64,21 @@ export async function addWorkoutExercise(
     },
   })
 
-  // 🔥 ensures server + optimistic stay in sync
-  revalidatePath(`/programs/${programId}`)
+  runRevalidate(programId)
+}
+
+export async function updateWorkoutName(
+  programId: string,
+  workoutId: string,
+  name: string
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) throw new Error("Unauthorized")
+
+  await prisma.workoutTemplate.update({
+    where: { id: workoutId },
+    data: { name },
+  })
+
+  runRevalidate(programId)
 }
