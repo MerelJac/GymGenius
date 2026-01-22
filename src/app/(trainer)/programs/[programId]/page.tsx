@@ -42,10 +42,21 @@ export default async function ProgramBuilderPage({
     })),
   };
 
+  const clients = await prisma.user.findMany({
+  where: {
+    trainerId: program.trainerId,
+    role: "CLIENT",
+  },
+  include: {
+    profile: true,
+  },
+});
+
   return (
     <ProgramBuilder
       program={programWithTypedPrescriptions}
       exercises={exercises}
+        clients={clients}
     />
   );
 }

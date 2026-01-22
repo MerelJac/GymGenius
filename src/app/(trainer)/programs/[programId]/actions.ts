@@ -133,3 +133,39 @@ export async function duplicateWorkout(programId: string, workoutId: string) {
 
   return newWorkout.id;
 }
+
+
+export async function assignProgramToClient(
+  programId: string,
+  clientId: string,
+  startDate: Date
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const program = await prisma.program.findUnique({
+    where: { id: programId },
+    include: {
+      workouts: {
+        orderBy: { order: "asc" },
+      },
+    },
+  });
+
+  if (!program) throw new Error("Program not found");
+
+  // Example: 1 workout per day
+  const scheduledWorkouts = program.workouts.map((workout, index) => ({
+    workoutId: workout.id,
+    clientId,
+    scheduledDate: new Date(
+      startDate.getTime() + index * 24 * 60 * 60 * 1000
+    ),
+  }));
+
+  await prisma.scheduledWorkout.createMany({
+    data: scheduledWorkouts,
+  });
+
+  revalidatePath(`/clients/${clientId}`);
+}

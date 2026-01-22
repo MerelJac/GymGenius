@@ -2,6 +2,7 @@
 
 import { useOptimistic, startTransition, useState } from "react";
 import {
+  assignProgramToClient,
   createWorkout,
   deleteWorkout,
   duplicateWorkout,
@@ -10,6 +11,7 @@ import WorkoutCard from "./WorkoutCard";
 import { ProgramWithWorkouts, WorkoutWithExercises } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
 import { updateProgramName } from "../(trainer)/programs/actions";
+import { User } from "@prisma/client";
 
 type WorkoutAction =
   | { type: "add"; workout: WorkoutWithExercises }
@@ -18,9 +20,11 @@ type WorkoutAction =
 export default function ProgramBuilder({
   program,
   exercises,
+  clients
 }: {
   program: ProgramWithWorkouts;
   exercises: Exercise[];
+  clients: User[];
 }) {
   const [optimisticWorkouts, updateOptimisticWorkouts] = useOptimistic<
     WorkoutWithExercises[],
@@ -39,13 +43,20 @@ export default function ProgramBuilder({
   });
   const [editingName, setEditingName] = useState(false);
   const [programName, setProgramName] = useState(program.name);
-
+  const [clientId, setClientId] = useState("");
+  const [startDate, setStartDate] = useState("");
   async function saveProgramName() {
     setEditingName(false);
 
     startTransition(() => {
       updateProgramName(program.id, programName);
     });
+  }
+
+  async function handleAssign() {
+    if (!clientId || !startDate) return;
+
+    await assignProgramToClient(program.id, clientId, new Date(startDate));
   }
 
   async function handleAddWorkout() {
@@ -106,12 +117,39 @@ export default function ProgramBuilder({
           autoFocus
         />
       ) : (
-        <h1
-          className="text-2xl font-semibold cursor-pointer hover:underline"
-          onClick={() => setEditingName(true)}
-        >
-          {programName}
-        </h1>
+        <>
+          <h1
+            className="text-2xl font-semibold cursor-pointer hover:underline"
+            onClick={() => setEditingName(true)}
+          >
+            {programName}
+          </h1>
+          <div className="flex gap-2 items-center">
+            <select
+              value={clientId}
+              onChange={(e) => setClientId(e.target.value)}
+              className="border px-2 py-1"
+            >
+              <option value="">Assign to client…</option>
+              {clients.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.email}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="border px-2 py-1"
+            />
+
+            <button onClick={handleAssign} className="border px-3 py-1 rounded">
+              Assign
+            </button>
+          </div>
+        </>
       )}
 
       <button onClick={handleAddWorkout} className="border px-3 py-1 rounded">
