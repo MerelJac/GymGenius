@@ -6,8 +6,19 @@ import {
   updateWorkoutName,
   deleteWorkoutExercise,
 } from "../(trainer)/programs/[programId]/actions";
+import { WorkoutWithExercises } from "@/types/workout";
+import { Exercise } from "@/types/exercise";
+import { buildPrescribed, formatPrescribed } from "../utils/prescriptionFormatter";
 
-export default function WorkoutCard({ workout, exercises, programId }) {
+export default function WorkoutCard({
+  workout,
+  exercises,
+  programId,
+}: {
+  workout: WorkoutWithExercises;
+  exercises: Exercise[];
+  programId: string;
+}) {
   const [exerciseId, setExerciseId] = useState(exercises[0]?.id);
   const [sets, setSets] = useState(3);
   const [reps, setReps] = useState(10);
@@ -24,52 +35,49 @@ export default function WorkoutCard({ workout, exercises, programId }) {
     });
   }
 
-  const [optimisticExercises, updateOptimisticExercises] = useOptimistic(
-    workout.exercises,
-    (state, action) => {
-      if (action.type === "add") {
-        return [...state, action.exercise];
-      }
+  type WorkoutExercise = WorkoutWithExercises["exercises"][number];
 
-      if (action.type === "remove") {
-        return state.filter((we) => we.id !== action.id);
-      }
+  type OptimisticExerciseAction =
+    | { type: "add"; exercise: WorkoutExercise }
+    | { type: "remove"; id: string };
 
-      return state;
-    },
-  );
+  const [optimisticExercises, updateOptimisticExercises] = useOptimistic<
+    WorkoutWithExercises["exercises"],
+    OptimisticExerciseAction
+  >(workout.exercises, (state, action) => {
+    if (action.type === "add") {
+      return [...state, action.exercise];
+    }
+
+    if (action.type === "remove") {
+      return state.filter((we) => we.id !== action.id);
+    }
+
+    return state;
+  });
 
   async function handleAddExercise() {
-  const exercise = exercises.find((e) => e.id === exerciseId)
-  if (!exercise) return
+    const exercise = exercises.find((e) => e.id === exerciseId);
+    if (!exercise) return;
 
-  const prescribed = {
-    sets,
-    reps,
-    weight,
+const prescribed = buildPrescribed(exercise, sets, reps, weight);
+
+    const optimistic = {
+      id: crypto.randomUUID(),
+      order: optimisticExercises.length,
+      exercise,
+      prescribed,
+    };
+
+    startTransition(() => {
+      updateOptimisticExercises({
+        type: "add",
+        exercise: optimistic,
+      });
+    });
+
+    await addWorkoutExercise(programId, workout.id, exerciseId, prescribed);
   }
-
-  const optimistic = {
-    id: crypto.randomUUID(),
-    exercise,
-    prescribed,
-  }
-
-  startTransition(() => {
-    updateOptimisticExercises({
-      type: "add",
-      exercise: optimistic,
-    })
-  })
-
-  await addWorkoutExercise(
-    programId,
-    workout.id,
-    exerciseId,
-    prescribed
-  )
-}
-
 
   async function handleDeleteExercise(workoutExerciseId: string) {
     startTransition(() => {
@@ -103,20 +111,20 @@ export default function WorkoutCard({ workout, exercises, programId }) {
         </h2>
       )}
 
-      <ul className="space-y-1 text-sm">
-        {optimisticExercises.map((we) => (
-          <li key={we.id}>
-            {we.exercise.name} — {we.prescribed.sets}×{we.prescribed.reps}
-            {we.prescribed.weight ? ` @ ${we.prescribed.weight}` : ""}
-            <button
-              onClick={() => handleDeleteExercise(we.id)}
-              className="text-red-600 text-xs hover:underline"
-            >
-              Remove
-            </button>
-          </li>
-        ))}
-      </ul>
+<ul className="space-y-1 text-sm">
+  {optimisticExercises.map((we) => (
+    <li key={we.id}>
+      {we.exercise.name} — {formatPrescribed(we.prescribed)}
+      <button
+        onClick={() => handleDeleteExercise(we.id)}
+        className="text-red-600 text-xs hover:underline ml-2"
+      >
+        Remove
+      </button>
+    </li>
+  ))}
+</ul>
+
 
       {/* ADD EXERCISE */}
       <div className="flex gap-2 items-center">

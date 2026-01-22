@@ -29,8 +29,7 @@ export async function POST(
       workoutId: params.workoutId,
       exerciseId,
       order: count + 1,
-      type: exercise.type,
-      prescription: {},
+      prescribed: {},
     },
   })
 

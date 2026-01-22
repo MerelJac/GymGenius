@@ -3,12 +3,19 @@
 import { useOptimistic, startTransition } from "react";
 import { createWorkout } from "../(trainer)/programs/[programId]/actions";
 import WorkoutCard from "./WorkoutCard";
+import { ProgramWithWorkouts, WorkoutWithExercises } from "@/types/workout";
+import { Exercise } from "@/types/exercise";
 
-export default function ProgramBuilder({ program, exercises }) {
-  const [workouts, addOptimisticWorkout] = useOptimistic(
+export default function ProgramBuilder({ program, exercises } : {
+    program: ProgramWithWorkouts, exercises: Exercise[]
+}) {
+  const [workouts, addOptimisticWorkout] = useOptimistic<
+    WorkoutWithExercises[],
+    WorkoutWithExercises
+  >(
     program.workouts,
-    (state, newWorkout) => [...state, newWorkout],
-  );
+    (state, newWorkout) => [...state, newWorkout]
+  )
 
   async function handleAddWorkout() {
     const optimisticWorkout = {

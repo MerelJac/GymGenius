@@ -1,4 +1,5 @@
 import type { ExerciseType , Exercise} from "./exercise"
+import { Prescribed } from "./prescribed"
 
 export type Workout = {
   id: string
@@ -28,4 +29,23 @@ export type WorkoutExercise = {
 
 export type WorkoutExerciseWithExercise = WorkoutExercise & {
   exercise: Exercise
+}
+
+
+export type WorkoutWithExercises = {
+  id: string
+  name: string
+  order: number
+  exercises: {
+    id: string
+    order: number
+    prescribed: Prescribed
+    exercise: Exercise
+  }[]
+}
+
+export type ProgramWithWorkouts = {
+  id: string
+  name: string
+  workouts: WorkoutWithExercises[]
 }

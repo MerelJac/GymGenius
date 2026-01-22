@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { NextResponse } from "next/server"
+import { Prescribed } from "@/types/prescribed"
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions)
@@ -23,12 +24,13 @@ export async function POST(req: Request) {
   }
 
   // Build prescribed JSON based on exercise type
-  let prescribed: any = {}
+  let prescribed: Prescribed;
 
   switch (exercise.type) {
     case "STRENGTH":
     case "HYBRID":
       prescribed = {
+        kind: 'hybrid',
         sets: Number(formData.get("sets")),
         reps: Number(formData.get("reps")),
         weight: formData.get("weight")
@@ -39,6 +41,7 @@ export async function POST(req: Request) {
 
     case "BODYWEIGHT":
       prescribed = {
+        kind: 'bodyweight',
         sets: Number(formData.get("sets")),
         reps: Number(formData.get("reps")),
       }
@@ -46,6 +49,7 @@ export async function POST(req: Request) {
 
     case "TIMED":
       prescribed = {
+        kind: 'timed',
         duration: Number(formData.get("duration")),
       }
       break

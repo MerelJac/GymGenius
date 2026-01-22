@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
+import { Prescribed } from "@/types/prescribed"
 
 function runRevalidate(programId: string) {
   revalidatePath(`/trainer/programs/${programId}`)
@@ -46,7 +47,7 @@ export async function addWorkoutExercise(
   programId: string,
   workoutId: string,
   exerciseId: string,
-  prescribed: any
+  prescribed: Prescribed
 ) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) throw new Error("Unauthorized")

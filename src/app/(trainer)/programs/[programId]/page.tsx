@@ -1,10 +1,11 @@
-import { prisma } from "@/lib/prisma"
-import ProgramBuilder from "@/app/components/ProgramBuilder"
+import { prisma } from "@/lib/prisma";
+import ProgramBuilder from "@/app/components/ProgramBuilder";
+import { Prescribed } from "@/types/prescribed";
 
 export default async function ProgramBuilderPage({
   params,
 }: {
-  params: { programId: string }
+  params: { programId: string };
 }) {
   const program = await prisma.program.findUnique({
     where: { id: params.programId },
@@ -19,24 +20,32 @@ export default async function ProgramBuilderPage({
         },
       },
     },
-  })
+  });
 
   const exercises = await prisma.exercise.findMany({
     where: {
-      OR: [
-        { trainerId: null },
-        { trainerId: program?.trainerId },
-      ],
+      OR: [{ trainerId: null }, { trainerId: program?.trainerId }],
     },
     orderBy: { name: "asc" },
-  })
+  });
 
-  if (!program) return <div>Program not found</div>
+  if (!program) return <div>Program not found</div>;
+
+  const programWithTypedPrescriptions = {
+    ...program,
+    workouts: program.workouts.map((workout) => ({
+      ...workout,
+      exercises: workout.exercises.map((we) => ({
+        ...we,
+        prescribed: we.prescribed as Prescribed,
+      })),
+    })),
+  };
 
   return (
     <ProgramBuilder
-      program={program}
+      program={programWithTypedPrescriptions}
       exercises={exercises}
     />
-  )
+  );
 }
