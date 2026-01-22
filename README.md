@@ -1,69 +1,50 @@
-# Gym Genius
-
-## Overview
-
-The Fitness App is a web application designed to help users create and manage their workout routines and track their One-Rep Max (1RM) data for future reference. This app offers several features to assist athletes in their fitness journey:
-
-- **Create Workouts**: Users can easily create and customize workout routines to suit their fitness goals.
-
-- **1RM Data Tracking**: The app allows users to input and store their One-Rep Max (1RM) data, helping them keep track of their strength progress over time.
-
-- **Random Workouts**: For a little excitement, the app provides the option to generate randomly generated workout plans with detailed information on each exercise, including demonstrations, targeted muscle groups, and more.
-
-- **View Statistics**: Users can view their workout statistics, helping them monitor their progress and make informed decisions about their fitness routines.
-
-- **Workout Suggestions**: Based on their past workout history, users receive workout suggestions to keep their routines fresh and challenging.
-
-[View the Deployed Application](http://www.thegymgenius.com)
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-To get started with the Fitness App, follow these steps:
+First, run the development server:
 
-1. **Clone the Repository**: Clone the project repository to your local machine.
+```bash
+nvm use 20
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
+Next.js App Router
 
-2. **Install Dependencies**: Navigate to the project's root directory and install the required dependencies using npm.
+Prisma 7
 
-   ```
-   cd fitness-app
-   npm install
-   ```
+Node 20+
 
-3. **Start the Application**: Start the app by running the following command.
+Auth.js v5
 
-   ```
-   npm start
-   ```
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-4. **Access the App**: Open your web browser and go to `http://localhost:3000` to access the Fitness App.
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Deployed Application 
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-Create Workout Page
+## Database in Dev and Prod
+Dev → file:./dev.db → SQLite file stored locally in your project.
 
-![alt text](./client/src/assets/images/pic1.png)
+Prod → Switch your .env DATABASE_URL to something like PostgreSQL or MySQL (e.g. on Supabase, PlanetScale, Neon, or RDS).
 
-Suggestions & Stats Page
+## Learn More
 
-![alt text](./client/src/assets/images/pic2.png)
+To learn more about Next.js, take a look at the following resources:
 
-Randomly Generated Workout
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-![alt text](./client/src/assets/images/pic3.png)
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-Create User Page
+## Deploy on Vercel
 
-![alt text](./client/src/assets/images/pic4.png)
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## Future Developments
-
-The Fitness App is continually evolving. Here are some potential future developments and features that we plan to add:
-
-- **Search Bar for Random Workouts**: We will introduce a search bar on the random workout page, allowing users to customize their randomized workout plans more effectively.
-
-- **Account Customization**: Users will be able to update their account information, including passwords, email addresses, and body metrics.
-
-- **Fitness Tracker Integration**: We aim to integrate fitness trackers to provide users with real-time data on their workouts and physical activity.
-
-We're committed to improving and expanding the Fitness App to better serve your fitness goals and needs. Stay tuned for these exciting updates!
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

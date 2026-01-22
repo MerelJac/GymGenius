@@ -1,0 +1,184 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  TRAINER
+  CLIENT
+}
+
+enum WorkoutStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+enum ExerciseType {
+  STRENGTH
+  TIMED
+  HYBRID
+  BODYWEIGHT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+
+  trainerId String?
+  trainer   User?   @relation("TrainerClients", fields: [trainerId], references: [id])
+  clients   User[]  @relation("TrainerClients")
+
+  profile  Profile?
+  programs Program[] @relation("TrainerPrograms")
+
+  sentMessages      Message[]          @relation("MessageSender")
+  receivedMessages  Message[]          @relation("MessageRecipient")
+  exercises         Exercise[]
+  scheduledWorkouts ScheduledWorkout[]
+  workoutLogs       WorkoutLog[]
+}
+
+model Profile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  height      Float?
+  weight      Float?
+  dob         DateTime?
+  experience  String?
+  injuryNotes String? // trainer-visible only
+}
+
+model Exercise {
+  id          String       @id @default(uuid())
+  name        String
+  type        ExerciseType
+  equipment   String?
+  muscleGroup String?
+  videoUrl    String?
+  notes       String?
+
+  trainerId String? // null = global default
+  trainer   User?   @relation(fields: [trainerId], references: [id])
+
+  workoutExercises WorkoutExercise[]
+  exerciseLogs     ExerciseLog[]     @relation("ExerciseToLogs")
+}
+
+model Program {
+  id        String @id @default(uuid())
+  trainerId String
+  trainer   User   @relation("TrainerPrograms", fields: [trainerId], references: [id])
+
+  name      String
+  version   Int      @default(1)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  workouts WorkoutTemplate[]
+}
+
+model WorkoutTemplate {
+  id        String  @id @default(uuid())
+  programId String
+  program   Program @relation(fields: [programId], references: [id])
+
+  name              String
+  order             Int
+  exercises         WorkoutExercise[]
+  scheduledWorkouts ScheduledWorkout[]
+}
+
+model WorkoutExercise {
+  id        String          @id @default(uuid())
+  workoutId String
+  workout   WorkoutTemplate @relation(fields: [workoutId], references: [id])
+
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+
+  prescribed Json
+  order      Int
+}
+
+model ScheduledWorkout {
+  id String @id @default(uuid())
+
+  workoutId String
+  workout   WorkoutTemplate @relation(fields: [workoutId], references: [id])
+
+  clientId String
+  client   User   @relation(fields: [clientId], references: [id])
+
+  scheduledDate DateTime
+  status        WorkoutStatus @default(SCHEDULED)
+
+  workoutLogs WorkoutLog[]
+}
+
+model WorkoutLog {
+  id       String @id @default(uuid())
+  clientId String
+  client   User   @relation(fields: [clientId], references: [id])
+
+  scheduledId String?
+  scheduled   ScheduledWorkout? @relation(fields: [scheduledId], references: [id])
+
+  startedAt DateTime?
+  endedAt   DateTime?
+  duration  Int?
+  notes     String?
+  status    WorkoutStatus
+
+  exercises ExerciseLog[]
+  createdAt DateTime      @default(now())
+}
+
+model ExerciseLog {
+  id           String     @id @default(uuid())
+  workoutLogId String
+  workoutLog   WorkoutLog @relation(fields: [workoutLogId], references: [id])
+
+  exerciseId String
+  exercise   Exercise @relation("ExerciseToLogs", fields: [exerciseId], references: [id])
+
+  prescribed Json
+  performed  Json
+
+  substitutedFrom    String?
+  substitutionReason String?
+}
+
+model EditHistory {
+  id        String   @id @default(uuid())
+  entity    String
+  entityId  String
+  editedBy  String
+  reason    String
+  before    Json
+  after     Json
+  createdAt DateTime @default(now())
+}
+
+model Message {
+  id String @id @default(uuid())
+
+  senderId String
+  sender   User   @relation("MessageSender", fields: [senderId], references: [id])
+
+  recipientId String
+  recipient   User   @relation("MessageRecipient", fields: [recipientId], references: [id])
+
+  content      String
+  workoutLogId String?
+  createdAt    DateTime @default(now())
+}

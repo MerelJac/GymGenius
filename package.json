@@ -1,18 +1,32 @@
 {
-  "name": "gymgenius",
-  "version": "1.0.0",
-  "description": "## Overview",
-  "main": "index.js",
+  "name": "gym-genius",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "node server/server.js --ignore client",
-    "develop": "concurrently \"cd server && npm run watch\" \"cd client && npm start\"",
-    "install": "cd server && npm i && cd ../client && npm i",
-    "seed": "cd server && npm run seed",
-    "build": "cd client && npm run build"
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint"
   },
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "@auth/core": "0.41.1",
+    "@auth/prisma-adapter": "^2.11.1",
+    "@prisma/client": "^7.3.0",
+    "next": "15.5.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^4.3.5"
+  },
   "devDependencies": {
-    "concurrently": "^8.2.1"
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.3",
+    "prisma": "^7.3.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
