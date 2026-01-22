@@ -1,18 +1,18 @@
+// middleware.ts
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { getToken } from "@auth/core/jwt"
+import { getToken } from "next-auth/jwt"
 
 export async function middleware(req: NextRequest) {
-  const secret = process.env.AUTH_SECRET
+  const secret = process.env.NEXTAUTH_SECRET
 
   if (!secret) {
-    throw new Error("AUTH_SECRET is not set")
+    throw new Error("NEXTAUTH_SECRET is not set")
   }
 
   const token = await getToken({
     req,
-    secret,
-    salt: "gymgenius-auth", // 👈 REQUIRED IN v5
+    secret
   })
 
   // Not logged in

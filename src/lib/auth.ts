@@ -1,48 +1,55 @@
-import type { AuthConfig } from "@auth/core";
-import Credentials from "@auth/core/providers/credentials";
-import { PrismaAdapter } from "@auth/prisma-adapter";
-import { prisma } from "@/lib/prisma";
+// src/lib/auth.ts
+import NextAuth, { AuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import { prisma } from "@/lib/prisma"
+import { Role } from "@prisma/client"
 
-export const authConfig: AuthConfig = {
+export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
   },
+
   providers: [
-    Credentials({
+    CredentialsProvider({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
-        if (!credentials?.email) return null;
+        if (!credentials?.email || !credentials?.password) return null
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
-        });
+        })
 
-        return user;
+        if (!user) return null
+
+        return user
       },
     }),
   ],
+
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        if (user.id) token.id = user.id;
-        if (user.role) token.role = user.role;
+        token.id = user.id
+        token.role = user.role
       }
-      return token;
+      return token
     },
 
     async session({ session, token }) {
-      // 🔐 Guard for initial / partial JWT
-      if (!token.id || !token.role) {
-        return session;
+      if (session.user) {
+        session.user.id = token.id as string
+        session.user.role = token.role as Role
       }
-
-      session.user.id = token.id;
-      session.user.role = token.role;
-      return session;
+      return session
     },
   },
-};
+}
+
+export default NextAuth(authOptions)
+

@@ -1,0 +1,49 @@
+import { PrismaClient } from "@prisma/client"
+import { PrismaPg } from '@prisma/adapter-pg';
+import bcrypt from "bcryptjs"
+
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+
+const prisma = new PrismaClient({ adapter });
+
+async function main() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set")
+  }
+
+  const passwordHash = await bcrypt.hash("password123", 10)
+
+  const trainer = await prisma.user.upsert({
+    where: { email: "trainer@gymgenius.dev" },
+    update: {},
+    create: {
+      email: "trainer@gymgenius.dev",
+      password: passwordHash,
+      role: "TRAINER",
+    },
+  })
+
+  await prisma.user.upsert({
+    where: { email: "client@gymgenius.dev" },
+    update: {},
+    create: {
+      email: "client@gymgenius.dev",
+      password: passwordHash,
+      role: "CLIENT",
+      trainerId: trainer.id,
+    },
+  })
+
+  console.log("✅ Seeded trainer & client")
+}
+
+main()
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
+  .finally(async () => {
+    await prisma.$disconnect()
+  })

@@ -21,7 +21,7 @@ Prisma 7
 
 Node 20+
 
-Auth.js v5
+NextAuth V4
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
