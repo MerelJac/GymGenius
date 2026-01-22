@@ -35,6 +35,6 @@ export async function POST(
   })
 
   return NextResponse.redirect(
-    `/trainer/programs/${params.workoutId}/edit`
+    `/programs/${params.workoutId}/edit`
   )
 }

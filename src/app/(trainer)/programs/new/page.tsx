@@ -1,25 +1,41 @@
-import { prisma } from "@/lib/prisma"
-import { redirect } from "next/navigation"
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function NewProgramPage() {
-  async function createProgram(formData: FormData) {
-    "use server"
+  const [name, setName] = useState("");
+  const router = useRouter();
 
-    const program = await prisma.program.create({
-      data: {
-        name: String(formData.get("name")),
-        trainerId: "TODO_FROM_SESSION",
-      },
-    })
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-    redirect(`/programs/${program.id}`)
+    const res = await fetch("/api/trainer/programs", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to create program");
+    }
+
+    const program = await res.json();
+    router.push(`/programs/${program.id}`);
   }
 
   return (
-    <form action={createProgram}>
-      <h1>Create Program</h1>
-      <input name="name" placeholder="Program name" />
-      <button type="submit">Create</button>
+    <form onSubmit={handleSubmit} className="max-w-md space-y-4">
+      <h1 className="text-xl font-semibold">Create Program</h1>
+
+      <input
+        className="border p-2 w-full"
+        placeholder="Program name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+
+      <button className="bg-black text-white px-4 py-2">Create Program</button>
     </form>
-  )
+  );
 }

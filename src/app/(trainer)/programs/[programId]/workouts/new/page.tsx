@@ -20,7 +20,7 @@ export default async function NewWorkoutPage({
     })
 
     // Add exercises later (next step)
-    redirect(`/trainer/programs/${params.programId}`)
+    redirect(`/programs/${params.programId}`)
   }
 
   return (
