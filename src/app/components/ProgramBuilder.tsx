@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, startTransition } from "react";
+import { useOptimistic, startTransition, useState } from "react";
 import {
   createWorkout,
   deleteWorkout,
@@ -9,6 +9,7 @@ import {
 import WorkoutCard from "./WorkoutCard";
 import { ProgramWithWorkouts, WorkoutWithExercises } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
+import { updateProgramName } from "../(trainer)/programs/actions";
 
 type WorkoutAction =
   | { type: "add"; workout: WorkoutWithExercises }
@@ -36,6 +37,16 @@ export default function ProgramBuilder({
         return state;
     }
   });
+  const [editingName, setEditingName] = useState(false);
+  const [programName, setProgramName] = useState(program.name);
+
+  async function saveProgramName() {
+    setEditingName(false);
+
+    startTransition(() => {
+      updateProgramName(program.id, programName);
+    });
+  }
 
   async function handleAddWorkout() {
     const optimisticWorkout: WorkoutWithExercises = {
@@ -85,12 +96,25 @@ export default function ProgramBuilder({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{program.name}</h1>
+      {editingName ? (
+        <input
+          value={programName}
+          onChange={(e) => setProgramName(e.target.value)}
+          onBlur={saveProgramName}
+          onKeyDown={(e) => e.key === "Enter" && saveProgramName()}
+          className="border px-2 py-1 text-2xl font-semibold w-full"
+          autoFocus
+        />
+      ) : (
+        <h1
+          className="text-2xl font-semibold cursor-pointer hover:underline"
+          onClick={() => setEditingName(true)}
+        >
+          {programName}
+        </h1>
+      )}
 
-      <button
-        onClick={handleAddWorkout}
-        className="border px-3 py-1 rounded"
-      >
+      <button onClick={handleAddWorkout} className="border px-3 py-1 rounded">
         + Add Workout
       </button>
 
