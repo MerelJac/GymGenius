@@ -8,16 +8,23 @@ import {
 } from "../(trainer)/programs/[programId]/actions";
 import { WorkoutWithExercises } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
-import { buildPrescribed, formatPrescribed } from "../utils/prescriptionFormatter";
+import {
+  buildPrescribed,
+  formatPrescribed,
+} from "../utils/prescriptionFormatter";
 
 export default function WorkoutCard({
   workout,
   exercises,
   programId,
+  onDelete,
+  onDuplicate,
 }: {
   workout: WorkoutWithExercises;
   exercises: Exercise[];
   programId: string;
+  onDelete: () => void;
+  onDuplicate: () => void;
 }) {
   const [exerciseId, setExerciseId] = useState(exercises[0]?.id);
   const [sets, setSets] = useState(3);
@@ -60,7 +67,7 @@ export default function WorkoutCard({
     const exercise = exercises.find((e) => e.id === exerciseId);
     if (!exercise) return;
 
-const prescribed = buildPrescribed(exercise, sets, reps, weight);
+    const prescribed = buildPrescribed(exercise, sets, reps, weight);
 
     const optimistic = {
       id: crypto.randomUUID(),
@@ -103,28 +110,42 @@ const prescribed = buildPrescribed(exercise, sets, reps, weight);
           autoFocus
         />
       ) : (
-        <h2
-          className="font-medium cursor-pointer hover:underline"
-          onClick={() => setEditing(true)}
-        >
-          {name}
-        </h2>
+        <div className="flex justify-between items-center">
+          <h2
+            className="font-medium cursor-pointer hover:underline"
+            onClick={() => setEditing(true)}
+          >
+            {name}
+          </h2>
+
+          <div className="flex gap-2 text-xs">
+            <button
+              onClick={onDuplicate}
+              className="text-blue-600 hover:underline"
+            >
+              Duplicate
+            </button>
+
+            <button onClick={onDelete} className="text-red-600 hover:underline">
+              Delete
+            </button>
+          </div>
+        </div>
       )}
 
-<ul className="space-y-1 text-sm">
-  {optimisticExercises.map((we) => (
-    <li key={we.id}>
-      {we.exercise.name} — {formatPrescribed(we.prescribed)}
-      <button
-        onClick={() => handleDeleteExercise(we.id)}
-        className="text-red-600 text-xs hover:underline ml-2"
-      >
-        Remove
-      </button>
-    </li>
-  ))}
-</ul>
-
+      <ul className="space-y-1 text-sm">
+        {optimisticExercises.map((we) => (
+          <li key={we.id}>
+            {we.exercise.name} — {formatPrescribed(we.prescribed)}
+            <button
+              onClick={() => handleDeleteExercise(we.id)}
+              className="text-red-600 text-xs hover:underline ml-2"
+            >
+              Remove
+            </button>
+          </li>
+        ))}
+      </ul>
 
       {/* ADD EXERCISE */}
       <div className="flex gap-2 items-center">
