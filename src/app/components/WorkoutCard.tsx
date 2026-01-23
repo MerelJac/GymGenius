@@ -9,11 +9,9 @@ import {
 } from "../(trainer)/programs/[programId]/actions";
 import { WorkoutWithExercises } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
-import {
-  buildPrescribed,
-  formatPrescribed,
-} from "../utils/prescriptionFormatter";
+import { formatPrescribed } from "../utils/prescriptionFormatter";
 import { WorkoutDay } from "@/types/enums";
+import { Prescribed } from "@/types/prescribed";
 
 export default function WorkoutCard({
   workout,
@@ -35,6 +33,15 @@ export default function WorkoutCard({
   const [name, setName] = useState(workout.name);
   const [editing, setEditing] = useState(false);
   const [day, setDay] = useState<WorkoutDay>(workout.day);
+  const selectedExercise = exercises.find((e) => e.id === exerciseId);
+  const [time, setTime] = useState<number | null>(null);
+
+  const showStrengthFields =
+    selectedExercise?.type === "STRENGTH" ||
+    selectedExercise?.type === "HYBRID" ||
+    selectedExercise?.type === "BODYWEIGHT";
+
+  const showTimedFields = selectedExercise?.type === "TIMED";
 
   async function save() {
     setEditing(false);
@@ -78,7 +85,42 @@ export default function WorkoutCard({
     const exercise = exercises.find((e) => e.id === exerciseId);
     if (!exercise) return;
 
-    const prescribed = buildPrescribed(exercise, sets, reps, weight);
+    let prescribed: Prescribed;
+
+    switch (exercise.type) {
+      case "TIMED":
+        prescribed = {
+          kind: "timed",
+          duration: time ?? 0,
+        };
+        break;
+
+      case "BODYWEIGHT":
+        prescribed = {
+          kind: "bodyweight",
+          sets,
+          reps,
+        };
+        break;
+
+      case "HYBRID":
+        prescribed = {
+          kind: "hybrid",
+          sets,
+          reps,
+          weight,
+        };
+        break;
+
+      case "STRENGTH":
+      default:
+        prescribed = {
+          kind: "strength",
+          sets,
+          reps,
+          weight,
+        };
+    }
 
     const optimistic = {
       id: crypto.randomUUID(),
@@ -188,29 +230,47 @@ export default function WorkoutCard({
           ))}
         </select>
 
-        <input
-          type="number"
-          value={sets}
-          onChange={(e) => setSets(+e.target.value)}
-          className="border w-14"
-          placeholder="Sets"
-        />
+        {showStrengthFields && (
+          <>
+            <input
+              type="number"
+              value={sets}
+              onChange={(e) => setSets(+e.target.value)}
+              className="border w-14"
+              placeholder="Sets"
+            />
 
-        <input
-          type="number"
-          value={reps}
-          onChange={(e) => setReps(+e.target.value)}
-          className="border w-14"
-          placeholder="Reps"
-        />
+            <input
+              type="number"
+              value={reps}
+              onChange={(e) => setReps(+e.target.value)}
+              className="border w-14"
+              placeholder="Reps"
+            />
 
-        <input
-          type="number"
-          value={weight ?? ""}
-          onChange={(e) => setWeight(e.target.value ? +e.target.value : null)}
-          className="border w-16"
-          placeholder="Wt"
-        />
+            {selectedExercise?.type !== "BODYWEIGHT" && (
+              <input
+                type="number"
+                value={weight ?? ""}
+                onChange={(e) =>
+                  setWeight(e.target.value ? +e.target.value : null)
+                }
+                className="border w-16"
+                placeholder="Wt"
+              />
+            )}
+          </>
+        )}
+
+        {showTimedFields && (
+          <input
+            type="number"
+            value={time ?? ""}
+            onChange={(e) => setTime(e.target.value ? +e.target.value : null)}
+            className="border w-20"
+            placeholder="Seconds"
+          />
+        )}
 
         <button onClick={handleAddExercise} className="text-sm underline">
           Add

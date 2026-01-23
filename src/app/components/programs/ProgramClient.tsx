@@ -3,7 +3,10 @@
 import { useOptimistic, startTransition } from "react";
 import Link from "next/link";
 import { Program } from "@/types/program";
-import { deleteProgram, duplicateProgram } from "@/app/(trainer)/programs/actions";
+import {
+  deleteProgram,
+  duplicateProgram,
+} from "@/app/(trainer)/programs/actions";
 
 export default function ProgramsPageClient({
   initialPrograms,
@@ -14,21 +17,27 @@ export default function ProgramsPageClient({
     | { type: "remove"; id: string }
     | { type: "add"; program: Program };
 
-  const [programs, updatePrograms] = useOptimistic<
-    Program[],
-    ProgramAction
-  >(initialPrograms, (state, action) => {
-    switch (action.type) {
-      case "remove":
-        return state.filter((p) => p.id !== action.id);
-      case "add":
-        return [...state, action.program];
-      default:
-        return state;
-    }
-  });
+  const [programs, updatePrograms] = useOptimistic<Program[], ProgramAction>(
+    initialPrograms,
+    (state, action) => {
+      switch (action.type) {
+        case "remove":
+          return state.filter((p) => p.id !== action.id);
+        case "add":
+          return [...state, action.program];
+        default:
+          return state;
+      }
+    },
+  );
 
   async function handleDelete(program: Program) {
+    const confirmed = window.confirm(
+      "Deleting this workout will also remove all scheduled workouts for clients.\n\nThis action can’t be undone.",
+    );
+
+    if (!confirmed) return;
+
     startTransition(() => {
       updatePrograms({ type: "remove", id: program.id });
     });
@@ -68,7 +77,6 @@ export default function ProgramsPageClient({
             <Link href={`/programs/${p.id}`} className="font-medium">
               {p.name}
             </Link>
-            
 
             <div className="flex gap-3 text-sm">
               <button

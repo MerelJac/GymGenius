@@ -11,6 +11,15 @@ export async function deleteProgram(programId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
 
+    // delete children first (or rely on cascade if configured)
+  await prisma.scheduledWorkout.deleteMany({
+    where: {
+      workout: {
+        programId,
+      },
+    },
+  });
+
   // delete children first (or rely on cascade if configured)
   await prisma.workoutExercise.deleteMany({
     where: {
