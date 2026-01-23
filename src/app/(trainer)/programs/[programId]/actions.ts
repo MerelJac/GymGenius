@@ -5,7 +5,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { Prescribed } from "@/types/prescribed";
-import { Prisma, WorkoutDay } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { WorkoutDay } from "@/types/enums";
 import { getNextDateForDay } from "@/app/utils/getNextDateForDay";
 
 function runRevalidate(programId: string) {
@@ -177,5 +178,5 @@ export async function updateWorkoutDay(
     data: { day},
   })
 
-  revalidatePath(`/trainer/programs/${programId}`)
+  revalidatePath(`/programs/${programId}`)
 }
