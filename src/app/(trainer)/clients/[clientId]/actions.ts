@@ -1,0 +1,25 @@
+"use server";
+
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
+
+export async function addBodyMetric(
+  clientId: string,
+  weight: number | null,
+  bodyFat: number | null
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  await prisma.bodyMetric.create({
+    data: {
+      clientId,
+      weight,
+      bodyFat,
+    },
+  });
+
+  revalidatePath(`/trainer/clients/${clientId}`);
+}

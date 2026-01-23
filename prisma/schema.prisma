@@ -45,6 +45,7 @@ model User {
   scheduledWorkouts ScheduledWorkout[]
   workoutLogs       WorkoutLog[]
   invitesSent       Invite[]
+  bodyMetrics       BodyMetric[]
 }
 
 model Profile {
@@ -52,11 +53,25 @@ model Profile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
+  firstName   String
+  lastName    String
   height      Float?
-  weight      Float?
   dob         DateTime?
   experience  String?
   injuryNotes String? // trainer-visible only
+}
+
+model BodyMetric {
+  id       String @id @default(uuid())
+  clientId String
+  client   User   @relation(fields: [clientId], references: [id])
+
+  weight  Float?
+  bodyFat Float? // BF %
+
+  recordedAt DateTime @default(now())
+
+  @@index([clientId, recordedAt])
 }
 
 model Exercise {

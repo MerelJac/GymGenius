@@ -1,11 +1,23 @@
-// src/app/trainer/clients/[clientId]/page.tsx
-export default function TrainerClientDetailPage() {
-  return (
-    <div>
-      <h1 className="text-xl font-semibold mb-4">Client Name</h1>
+import { prisma } from "@/lib/prisma";
+import ClientProfile from "@/app/components/clients/ClientProfile";
+import { notFound } from "next/navigation";
 
-      {/* tab navigation */}
-      {/* tab content */}
-    </div>
-  )
+export default async function ClientPage({
+  params,
+}: {
+  params: { clientId: string };
+}) {
+  const client = await prisma.user.findUnique({
+    where: { id: params.clientId },
+    include: {
+      profile: true,
+      bodyMetrics: {
+        orderBy: { recordedAt: "asc" },
+      },
+    },
+  });
+
+  if (!client) notFound();
+
+  return <ClientProfile client={client} />;
 }
