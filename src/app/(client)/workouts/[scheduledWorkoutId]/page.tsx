@@ -30,13 +30,18 @@ export default async function ClientWorkoutPage({
       workoutLogs: {
         orderBy: { createdAt: "desc" },
         take: 1,
+        include: {
+          exercises: {
+            include: {
+              exercise: true, // 👈 so viewer can show names
+            },
+          },
+        },
       },
     },
   });
 
   if (!scheduledWorkout) return notFound();
 
-  return (
-    <WorkoutRunner scheduledWorkout={scheduledWorkout} />
-  );
+  return <WorkoutRunner scheduledWorkout={scheduledWorkout} />;
 }

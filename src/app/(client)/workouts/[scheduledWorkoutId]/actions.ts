@@ -26,16 +26,28 @@ export async function startWorkout(scheduledWorkoutId: string) {
   return log.id;
 }
 
+
 export async function stopWorkout(workoutLogId: string) {
-  await prisma.workoutLog.update({
+  const log = await prisma.workoutLog.update({
     where: { id: workoutLogId },
     data: {
-      status: "COMPLETED",
       endedAt: new Date(),
+      status: "COMPLETED",
+    },
+    include: {
+      scheduled: true,
     },
   });
-}
 
+  if (log.scheduledId) {
+    await prisma.scheduledWorkout.update({
+      where: { id: log.scheduledId },
+      data: {
+        status: "COMPLETED",
+      },
+    });
+  }
+}
 export async function logExercise(
   workoutLogId: string,
   exerciseId: string,
