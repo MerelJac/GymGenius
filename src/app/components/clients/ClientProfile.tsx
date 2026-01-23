@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { addBodyMetric } from "@/app/(trainer)/clients/[clientId]/actions";
+import { Client } from "@/types/client";
 
-export default function ClientProfile({ client }: { client: any }) {
+export default function ClientProfile({ client }: { client: Client }) {
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
 
@@ -11,7 +13,7 @@ export default function ClientProfile({ client }: { client: any }) {
     await addBodyMetric(
       client.id,
       weight ? Number(weight) : null,
-      bodyFat ? Number(bodyFat) : null
+      bodyFat ? Number(bodyFat) : null,
     );
 
     setWeight("");
@@ -20,9 +22,33 @@ export default function ClientProfile({ client }: { client: any }) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">
-        {client.profile?.firstName} {client.profile?.lastName}
-      </h1>
+      <div className="flex justify-between items-start">
+        <Link
+          href={`/clients`}
+          className="border px-3 py-1 rounded text-sm hover:bg-gray-50"
+        >
+          Back
+        </Link>
+        <h1 className="text-2xl font-semibold">
+          {client.profile?.firstName} {client.profile?.lastName} {" "}
+          {client.email}
+        </h1>
+      </div>
+
+      {/* Profile Summary */}
+
+      {/* Profile Summary */}
+      <div className="flex gap-2 items-start text-sm text-gray-600 flex-col">
+        <p>
+          Joined:{" "}
+          {new Date(client.createdAt).toLocaleDateString(undefined, {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })}
+        </p>
+        <p>Email:{" "}{client.email}</p>
+      </div>
 
       {/* Add metric */}
       <div className="flex gap-2 items-center">
@@ -44,10 +70,7 @@ export default function ClientProfile({ client }: { client: any }) {
           className="border px-2 py-1"
         />
 
-        <button
-          onClick={handleAddMetric}
-          className="border px-3 py-1 rounded"
-        >
+        <button onClick={handleAddMetric} className="border px-3 py-1 rounded">
           Add
         </button>
       </div>
@@ -59,8 +82,8 @@ export default function ClientProfile({ client }: { client: any }) {
         <ul className="space-y-1 text-sm">
           {client.bodyMetrics.map((m) => (
             <li key={m.id}>
-              {new Date(m.recordedAt).toLocaleDateString()} —{" "}
-              {m.weight ?? "–"} lb, {m.bodyFat ?? "–"}%
+              {new Date(m.recordedAt).toLocaleDateString()} — {m.weight ?? "–"}{" "}
+              lb, {m.bodyFat ?? "–"}%
             </li>
           ))}
         </ul>

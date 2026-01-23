@@ -1,6 +1,7 @@
 // src/app/trainer/clients/page.tsx
 import { prisma } from "@/lib/prisma";
 import AddClientForm from "@/app/components/AddClientFomr";
+import Link from "next/link";
 
 export default async function TrainerClientsPage() {
   const clients = await prisma.user.findMany({
@@ -22,25 +23,22 @@ export default async function TrainerClientsPage() {
 
       <ul className="space-y-2">
         {clients.map((c) => (
-          <li
-            key={c.id}
-            className="border p-3 flex justify-between"
-          >
+          <li key={c.id} className="border p-3 flex justify-between">
             <div>
-              <div className="font-medium">
-                { c.email}
-              </div>
-              <div className="text-sm text-gray-500">
-                {c.email}
-              </div>
+              <div className="font-medium">{c.email}</div>
+              <div className="text-sm text-gray-500">{c.email}</div>
             </div>
+            <Link
+              href={`/clients/${c.id}`}
+              className="border px-3 py-1 rounded text-sm hover:bg-gray-50"
+            >
+              View client
+            </Link>
           </li>
         ))}
 
         {clients.length === 0 && (
-          <div className="text-sm text-gray-500">
-            No clients yet.
-          </div>
+          <div className="text-sm text-gray-500">No clients yet.</div>
         )}
       </ul>
     </div>
