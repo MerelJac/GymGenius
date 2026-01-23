@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import { Exercise } from "@/types/exercise";
-import { WorkoutExerciseWithExercise } from "@/types/workout";
 
 export default async function WorkoutBuilderPage({
   params,

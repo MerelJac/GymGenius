@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import WorkoutRunner from "@/app/components/workout/WorkoutRunner";
+import Link from "next/link";
 
 export default async function ClientWorkoutPage({
   params,
@@ -43,5 +44,10 @@ export default async function ClientWorkoutPage({
 
   if (!scheduledWorkout) return notFound();
 
-  return <WorkoutRunner scheduledWorkout={scheduledWorkout} />;
+  return (
+    <>
+    <Link href={"/dashboard"}>Back </Link>
+      <WorkoutRunner scheduledWorkout={scheduledWorkout} />
+    </>
+  );
 }
