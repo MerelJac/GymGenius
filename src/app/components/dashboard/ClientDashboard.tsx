@@ -2,6 +2,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import Link from "next/link";
+import { ScheduledWorkoutDashboard } from "@/types/workout";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
@@ -68,9 +70,7 @@ export default async function ClientDashboard() {
 function TodayWorkout({
   workout,
 }: {
-  workout: Awaited<
-    ReturnType<typeof prisma.scheduledWorkout.findFirst>
-  > | undefined;
+ workout: ScheduledWorkoutDashboard | undefined;
 }) {
   if (!workout) {
     return (
@@ -85,7 +85,8 @@ function TodayWorkout({
       <h2 className="font-medium">Today’s Workout</h2>
 
       <p className="text-sm text-gray-600">
-        {workout.workout.name}
+        <Link href={`/workouts/${workout.id}`}>
+        <button>{workout.workout.name}</button></Link>
       </p>
 
       <ul className="text-sm list-disc pl-5">
@@ -106,7 +107,7 @@ function TodayWorkout({
 function UpcomingWorkouts({
   workouts,
 }: {
-  workouts: any[];
+  workouts: ScheduledWorkoutDashboard[];
 }) {
   if (workouts.length === 0) return null;
 
@@ -117,7 +118,8 @@ function UpcomingWorkouts({
       <ul className="text-sm space-y-1">
         {workouts.map((w) => (
           <li key={w.id} className="flex justify-between">
-            <span>{w.workout.name}</span>
+                    <Link href={`/workouts/${w.id}`}>
+        <span>{w.workout.name}</span></Link>
             <span className="text-gray-500">
               {w.scheduledDate.toLocaleDateString()}
             </span>

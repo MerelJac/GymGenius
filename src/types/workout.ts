@@ -1,4 +1,4 @@
-import { WorkoutDay, WorkoutStatus } from "@prisma/client"
+import { Prisma, WorkoutDay, WorkoutStatus } from "@prisma/client"
 import type { ExerciseType , Exercise} from "./exercise"
 import { Prescribed } from "./prescribed"
 
@@ -66,3 +66,33 @@ export type ScheduledWorkoutWithProgram = {
     };
   };
 };
+
+
+export type ScheduledWorkoutDashboard = Prisma.ScheduledWorkoutGetPayload<{
+  include: {
+    workout: {
+      include: {
+        exercises: {
+          include: {
+            exercise: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
+export type ScheduledWorkoutWithLogs = Prisma.ScheduledWorkoutGetPayload<{
+  include: {
+    workout: {
+      include: {
+        exercises: {
+          include: {
+            exercise: true;
+          };
+        };
+      };
+    };
+    workoutLogs: true;
+  };
+}>;
