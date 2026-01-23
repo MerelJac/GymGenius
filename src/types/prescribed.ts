@@ -29,24 +29,27 @@ export type Prescribed =
   | BodyweightPrescribed
   | HybridPrescribed;
 
-  export type BodyweightPerformed = {
-  kind: "bodyweight";
-  sets: number;
-  reps: number;
+export type StrengthPerformed = {
+  kind: "strength";
+  sets: {
+    reps: number;
+    weight: number | null;
+  }[];
 };
 
 export type HybridPerformed = {
   kind: "hybrid";
-  sets: number;
-  reps: number;
-  weight: number | null;
+  sets: {
+    reps: number;
+    weight: number | null;
+  }[];
 };
 
-export type StrengthPerformed = {
-  kind: "strength";
-  sets: number;
-  reps: number;
-  weight: number | null;
+export type BodyweightPerformed = {
+  kind: "bodyweight";
+  sets: {
+    reps: number;
+  }[];
 };
 
 export type TimedPerformed = {
@@ -56,6 +59,6 @@ export type TimedPerformed = {
 
 export type Performed =
   | StrengthPerformed
-  | TimedPerformed
+  | HybridPerformed
   | BodyweightPerformed
-  | HybridPerformed;
+  | TimedPerformed;

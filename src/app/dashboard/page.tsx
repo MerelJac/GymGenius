@@ -1,23 +1,20 @@
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { redirect } from "next/navigation"
-import TrainerDashboard from "../components/dashboard/TrainerDashboard"
-import ClientDashboard from "../components/dashboard/ClientDashboard"
-import Page404 from "../components/Page404"
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import ClientDashboard from "../components/dashboard/ClientDashboard";
+import Page404 from "../components/Page404";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
 
-  if (!session) redirect("/login")
+  if (!session) redirect("/login");
 
-    console.log('ROLE', session.user?.role)
+  console.log("ROLE", session.user?.role);
   if (session.user?.role === "TRAINER") {
-    return <TrainerDashboard />
+    redirect("/trainer");
   } else if (session.user?.role === "CLIENT") {
-  return <ClientDashboard />
+    return <ClientDashboard />;
   } else {
-    return <Page404/>
+    return <Page404 />;
   }
-
-
 }

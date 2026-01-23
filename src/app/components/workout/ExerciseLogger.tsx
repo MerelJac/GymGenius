@@ -1,4 +1,4 @@
-import { logExercise } from "@/app/(client)/workouts/[scheduleWorkoutId]/actions";
+import { logExercise } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
 import {
   buildPerformedFromPrescribed,
   renderPrescribed,
@@ -19,12 +19,12 @@ export function ExerciseLogger({
   disabled: boolean;
 }) {
   const [performed, setPerformed] = useState<Performed>(
-    buildPerformedFromPrescribed(prescribed)
+    buildPerformedFromPrescribed(prescribed),
   );
   const [note, setNote] = useState("");
 
   function updatePerformed<K extends keyof Performed>(
-    updater: (prev: Performed) => Performed
+    updater: (prev: Performed) => Performed,
   ) {
     setPerformed((prev) => updater(prev));
   }
@@ -59,61 +59,105 @@ export function ExerciseLogger({
             </div>
           )}
 
-          {(prescribed.kind === "strength" ||
-            prescribed.kind === "hybrid" ||
-            prescribed.kind === "bodyweight") &&
-            performed.kind !== "timed" && (
-              <div className="flex gap-4">
-                <div>
-                  <label className="block text-sm">Sets</label>
+          {(performed.kind === "strength" || performed.kind === "hybrid") && (
+            <div className="space-y-2">
+              {performed.sets.map((set, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <span className="text-sm w-12">Set {index + 1}</span>
+
                   <input
                     type="number"
                     className="border p-1 w-16 text-sm"
-                    value={performed.sets}
+                    value={set.reps}
                     onChange={(e) =>
-                      updatePerformed((prev) => ({
-                        ...prev,
-                        sets: Number(e.target.value),
-                      }))
+                      setPerformed((prev) => {
+                        if (prev.kind !== "strength" && prev.kind !== "hybrid")
+                          return prev;
+
+                        const sets = [...prev.sets];
+                        sets[index] = {
+                          ...sets[index],
+                          reps: Number(e.target.value),
+                        };
+
+                        return { ...prev, sets };
+                      })
                     }
                   />
-                </div>
 
-                <div>
-                  <label className="block text-sm">Reps</label>
+                  <span className="text-sm">reps</span>
+
                   <input
                     type="number"
-                    className="border p-1 w-16 text-sm"
-                    value={performed.reps}
+                    className="border p-1 w-20 text-sm"
+                    value={set.weight ?? ""}
                     onChange={(e) =>
-                      updatePerformed((prev) => ({
-                        ...prev,
-                        reps: Number(e.target.value),
-                      }))
-                    }
-                  />
-                </div>
+                      setPerformed((prev) => {
+                        if (prev.kind !== "strength" && prev.kind !== "hybrid")
+                          return prev;
 
-                {"weight" in performed && (
-                  <div>
-                    <label className="block text-sm">Weight</label>
-                    <input
-                      type="number"
-                      className="border p-1 w-20 text-sm"
-                      value={performed.weight ?? ""}
-                      onChange={(e) =>
-                        updatePerformed((prev) => ({
-                          ...prev,
+                        const sets = [...prev.sets];
+                        sets[index] = {
+                          ...sets[index],
                           weight: e.target.value
                             ? Number(e.target.value)
                             : null,
-                        }))
-                      }
-                    />
-                  </div>
-                )}
-              </div>
-            )}
+                        };
+
+                        return { ...prev, sets };
+                      })
+                    }
+                  />
+
+                  <span className="text-sm">lb</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {performed.kind === "bodyweight" && (
+            <div className="space-y-2">
+              {performed.sets.map((set, index) => (
+                <div key={index} className="flex gap-2 items-center">
+                  <span className="text-sm w-12">Set {index + 1}</span>
+
+                  <input
+                    type="number"
+                    className="border p-1 w-16 text-sm"
+                    value={set.reps}
+                    onChange={(e) =>
+                      setPerformed((prev) => {
+                        if (prev.kind !== "bodyweight") return prev;
+
+                        const sets = [...prev.sets];
+                        sets[index] = {
+                          reps: Number(e.target.value),
+                        };
+
+                        return { kind: "bodyweight", sets };
+                      })
+                    }
+                  />
+
+                  <span className="text-sm">reps</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {performed.kind === "timed" && (
+            <input
+              type="number"
+              className="border p-1 w-24 text-sm"
+              value={performed.duration}
+              onChange={(e) =>
+                setPerformed({
+                  kind: "timed",
+                  duration: Number(e.target.value),
+                })
+              }
+            />
+          )}
 
           {/* Optional note */}
           <input
@@ -132,7 +176,7 @@ export function ExerciseLogger({
                 exercise.id,
                 prescribed,
                 performed,
-                note
+                note,
               )
             }
           >

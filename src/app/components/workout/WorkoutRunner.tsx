@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Prescribed } from "@/types/prescribed";
-import { startWorkout, stopWorkout } from "@/app/(client)/workouts/[scheduleWorkoutId]/actions";
+import { startWorkout, stopWorkout } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
 import { ExerciseLogger } from "./ExerciseLogger";
 import { ScheduledWorkoutWithLogs } from "@/types/workout";
 

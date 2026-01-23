@@ -1,30 +1,24 @@
 import { Performed, Prescribed } from "@/types/prescribed";
-
 export function buildPerformedFromPrescribed(
   prescribed: Prescribed
-): Performed{
+): Performed {
   switch (prescribed.kind) {
     case "strength":
-      return {
-        kind: "strength",
-        sets: prescribed.sets,
-        reps: prescribed.reps,
-        weight: prescribed.weight,
-      };
-
     case "hybrid":
       return {
-        kind: "hybrid",
-        sets: prescribed.sets,
-        reps: prescribed.reps,
-        weight: prescribed.weight,
+        kind: prescribed.kind,
+        sets: Array.from({ length: prescribed.sets }, () => ({
+          reps: prescribed.reps,
+          weight: prescribed.weight,
+        })),
       };
 
     case "bodyweight":
       return {
         kind: "bodyweight",
-        sets: prescribed.sets,
-        reps: prescribed.reps,
+        sets: Array.from({ length: prescribed.sets }, () => ({
+          reps: prescribed.reps,
+        })),
       };
 
     case "timed":
@@ -34,6 +28,7 @@ export function buildPerformedFromPrescribed(
       };
   }
 }
+
 
 
 

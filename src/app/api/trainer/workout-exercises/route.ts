@@ -1,26 +1,26 @@
-import { prisma } from "@/lib/prisma"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { NextResponse } from "next/server"
-import { Prescribed } from "@/types/prescribed"
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { NextResponse } from "next/server";
+import { Prescribed } from "@/types/prescribed";
 
 export async function POST(req: Request) {
-  const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions);
   if (!session?.user?.email) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const formData = await req.formData()
+  const formData = await req.formData();
 
-  const workoutId = String(formData.get("workoutId"))
-  const exerciseId = String(formData.get("exerciseId"))
+  const workoutId = String(formData.get("workoutId"));
+  const exerciseId = String(formData.get("exerciseId"));
 
   const exercise = await prisma.exercise.findUnique({
     where: { id: exerciseId },
-  })
+  });
 
   if (!exercise) {
-    return NextResponse.json({ error: "Invalid exercise" }, { status: 400 })
+    return NextResponse.json({ error: "Invalid exercise" }, { status: 400 });
   }
 
   // Build prescribed JSON based on exercise type
@@ -28,36 +28,41 @@ export async function POST(req: Request) {
 
   switch (exercise.type) {
     case "STRENGTH":
-    case "HYBRID":
       prescribed = {
-        kind: 'hybrid',
+        kind: "strength",
         sets: Number(formData.get("sets")),
         reps: Number(formData.get("reps")),
-        weight: formData.get("weight")
-          ? Number(formData.get("weight"))
-          : null,
-      }
-      break
+        weight: formData.get("weight") ? Number(formData.get("weight")) : null,
+      };
+      break;
+    case "HYBRID":
+      prescribed = {
+        kind: "hybrid",
+        sets: Number(formData.get("sets")),
+        reps: Number(formData.get("reps")),
+        weight: formData.get("weight") ? Number(formData.get("weight")) : null,
+      };
+      break;
 
     case "BODYWEIGHT":
       prescribed = {
-        kind: 'bodyweight',
+        kind: "bodyweight",
         sets: Number(formData.get("sets")),
         reps: Number(formData.get("reps")),
-      }
-      break
+      };
+      break;
 
     case "TIMED":
       prescribed = {
-        kind: 'timed',
+        kind: "timed",
         duration: Number(formData.get("duration")),
-      }
-      break
+      };
+      break;
   }
 
   const order = await prisma.workoutExercise.count({
     where: { workoutId },
-  })
+  });
 
   await prisma.workoutExercise.create({
     data: {
@@ -66,7 +71,7 @@ export async function POST(req: Request) {
       order,
       prescribed,
     },
-  })
+  });
 
-  return NextResponse.redirect(req.headers.get("referer")!)
+  return NextResponse.redirect(req.headers.get("referer")!);
 }
