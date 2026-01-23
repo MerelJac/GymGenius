@@ -5,7 +5,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { Prescribed } from "@/types/prescribed";
-import { Prisma } from "@prisma/client";
+import { Prisma, WorkoutDay } from "@prisma/client";
+import { getNextDateForDay } from "@/app/utils/getNextDateForDay";
 
 function runRevalidate(programId: string) {
   revalidatePath(`/trainer/programs/${programId}`);
@@ -140,32 +141,41 @@ export async function assignProgramToClient(
   clientId: string,
   startDate: Date
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
   const program = await prisma.program.findUnique({
     where: { id: programId },
-    include: {
-      workouts: {
-        orderBy: { order: "asc" },
-      },
-    },
+    include: { workouts: true },
   });
 
   if (!program) throw new Error("Program not found");
 
-  // Example: 1 workout per day
-  const scheduledWorkouts = program.workouts.map((workout, index) => ({
-    workoutId: workout.id,
-    clientId,
-    scheduledDate: new Date(
-      startDate.getTime() + index * 24 * 60 * 60 * 1000
-    ),
-  }));
+  for (const workout of program.workouts) {
+    const scheduledDate = getNextDateForDay(
+      startDate,
+      workout.day
+    );
 
-  await prisma.scheduledWorkout.createMany({
-    data: scheduledWorkouts,
-  });
+    await prisma.scheduledWorkout.create({
+      data: {
+        workoutId: workout.id,
+        clientId,
+        scheduledDate,
+      },
+    });
+  }
+}
 
-  revalidatePath(`/clients/${clientId}`);
+export async function updateWorkoutDay(
+  programId: string,
+  workoutId: string,
+  day: WorkoutDay
+) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) throw new Error("Unauthorized")
+
+  await prisma.workoutTemplate.update({
+    where: { id: workoutId },
+    data: { day},
+  })
+
+  revalidatePath(`/trainer/programs/${programId}`)
 }

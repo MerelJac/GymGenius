@@ -5,6 +5,7 @@ import {
   addWorkoutExercise,
   updateWorkoutName,
   deleteWorkoutExercise,
+  updateWorkoutDay,
 } from "../(trainer)/programs/[programId]/actions";
 import { WorkoutWithExercises } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
@@ -12,6 +13,7 @@ import {
   buildPrescribed,
   formatPrescribed,
 } from "../utils/prescriptionFormatter";
+import { WorkoutDay } from "@/types/enums";
 
 export default function WorkoutCard({
   workout,
@@ -32,6 +34,7 @@ export default function WorkoutCard({
   const [weight, setWeight] = useState<number | null>(null);
   const [name, setName] = useState(workout.name);
   const [editing, setEditing] = useState(false);
+  const [day, setDay] = useState<WorkoutDay>(workout.day);
 
   async function save() {
     setEditing(false);
@@ -62,6 +65,14 @@ export default function WorkoutCard({
 
     return state;
   });
+
+  function saveDay(newDay: WorkoutDay) {
+    setDay(newDay);
+
+    startTransition(() => {
+      updateWorkoutDay(programId, workout.id, newDay);
+    });
+  }
 
   async function handleAddExercise() {
     const exercise = exercises.find((e) => e.id === exerciseId);
@@ -111,12 +122,28 @@ export default function WorkoutCard({
         />
       ) : (
         <div className="flex justify-between items-center">
-          <h2
-            className="font-medium cursor-pointer hover:underline"
-            onClick={() => setEditing(true)}
-          >
-            {name}
-          </h2>
+          <div className="flex items-center gap-3">
+            <h2
+              className="font-medium cursor-pointer hover:underline"
+              onClick={() => setEditing(true)}
+            >
+              {name}
+            </h2>
+
+            <select
+              value={day}
+              onChange={(e) => saveDay(e.target.value as WorkoutDay)}
+              className="border px-2 py-1 text-xs rounded"
+            >
+              <option value="MONDAY">Mon</option>
+              <option value="TUESDAY">Tue</option>
+              <option value="WEDNESDAY">Wed</option>
+              <option value="THURSDAY">Thu</option>
+              <option value="FRIDAY">Fri</option>
+              <option value="SATURDAY">Sat</option>
+              <option value="SUNDAY">Sun</option>
+            </select>
+          </div>
 
           <div className="flex gap-2 text-xs">
             <button

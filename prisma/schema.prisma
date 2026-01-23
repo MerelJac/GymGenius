@@ -11,6 +11,16 @@ enum Role {
   CLIENT
 }
 
+enum WorkoutDay {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
 enum WorkoutStatus {
   SCHEDULED
   IN_PROGRESS
@@ -112,6 +122,7 @@ model WorkoutTemplate {
 
   name              String
   order             Int
+  day               WorkoutDay         @default(MONDAY)
   exercises         WorkoutExercise[]
   scheduledWorkouts ScheduledWorkout[]
 }

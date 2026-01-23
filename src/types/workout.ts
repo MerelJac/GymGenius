@@ -1,3 +1,4 @@
+import { WorkoutDay, WorkoutStatus } from "@prisma/client"
 import type { ExerciseType , Exercise} from "./exercise"
 import { Prescribed } from "./prescribed"
 
@@ -41,7 +42,8 @@ export type WorkoutWithExercises = {
     order: number
     prescribed: Prescribed
     exercise: Exercise
-  }[]
+  }[],
+  day: WorkoutDay
 }
 
 export type ProgramWithWorkouts = {
@@ -49,3 +51,18 @@ export type ProgramWithWorkouts = {
   name: string
   workouts: WorkoutWithExercises[]
 }
+
+
+export type ScheduledWorkoutWithProgram = {
+  id: string;
+  scheduledDate: Date;
+  status: WorkoutStatus;
+  workout: {
+    id: string;
+    name: string;
+    program: {
+      id: string;
+      name: string;
+    };
+  };
+};

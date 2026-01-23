@@ -1,18 +1,28 @@
 import { prisma } from "@/lib/prisma";
 import ClientProfile from "@/app/components/clients/ClientProfile";
 import { notFound } from "next/navigation";
-
 export default async function ClientPage({
   params,
 }: {
-  params: { clientId: string };
+  params: Promise<{ clientId: string }>;
 }) {
+  const { clientId } = await params;
+
   const client = await prisma.user.findUnique({
-    where: { id: params.clientId },
+    where: { id: clientId },
     include: {
       profile: true,
       bodyMetrics: {
         orderBy: { recordedAt: "asc" },
+      },
+      scheduledWorkouts: {
+        include: {
+          workout: {
+            include: {
+              program: true,
+            },
+          },
+        },
       },
     },
   });

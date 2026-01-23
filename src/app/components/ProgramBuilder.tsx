@@ -11,7 +11,7 @@ import WorkoutCard from "./WorkoutCard";
 import { ProgramWithWorkouts, WorkoutWithExercises } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
 import { updateProgramName } from "../(trainer)/programs/actions";
-import { User } from "@prisma/client";
+import { User, WorkoutDay } from "@prisma/client";
 
 type WorkoutAction =
   | { type: "add"; workout: WorkoutWithExercises }
@@ -65,6 +65,7 @@ export default function ProgramBuilder({
       name: "New Workout",
       order: optimisticWorkouts.length,
       exercises: [],
+      day: WorkoutDay.MONDAY,
     };
 
     startTransition(() => {

@@ -21,5 +21,5 @@ export async function addBodyMetric(
     },
   });
 
-  revalidatePath(`/trainer/clients/${clientId}`);
+  revalidatePath(`/clients/${clientId}`);
 }

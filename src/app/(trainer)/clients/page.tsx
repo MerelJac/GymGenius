@@ -30,7 +30,7 @@ export default async function TrainerClientsPage() {
             </div>
             <Link
               href={`/clients/${c.id}`}
-              className="border px-3 py-1 rounded text-sm hover:bg-gray-50"
+              className="border px-3 py-1 rounded text-sm hover:bg-gray-50 flex items-center"
             >
               View client
             </Link>
