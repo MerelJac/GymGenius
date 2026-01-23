@@ -35,6 +35,7 @@ export default function WorkoutCard({
   const [day, setDay] = useState<WorkoutDay>(workout.day);
   const selectedExercise = exercises.find((e) => e.id === exerciseId);
   const [time, setTime] = useState<number | null>(null);
+  const [notes, setNotes] = useState("");
 
   const showStrengthFields =
     selectedExercise?.type === "STRENGTH" ||
@@ -127,6 +128,7 @@ export default function WorkoutCard({
       order: optimisticExercises.length,
       exercise,
       prescribed,
+      notes,
     };
 
     startTransition(() => {
@@ -136,7 +138,16 @@ export default function WorkoutCard({
       });
     });
 
-    await addWorkoutExercise(programId, workout.id, exerciseId, prescribed);
+    await addWorkoutExercise(
+      programId,
+      workout.id,
+      exerciseId,
+      prescribed,
+      notes,
+    );
+
+    // Resent notes after posting
+    setNotes("");
   }
 
   async function handleDeleteExercise(workoutExerciseId: string) {
@@ -206,6 +217,11 @@ export default function WorkoutCard({
         {optimisticExercises.map((we) => (
           <li key={we.id}>
             {we.exercise.name} — {formatPrescribed(we.prescribed)}
+            {we.notes && (
+              <div className="text-xs text-gray-500 italic mt-1">
+                {we.notes}
+              </div>
+            )}
             <button
               onClick={() => handleDeleteExercise(we.id)}
               className="text-red-600 text-xs hover:underline ml-2"
@@ -271,6 +287,14 @@ export default function WorkoutCard({
             placeholder="Seconds"
           />
         )}
+
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Coach notes (tempo, cues, intent, recovery)"
+          className="border p-2 text-sm w-full"
+          rows={2}
+        />
 
         <button onClick={handleAddExercise} className="text-sm underline">
           Add

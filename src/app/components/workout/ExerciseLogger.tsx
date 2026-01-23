@@ -13,11 +13,13 @@ export function ExerciseLogger({
   prescribed,
   workoutLogId,
   disabled,
+  notes,
 }: {
   exercise: Exercise;
   prescribed: Prescribed;
   workoutLogId: string | null;
   disabled: boolean;
+  notes?: string | null;
 }) {
   const [performed, setPerformed] = useState<Performed>(
     buildPerformedFromPrescribed(prescribed),
@@ -32,7 +34,7 @@ export function ExerciseLogger({
 
   return (
     <li className="border p-3 rounded space-y-3">
-            <Link href={"/dashboard"}>Back </Link>
+      <Link href={"/dashboard"}>Back </Link>
       <div className="font-medium">{exercise.name}</div>
 
       {/* Prescribed */}
@@ -169,6 +171,11 @@ export function ExerciseLogger({
             onChange={(e) => setNote(e.target.value)}
           />
 
+          {notes && (
+            <div className="text-sm text-gray-500 italic">
+              Coach notes: {notes}
+            </div>
+          )}
           <button
             className="text-sm underline"
             onClick={() =>

@@ -51,6 +51,7 @@ export async function addWorkoutExercise(
   workoutId: string,
   exerciseId: string,
   prescribed: Prescribed,
+  notes?: string
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -65,6 +66,7 @@ export async function addWorkoutExercise(
       exerciseId,
       order,
       prescribed,
+      notes: notes || null,
     },
   });
 

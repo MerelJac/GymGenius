@@ -38,6 +38,7 @@ export type WorkoutWithExercises = {
   name: string
   order: number
   exercises: {
+    notes?: string,
     id: string
     order: number
     prescribed: Prescribed

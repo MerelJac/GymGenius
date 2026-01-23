@@ -137,6 +137,7 @@ model WorkoutExercise {
 
   prescribed Json
   order      Int
+  notes      String?
 }
 
 model ScheduledWorkout {

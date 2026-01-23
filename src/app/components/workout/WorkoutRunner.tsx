@@ -79,6 +79,7 @@ export default function WorkoutRunner({
           <ExerciseLogger
             key={we.id}
             exercise={we.exercise}
+             notes={we.notes}
             prescribed={we.prescribed as Prescribed}
             workoutLogId={workoutLogId}
             disabled={!isActive}
