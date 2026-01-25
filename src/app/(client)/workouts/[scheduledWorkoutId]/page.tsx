@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import WorkoutRunner from "@/app/components/workout/WorkoutRunner";
 import Link from "next/link";
+import { BackButton } from "@/app/components/BackButton";
 
 export default async function ClientWorkoutPage({
   params,
@@ -46,7 +47,7 @@ export default async function ClientWorkoutPage({
 
   return (
     <>
-    <Link href={"/dashboard"}>Back </Link>
+      <BackButton route={"/dashboard"} />
       <WorkoutRunner scheduledWorkout={scheduledWorkout} />
     </>
   );

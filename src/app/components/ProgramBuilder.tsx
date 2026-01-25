@@ -12,6 +12,8 @@ import { ProgramWithWorkouts, WorkoutWithExercises } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
 import { updateProgramName } from "../(trainer)/programs/actions";
 import { User, WorkoutDay } from "@prisma/client";
+import Link from "next/link";
+import { BackButton } from "./BackButton";
 
 type WorkoutAction =
   | { type: "add"; workout: WorkoutWithExercises }
@@ -20,7 +22,7 @@ type WorkoutAction =
 export default function ProgramBuilder({
   program,
   exercises,
-  clients
+  clients,
 }: {
   program: ProgramWithWorkouts;
   exercises: Exercise[];
@@ -119,6 +121,7 @@ export default function ProgramBuilder({
         />
       ) : (
         <>
+          <BackButton route={"/programs"} />
           <h1
             className="text-2xl font-semibold cursor-pointer hover:underline"
             onClick={() => setEditingName(true)}

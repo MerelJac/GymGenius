@@ -7,6 +7,7 @@ import { Exercise } from "@/types/exercise";
 import { Performed, Prescribed } from "@/types/prescribed";
 import Link from "next/link";
 import { useState } from "react";
+import { BackButton } from "../BackButton";
 
 export function ExerciseLogger({
   exercise,
@@ -34,7 +35,7 @@ export function ExerciseLogger({
 
   return (
     <li className="border p-3 rounded space-y-3">
-      <Link href={"/dashboard"}>Back </Link>
+      <BackButton route={"/dashboard"} />
       <div className="font-medium">{exercise.name}</div>
 
       {/* Prescribed */}
