@@ -38,7 +38,7 @@ export type WorkoutWithExercises = {
   name: string
   order: number
   exercises: {
-    notes?: string,
+    notes?: string | null;
     id: string
     order: number
     prescribed: Prescribed

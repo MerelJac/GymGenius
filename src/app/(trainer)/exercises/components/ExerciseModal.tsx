@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Exercise, ExerciseSubstitution } from "@prisma/client";
-
+import { getEmbedUrl } from "@/lib/video";
 type ExerciseWithSubs = Exercise & {
   substitutionsFrom: (ExerciseSubstitution & {
     substituteExercise: Exercise;
@@ -15,6 +15,7 @@ export default function ExerciseModal({
   exercise: ExerciseWithSubs;
 }) {
   const router = useRouter();
+  const embedUrl = exercise.videoUrl ? getEmbedUrl(exercise.videoUrl) : null;
 
   return (
     <>
@@ -35,14 +36,30 @@ export default function ExerciseModal({
             ✕
           </button>
 
-          <h2 className="text-xl font-semibold mb-2">
-            {exercise.name}
-          </h2>
+          <h2 className="text-xl font-semibold mb-2">{exercise.name}</h2>
 
           <div className="text-sm text-gray-500 mb-4">
             {exercise.type}
             {exercise.equipment && ` • ${exercise.equipment}`}
           </div>
+
+          {/* 🎥 Video */}
+          {embedUrl && (
+            <div className="mb-4">
+              {embedUrl.endsWith(".mp4") ? (
+                <video controls className="w-full rounded-md" src={embedUrl} />
+              ) : (
+                <div className="relative aspect-video rounded-md overflow-hidden">
+                  <iframe
+                    src={embedUrl}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Notes */}
           {exercise.notes && (
@@ -70,9 +87,7 @@ export default function ExerciseModal({
                   </div>
 
                   {sub.note && (
-                    <div className="text-sm text-gray-600">
-                      {sub.note}
-                    </div>
+                    <div className="text-sm text-gray-600">{sub.note}</div>
                   )}
                 </li>
               ))}
