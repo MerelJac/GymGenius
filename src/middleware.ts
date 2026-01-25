@@ -9,7 +9,6 @@ export async function middleware(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   })
 
-  console.log("Middleware — token:", JSON.stringify(token, null, 2));
   // 🔒 Not logged in
   if (!token) {
     return NextResponse.redirect(new URL("/login", req.url))
@@ -29,16 +28,6 @@ export async function middleware(req: NextRequest) {
 if (isTrainerRoute && token.role !== "TRAINER") {
   console.log(`Blocked ${req.nextUrl.pathname} — role was: ${token?.role ?? "MISSING"}`);
   return NextResponse.redirect(new URL("/client", req.url));
-}
-
-// Temporary debug route guard
-if (req.nextUrl.pathname.startsWith("/exercises")) {
-  return NextResponse.json({
-    message: "Debug",
-    pathname: req.nextUrl.pathname,
-    role: token?.role,
-    fullToken: token,
-  });
 }
 
   return NextResponse.next()
