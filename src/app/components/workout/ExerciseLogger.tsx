@@ -5,7 +5,6 @@ import {
 } from "@/app/utils/workoutFunctions";
 import { Exercise } from "@/types/exercise";
 import { Performed, Prescribed } from "@/types/prescribed";
-import Link from "next/link";
 import { useState } from "react";
 import { BackButton } from "../BackButton";
 
