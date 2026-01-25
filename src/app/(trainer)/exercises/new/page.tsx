@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
-import ExerciseForm from "../components/ExerciseForm";
+import ExerciseForm from "../../../components/exercise/ExerciseForm";
 import { parseExerciseType } from "@/lib/exerciseValidation";
 
 export default function NewExercisePage() {

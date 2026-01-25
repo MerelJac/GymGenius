@@ -176,17 +176,19 @@ model WorkoutLog {
   clientId String
   client   User   @relation(fields: [clientId], references: [id])
 
-  scheduledId String?
-  scheduled   ScheduledWorkout? @relation(fields: [scheduledId], references: [id])
+  scheduledId String
+
+  scheduled ScheduledWorkout? @relation(fields: [scheduledId], references: [id])
 
   startedAt DateTime?
   endedAt   DateTime?
   duration  Int?
   notes     String?
   status    WorkoutStatus
-
   exercises ExerciseLog[]
   createdAt DateTime      @default(now())
+
+  @@unique([scheduledId])
 }
 
 model ExerciseLog {

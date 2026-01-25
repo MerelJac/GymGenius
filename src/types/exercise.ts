@@ -19,3 +19,17 @@ export type Exercise = {
 
   createdAt?: string
 }
+
+export type ExerciseDetail = {
+  id: string;
+  name: string;
+  type: string;
+  equipment: string | null;
+  notes: string | null;
+  videoUrl: string | null;
+  substitutions: {
+    id: string;
+    name: string;
+    note: string | null;
+  }[];
+};

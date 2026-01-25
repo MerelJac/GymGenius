@@ -1,4 +1,5 @@
 import { logExercise } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
+import ExerciseModal from "@/app/components/exercise/ExerciseModal";
 import {
   buildPerformedFromPrescribed,
   renderPrescribed,
@@ -6,7 +7,6 @@ import {
 import { Exercise } from "@/types/exercise";
 import { Performed, Prescribed } from "@/types/prescribed";
 import { useState } from "react";
-import { BackButton } from "../BackButton";
 
 export function ExerciseLogger({
   exercise,
@@ -25,6 +25,7 @@ export function ExerciseLogger({
     buildPerformedFromPrescribed(prescribed),
   );
   const [note, setNote] = useState("");
+  const [openExerciseId, setOpenExerciseId] = useState<string | null>(null);
 
   function updatePerformed<K extends keyof Performed>(
     updater: (prev: Performed) => Performed,
@@ -34,8 +35,12 @@ export function ExerciseLogger({
 
   return (
     <li className="border p-3 rounded space-y-3">
-      <BackButton route={"/dashboard"} />
-      <div className="font-medium">{exercise.name}</div>
+      <div
+        className="font-medium underline cursor-pointer"
+        onClick={() => setOpenExerciseId(exercise.id)}
+      >
+        {exercise.name}
+      </div>
 
       {/* Prescribed */}
       <div className="text-sm text-gray-600">
@@ -192,6 +197,13 @@ export function ExerciseLogger({
             Save
           </button>
         </div>
+      )}
+
+      {openExerciseId && (
+        <ExerciseModal
+          exerciseId={openExerciseId}
+          onClose={() => setOpenExerciseId(null)}
+        />
       )}
     </li>
   );

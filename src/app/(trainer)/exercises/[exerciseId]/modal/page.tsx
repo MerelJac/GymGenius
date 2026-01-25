@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import ExerciseModal from "../../components/ExerciseModal";
+import ExerciseModal from "../../../../components/exercise/ExerciseModal";
 
 export default async function ExerciseModalPage({
   params,
@@ -19,5 +19,5 @@ export default async function ExerciseModalPage({
 
   if (!exercise) return null;
 
-  return <ExerciseModal exercise={exercise} />;
+  return <ExerciseModal exerciseId={exercise.id} onClose={() => {}} />;
 }

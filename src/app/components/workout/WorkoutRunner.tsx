@@ -9,6 +9,7 @@ import {
 import { ExerciseLogger } from "./ExerciseLogger";
 import { ScheduledWorkoutWithLogs } from "@/types/workout";
 import { ExerciseLogViewer } from "./ExerciseLogViewer";
+import { useRouter } from "next/router";
 
 export default function WorkoutRunner({
   scheduledWorkout,
@@ -16,7 +17,7 @@ export default function WorkoutRunner({
   scheduledWorkout: ScheduledWorkoutWithLogs;
 }) {
   const activeLog = scheduledWorkout.workoutLogs[0] ?? null;
-
+  const router = useRouter();
   const isActive = activeLog?.status === "IN_PROGRESS" && !activeLog.endedAt;
 
   const isCompleted = activeLog?.status === "COMPLETED";
@@ -55,6 +56,7 @@ export default function WorkoutRunner({
           onClick={async () => {
             const id = await startWorkout(scheduledWorkout.id);
             setWorkoutLogId(id);
+            router.refresh();
           }}
         >
           Start workout
@@ -79,7 +81,7 @@ export default function WorkoutRunner({
           <ExerciseLogger
             key={we.id}
             exercise={we.exercise}
-             notes={we.notes}
+            notes={we.notes}
             prescribed={we.prescribed as Prescribed}
             workoutLogId={workoutLogId}
             disabled={!isActive}
