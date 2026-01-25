@@ -96,10 +96,26 @@ model Exercise {
   trainerId String?
   trainer   User?   @relation(fields: [trainerId], references: [id])
 
-  workoutExercises WorkoutExercise[]
-  exerciseLogs     ExerciseLog[]     @relation("ExerciseToLogs")
+  workoutExercises  WorkoutExercise[]
+  exerciseLogs      ExerciseLog[]          @relation("ExerciseToLogs")
+  substitutionsFrom ExerciseSubstitution[] @relation("PrimaryExercise")
+  substitutionsTo   ExerciseSubstitution[] @relation("SubstituteExercise")
 
   @@unique([name, trainerId], name: "exercise_name_trainer_unique")
+}
+
+model ExerciseSubstitution {
+  id String @id @default(cuid())
+
+  exerciseId   String
+  substituteId String
+
+  note String?
+
+  exercise           Exercise @relation("PrimaryExercise", fields: [exerciseId], references: [id])
+  substituteExercise Exercise @relation("SubstituteExercise", fields: [substituteId], references: [id])
+
+  @@unique([exerciseId, substituteId])
 }
 
 model Program {

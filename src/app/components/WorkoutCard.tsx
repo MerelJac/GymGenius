@@ -12,6 +12,7 @@ import { Exercise } from "@/types/exercise";
 import { formatPrescribed } from "../utils/prescriptionFormatter";
 import { WorkoutDay } from "@/types/enums";
 import { Prescribed } from "@/types/prescribed";
+import Link from "next/link";
 
 export default function WorkoutCard({
   workout,
@@ -215,8 +216,17 @@ export default function WorkoutCard({
 
       <ul className="space-y-1 text-sm">
         {optimisticExercises.map((we) => (
-          <li key={we.id}>
-            {we.exercise.name} — {formatPrescribed(we.prescribed)}
+          <li key={we.id} className="flex items-center justify-between">
+            <section className="flex gap-2">
+              <Link
+                href={`/exercises/${we.exercise.id}/modal`}
+                scroll={false}
+                className="underline"
+              >
+                {we.exercise.name}
+              </Link>{" "}
+              — {formatPrescribed(we.prescribed)}
+            </section>
             {we.notes && (
               <div className="text-xs text-gray-500 italic mt-1">
                 {we.notes}
