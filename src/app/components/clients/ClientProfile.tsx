@@ -5,16 +5,16 @@ import Link from "next/link";
 import { addBodyMetric } from "@/app/(trainer)/clients/[clientId]/actions";
 import { Client } from "@/types/client";
 import { ScheduledWorkoutWithProgram } from "@/types/workout";
+import { ClientProfileEditor } from "./ClientProfileEditor";
 
 export default function ClientProfile({ client }: { client: Client }) {
   type ProgramGroup = {
-  program: {
-    id: string;
-    name: string;
+    program: {
+      id: string;
+      name: string;
+    };
+    workouts: ScheduledWorkoutWithProgram[];
   };
-  workouts: ScheduledWorkoutWithProgram[];
-};
-
 
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
@@ -31,8 +31,7 @@ export default function ClientProfile({ client }: { client: Client }) {
   }
 
   const programs = Object.values(
-  client.scheduledWorkouts.reduce<Record<string, ProgramGroup>>(
-    (acc, sw) => {
+    client.scheduledWorkouts.reduce<Record<string, ProgramGroup>>((acc, sw) => {
       const program = sw.workout.program;
 
       if (!acc[program.id]) {
@@ -47,11 +46,8 @@ export default function ClientProfile({ client }: { client: Client }) {
 
       acc[program.id].workouts.push(sw);
       return acc;
-    },
-    {},
-  ),
-);
-
+    }, {}),
+  );
 
   return (
     <div className="space-y-6">
@@ -80,6 +76,10 @@ export default function ClientProfile({ client }: { client: Client }) {
         <p>Email: {client.email}</p>
       </div>
 
+      <ClientProfileEditor
+        firstName={client.profile?.firstName}
+        lastName={client.profile?.lastName}
+      />
       {/* Add metric */}
       <div className="flex gap-2 items-center">
         <input

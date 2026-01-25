@@ -23,3 +23,30 @@ export async function addBodyMetric(
 
   revalidatePath(`/clients/${clientId}`);
 }
+
+
+export async function updateClientProfile(
+  firstName: string,
+  lastName: string,
+) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.profile.upsert({
+    where: {
+      userId: session.user.id,
+    },
+    update: {
+      firstName,
+      lastName,
+    },
+    create: {
+      userId: session.user.id,
+      firstName,
+      lastName,
+    },
+  });
+}
