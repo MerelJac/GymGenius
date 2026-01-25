@@ -41,12 +41,14 @@ export default async function ClientDashboard() {
   });
 
   const todaysWorkout = upcomingWorkouts.find(
-    (w) => w.scheduledDate < tomorrow
+    (w) => w.scheduledDate < tomorrow,
   );
 
   const futureWorkouts = upcomingWorkouts.filter(
-    (w) => w.scheduledDate >= tomorrow
+    (w) => w.scheduledDate >= tomorrow,
   );
+
+  const pastWorkouts = upcomingWorkouts.filter((w) => w.scheduledDate <= today);
 
   return (
     <div className="space-y-4">
@@ -55,6 +57,8 @@ export default async function ClientDashboard() {
       <TodayWorkout workout={todaysWorkout} />
 
       <UpcomingWorkouts workouts={futureWorkouts} />
+
+      <PastWorkouts workouts={pastWorkouts} />
 
       <div className="rounded border p-4">
         <p>Progress overview (coming next)</p>
@@ -70,7 +74,7 @@ export default async function ClientDashboard() {
 function TodayWorkout({
   workout,
 }: {
- workout: ScheduledWorkoutDashboard | undefined;
+  workout: ScheduledWorkoutDashboard | undefined;
 }) {
   if (!workout) {
     return (
@@ -86,20 +90,17 @@ function TodayWorkout({
 
       <p className="text-sm text-gray-600">
         <Link href={`/workouts/${workout.id}`}>
-        <button>{workout.workout.name}</button></Link>
+          <button>{workout.workout.name}</button>
+        </Link>
       </p>
 
       <ul className="text-sm list-disc pl-5">
         {workout.workout.exercises.map((we) => (
-          <li key={we.id}>
-            {we.exercise.name}
-          </li>
+          <li key={we.id}>{we.exercise.name}</li>
         ))}
       </ul>
 
-      <button className="mt-2 text-sm underline">
-        Start workout
-      </button>
+      <button className="mt-2 text-sm underline">Start workout</button>
     </div>
   );
 }
@@ -118,8 +119,9 @@ function UpcomingWorkouts({
       <ul className="text-sm space-y-1">
         {workouts.map((w) => (
           <li key={w.id} className="flex justify-between">
-                    <Link href={`/workouts/${w.id}`}>
-        <span>{w.workout.name}</span></Link>
+            <Link href={`/workouts/${w.id}`}>
+              <span>{w.workout.name}</span>
+            </Link>
             <span className="text-gray-500">
               {w.scheduledDate.toLocaleDateString()}
             </span>
@@ -130,3 +132,25 @@ function UpcomingWorkouts({
   );
 }
 
+function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
+  if (workouts.length === 0) return null;
+
+  return (
+    <div className="rounded border p-4 space-y-2">
+      <h2 className="font-medium">Coming up</h2>
+
+      <ul className="text-sm space-y-1">
+        {workouts.map((w) => (
+          <li key={w.id} className="flex justify-between">
+            <Link href={`/workouts/${w.id}`}>
+              <span>{w.workout.name}</span>
+            </Link>
+            <span className="text-gray-500">
+              {w.scheduledDate.toLocaleDateString()}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

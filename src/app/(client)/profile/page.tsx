@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { BodyMetricLogger } from "@/app/components/clients/BodyMetricLogger";
 import { ClientProfileEditor } from "@/app/components/clients/ClientProfileEditor";
+import { LogoutButton } from "@/app/components/Logout";
 
 export default async function ClientProfilePage() {
   const session = await getServerSession(authOptions);
@@ -107,6 +108,7 @@ export default async function ClientProfilePage() {
           </ul>
         )}
       </section>
+      <LogoutButton/>
     </div>
   );
 }
