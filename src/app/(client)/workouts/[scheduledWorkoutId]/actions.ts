@@ -11,7 +11,7 @@ export async function startWorkout(scheduledId: string) {
   if (!session) throw new Error("Unauthorized");
 
   // 1️⃣ Check for existing log
-  const existing = await prisma.workoutLog.findUnique({
+  const existing = await prisma.workoutLog.findFirst({
     where: { scheduledId },
   });
 
