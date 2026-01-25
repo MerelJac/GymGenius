@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { BodyMetricLogger } from "@/app/components/clients/BodyMetricLogger";
+import { ClientProfileEditor } from "@/app/components/clients/ClientProfileEditor";
 
 export default async function ClientProfilePage() {
   const session = await getServerSession(authOptions);
@@ -44,6 +45,10 @@ export default async function ClientProfilePage() {
             <strong>Email:</strong> {user.email}
           </div>
           <div>
+            <ClientProfileEditor
+              firstName={user.profile?.firstName}
+              lastName={user.profile?.lastName}
+            />
             <strong>Name:</strong> {user.profile?.firstName}{" "}
             {user.profile?.lastName}
           </div>
