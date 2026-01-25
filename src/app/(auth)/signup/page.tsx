@@ -46,42 +46,44 @@ export default function SignupPage() {
   }
 
   return (
-    <form action={signup} className="max-w-md space-y-4">
-      <h1 className="text-xl font-semibold">Create account</h1>
+    <div className="min-h-screen flex items-center justify-center">
+      <form action={signup} className="max-w-md space-y-4">
+        <h1 className="text-xl font-semibold">Create account</h1>
 
-      <input
-        name="firstName"
-        placeholder="First name"
-        required
-        className="border p-2 w-full"
-      />
+        <input
+          name="firstName"
+          placeholder="First name"
+          required
+          className="border p-2 w-full"
+        />
 
-      <input
-        name="lastName"
-        placeholder="Last name"
-        required
-        className="border p-2 w-full"
-      />
+        <input
+          name="lastName"
+          placeholder="Last name"
+          required
+          className="border p-2 w-full"
+        />
 
-      <input
-        name="email"
-        type="email"
-        placeholder="Email"
-        required
-        className="border p-2 w-full"
-      />
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          required
+          className="border p-2 w-full"
+        />
 
-      <input
-        name="password"
-        type="password"
-        placeholder="Password"
-        required
-        className="border p-2 w-full"
-      />
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+          className="border p-2 w-full"
+        />
 
-      <button type="submit" className="border px-4 py-2 rounded">
-        Sign up
-      </button>
-    </form>
+        <button type="submit" className="border px-4 py-2 rounded">
+          Sign up
+        </button>
+      </form>
+    </div>
   );
 }
