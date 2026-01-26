@@ -15,7 +15,7 @@ import { User, WorkoutDay } from "@prisma/client";
 import { BackButton } from "./BackButton";
 import { ClientProgramProgress } from "./ClientProgramProgress";
 import { ClientWithWorkouts } from "@/types/client";
-import { Plus, Users, Calendar } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 
 export default function ProgramBuilder({
   program,
@@ -132,6 +132,7 @@ export default function ProgramBuilder({
   return (
     <div className="space-y-8 pb-12">
       {/* Header & Program Name */}
+      <BackButton route="/programs" />
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b bg-gray-50/70">
           <div className="flex items-start justify-between gap-6 flex-wrap">
@@ -157,8 +158,6 @@ export default function ProgramBuilder({
                 </h1>
               )}
             </div>
-
-            <BackButton route="/programs" />
           </div>
         </div>
 
@@ -182,7 +181,10 @@ export default function ProgramBuilder({
                     </option>
                   ))}
                 </select>
-                <Users className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                <Users
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
               </div>
             </div>
 
@@ -197,7 +199,6 @@ export default function ProgramBuilder({
                   onChange={(e) => setStartDate(e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
-                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               </div>
             </div>
 
@@ -214,7 +215,9 @@ export default function ProgramBuilder({
         {/* Assigned Clients Progress */}
         {clientsAssignedProgram.length > 0 && (
           <div className="px-6 py-5 border-b last:border-b-0">
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">Assigned Clients</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">
+              Assigned Clients
+            </h3>
             <div className="space-y-4">
               {clientsAssignedProgram.map((client) => (
                 <ClientProgramProgress key={client.id} client={client} />
@@ -239,7 +242,9 @@ export default function ProgramBuilder({
 
         {optimisticWorkouts.length === 0 ? (
           <div className="bg-gray-50 border border-gray-200 rounded-xl p-10 text-center">
-            <p className="text-gray-600 mb-4">No workouts in this program yet</p>
+            <p className="text-gray-600 mb-4">
+              No workouts in this program yet
+            </p>
             <button
               onClick={handleAddWorkout}
               className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
