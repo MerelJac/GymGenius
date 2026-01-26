@@ -1,65 +1,116 @@
 // src/app/(auth)/login/page.tsx
-"use client"
+"use client";
 
-import { signIn } from "next-auth/react"
-import { useState } from "react"
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useState } from "react";
 
 export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
-    const formData = new FormData(e.currentTarget)
+    const formData = new FormData(e.currentTarget);
 
     const res = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
       redirect: false,
-    })
+    });
 
     if (res?.error) {
-      setError("Invalid email or password")
-      return
+      setError("Invalid email or password");
+      return;
     }
 
-    window.location.href = "/dashboard"
+    window.location.href = "/dashboard";
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 border p-6 rounded w-80"
-      >
-        <h1 className="text-xl font-semibold">Login</h1>
-
-        {error && <p className="text-red-600 text-sm">{error}</p>}
-
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          className="border p-2 w-full"
-          required
-        />
-
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          className="border p-2 w-full"
-          required
-        />
-
-        <button
-          type="submit"
-          className="bg-black text-white p-2 w-full"
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-sm">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 space-y-6"
         >
-          Login
-        </button>
-      </form>
+          {/* Header */}
+          <div className="text-center space-y-1">
+            <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
+            <p className="text-sm text-gray-500">
+              Sign in to your GymGenius account
+            </p>
+          </div>
+
+          {/* Error */}
+          {error && (
+            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          {/* Email */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              Email
+            </label>
+            <input
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       transition"
+              required
+            />
+          </div>
+
+          {/* Password */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       transition"
+              required
+            />
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full py-2.5 rounded-lg bg-blue-600 text-white font-medium
+                     hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
+                     focus:ring-offset-2 transition"
+          >
+            Sign in
+          </button>
+
+          <Link href="/signup">
+  <button
+    type="button"
+    className="w-full py-2.5 rounded-lg border border-gray-300
+               text-gray-700 font-medium
+               hover:bg-gray-50 hover:border-gray-400
+               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+               transition"
+  >
+              Sign Up
+            </button>
+          </Link>
+
+          {/* Footer */}
+          <p className="text-xs text-center text-gray-500">
+            © {new Date().getFullYear()} GymGenius
+          </p>
+        </form>
+      </div>
     </div>
-  )
+  );
 }
