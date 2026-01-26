@@ -39,8 +39,6 @@ export default async function ProgramBuilderPage({
 
   if (!program) return <div>Program not found</div>;
 
-
-
   const clients = await prisma.user.findMany({
     where: {
       trainerId: program.trainerId,
@@ -51,12 +49,44 @@ export default async function ProgramBuilderPage({
     },
   });
 
-  
+  const clientsAssignedProgram = await prisma.user.findMany({
+    where: {
+      role: "CLIENT",
+      trainerId: program.trainerId,
+      scheduledWorkouts: {
+        some: {
+          workout: {
+            programId: program.id,
+          },
+        },
+      },
+    },
+    include: {
+      profile: true,
+      scheduledWorkouts: {
+        where: {
+          workout: {
+            programId: program.id,
+          },
+        },
+        include: {
+          workout: {
+            include: {
+              program: true, // ✅ REQUIRED to satisfy ScheduledWorkout type
+            },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
     <ProgramBuilder
       program={program}
       exercises={exercises}
       clients={clients}
+      clientsAssignedProgram={clientsAssignedProgram}
     />
   );
 }

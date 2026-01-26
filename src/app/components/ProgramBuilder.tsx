@@ -13,33 +13,37 @@ import { Exercise } from "@/types/exercise";
 import { updateProgramName } from "../(trainer)/programs/actions";
 import { User, WorkoutDay } from "@prisma/client";
 import { BackButton } from "./BackButton";
+import { ClientProgramProgress } from "./ClientProgramProgress";
+import { ClientWithWorkouts } from "@/types/client";
 
 export default function ProgramBuilder({
   program,
   exercises,
   clients,
+  clientsAssignedProgram,
 }: {
   program: ProgramWithWorkouts;
   exercises: Exercise[];
   clients: User[];
+  clientsAssignedProgram: ClientWithWorkouts[];
 }) {
-type WorkoutAction =
-  | { type: "add"; workout: WorkoutWithSections }
-  | { type: "remove"; id: string };
+  type WorkoutAction =
+    | { type: "add"; workout: WorkoutWithSections }
+    | { type: "remove"; id: string };
 
-const [optimisticWorkouts, updateOptimisticWorkouts] = useOptimistic<
-  WorkoutWithSections[],
-  WorkoutAction
->(program.workouts, (state, action) => {
-  switch (action.type) {
-    case "add":
-      return [...state, action.workout];
-    case "remove":
-      return state.filter((w) => w.id !== action.id);
-    default:
-      return state;
-  }
-});
+  const [optimisticWorkouts, updateOptimisticWorkouts] = useOptimistic<
+    WorkoutWithSections[],
+    WorkoutAction
+  >(program.workouts, (state, action) => {
+    switch (action.type) {
+      case "add":
+        return [...state, action.workout];
+      case "remove":
+        return state.filter((w) => w.id !== action.id);
+      default:
+        return state;
+    }
+  });
 
   const [editingName, setEditingName] = useState(false);
   const [programName, setProgramName] = useState(program.name);
@@ -59,32 +63,32 @@ const [optimisticWorkouts, updateOptimisticWorkouts] = useOptimistic<
     await assignProgramToClient(program.id, clientId, new Date(startDate));
   }
 
-async function handleAddWorkout() {
-  const optimisticWorkout: WorkoutWithSections = {
-    id: crypto.randomUUID(),
-    name: "New Workout",
-    order: optimisticWorkouts.length,
-    day: WorkoutDay.MONDAY,
+  async function handleAddWorkout() {
+    const optimisticWorkout: WorkoutWithSections = {
+      id: crypto.randomUUID(),
+      name: "New Workout",
+      order: optimisticWorkouts.length,
+      day: WorkoutDay.MONDAY,
 
-    workoutSections: [
-      {
-        id: crypto.randomUUID(),
-        title: "Main",
-        order: 0,
-        exercises: [],
-      },
-    ],
-  };
+      workoutSections: [
+        {
+          id: crypto.randomUUID(),
+          title: "Main",
+          order: 0,
+          exercises: [],
+        },
+      ],
+    };
 
-  startTransition(() => {
-    updateOptimisticWorkouts({
-      type: "add",
-      workout: optimisticWorkout,
+    startTransition(() => {
+      updateOptimisticWorkouts({
+        type: "add",
+        workout: optimisticWorkout,
+      });
     });
-  });
 
-  await createWorkout(program.id);
-}
+    await createWorkout(program.id);
+  }
 
   async function handleDeleteWorkout(workout: WorkoutWithSections) {
     startTransition(() => {
@@ -97,34 +101,34 @@ async function handleAddWorkout() {
     await deleteWorkout(program.id, workout.id);
   }
 
-async function handleDuplicateWorkout(workout: WorkoutWithSections) {
-  const optimisticCopy: WorkoutWithSections = {
-    ...workout,
-    id: crypto.randomUUID(),
-    name: `${workout.name} (Copy)`,
-
-    workoutSections: workout.workoutSections.map((section, sectionIndex) => ({
-      ...section,
+  async function handleDuplicateWorkout(workout: WorkoutWithSections) {
+    const optimisticCopy: WorkoutWithSections = {
+      ...workout,
       id: crypto.randomUUID(),
-      order: sectionIndex,
+      name: `${workout.name} (Copy)`,
 
-      exercises: section.exercises.map((we, exerciseIndex) => ({
-        ...we,
+      workoutSections: workout.workoutSections.map((section, sectionIndex) => ({
+        ...section,
         id: crypto.randomUUID(),
-        order: exerciseIndex,
+        order: sectionIndex,
+
+        exercises: section.exercises.map((we, exerciseIndex) => ({
+          ...we,
+          id: crypto.randomUUID(),
+          order: exerciseIndex,
+        })),
       })),
-    })),
-  };
+    };
 
-  startTransition(() => {
-    updateOptimisticWorkouts({
-      type: "add",
-      workout: optimisticCopy,
+    startTransition(() => {
+      updateOptimisticWorkouts({
+        type: "add",
+        workout: optimisticCopy,
+      });
     });
-  });
 
-  await duplicateWorkout(program.id, workout.id);
-}
+    await duplicateWorkout(program.id, workout.id);
+  }
 
   return (
     <div className="space-y-6">
@@ -160,7 +164,9 @@ async function handleDuplicateWorkout(workout: WorkoutWithSections) {
               ))}
             </select>
 
-            
+            {clientsAssignedProgram.map((client) => (
+              <ClientProgramProgress key={client.id} client={client} />
+            ))}
 
             <input
               type="date"

@@ -1,26 +1,9 @@
 // components/ClientProgramProgress.tsx
 import Link from "next/link";
 import { WorkoutStatus } from "@prisma/client";
+import { ClientWithWorkouts } from "@/types/client";
+import { ScheduledWorkout } from "@/types/workout";
 
-type ScheduledWorkout = {
-  status: WorkoutStatus;
-  workout: {
-    program: {
-      id: string;
-      name: string;
-    };
-  };
-};
-
-type ClientWithWorkouts = {
-  id: string;
-  email: string;
-  profile?: {
-    firstName?: string | null;
-    lastName?: string | null;
-  } | null;
-  scheduledWorkouts: ScheduledWorkout[];
-};
 
 export function ClientProgramProgress({
   client,

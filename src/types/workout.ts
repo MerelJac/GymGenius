@@ -86,6 +86,18 @@ export type WorkoutWithExercises = {
   day: WorkoutDay;
 };
 
+
+export type ScheduledWorkout = {
+  status: WorkoutStatus;
+  workout: {
+    program: {
+      id: string;
+      name: string;
+    };
+  };
+};
+
+
 export type ScheduledWorkoutWithProgram = {
   id: string;
   scheduledDate: Date;
