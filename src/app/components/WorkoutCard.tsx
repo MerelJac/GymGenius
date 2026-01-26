@@ -5,8 +5,14 @@ import {
   updateWorkoutName,
   deleteWorkoutExercise,
   updateWorkoutDay,
+  createWorkoutSection,
+  updateWorkoutSectionTitle,
 } from "../(trainer)/programs/[programId]/actions";
-import { SectionExercise, WorkoutWithSections } from "@/types/workout"; // ← update this type!
+import {
+  SectionExercise,
+  WorkoutSectionWithExercises,
+  WorkoutWithSections,
+} from "@/types/workout"; // ← update this type!
 import { Exercise } from "@/types/exercise";
 import { formatPrescribed } from "../utils/prescriptionFormatter";
 import { WorkoutDay } from "@/types/enums";
@@ -38,7 +44,10 @@ export default function WorkoutCard({
   const [name, setName] = useState(workout.name);
   const [editing, setEditing] = useState(false);
   const [day, setDay] = useState<WorkoutDay>(workout.day);
-
+  const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [sectionTitles, setSectionTitles] = useState<Record<string, string>>(
+    {},
+  );
   const selectedExercise = exercises.find((e) => e.id === exerciseId);
 
   const showStrengthFields =
@@ -48,45 +57,92 @@ export default function WorkoutCard({
 
   const showTimedFields = selectedExercise?.type === "TIMED";
 
+  function normalizeSections(
+    sections: WorkoutWithSections["workoutSections"],
+  ): WorkoutSectionWithExercises[] {
+    return sections.map((section) => ({
+      id: section.id,
+      title: section.title,
+      order: section.order,
+      exercises: section.exercises.map((we) => ({
+        id: we.id,
+        order: we.order,
+        exerciseId: we.exercise?.id ?? "__missing__", // required
+        exercise: we.exercise
+          ? ({
+              ...we.exercise,
+            } as Exercise)
+          : null,
+        prescribed: we.prescribed,
+        notes: we.notes,
+      })),
+    }));
+  }
+
   // ── Optimistic updates for sections + nested exercises ──
-  const [optimisticSections, updateOptimisticSections] = useOptimistic(
-    workout.workoutSections,
-    (
-      currentSections,
-      action:
-        | { type: "add-exercise"; sectionId: string; exercise: SectionExercise }
-        | { type: "remove-exercise"; exerciseId: string },
-    ) => {
-      switch (action.type) {
-        case "add-exercise":
-          return currentSections.map((section) =>
-            section.id === action.sectionId
-              ? {
-                  ...section,
-                  exercises: [...section.exercises, action.exercise],
-                }
-              : section,
-          );
-
-        case "remove-exercise":
-          return currentSections.map((section) => ({
-            ...section,
-            exercises: section.exercises.filter(
-              (e) => e.id !== action.exerciseId,
-            ),
-          }));
-
-        default:
-          return currentSections;
+  const [optimisticSections, updateOptimisticSections] = useOptimistic<
+    WorkoutSectionWithExercises[],
+    | {
+        type: "add-exercise";
+        sectionId: string;
+        exercise: SectionExercise;
+        exerciseId: string;
       }
-    },
-  );
+    | { type: "remove-exercise"; exerciseId: string }
+    | { type: "add-section"; section: WorkoutSectionWithExercises }
+    | {
+        type: "replace-section";
+        tempId: string;
+        section: WorkoutSectionWithExercises;
+      }
+    | { type: "update-section-title"; sectionId: string; title: string }
+  >(normalizeSections(workout.workoutSections), (currentSections, action) => {
+    switch (action.type) {
+      case "replace-section":
+        return currentSections.map((s) =>
+          s.id === action.tempId ? action.section : s,
+        );
+
+      case "add-section":
+        return [...currentSections, action.section];
+      case "update-section-title":
+        return currentSections.map((section) =>
+          section.id === action.sectionId
+            ? { ...section, title: action.title }
+            : section,
+        );
+
+      case "add-exercise":
+        return currentSections.map((section) =>
+          section.id === action.sectionId
+            ? {
+                ...section,
+                exercises: [...section.exercises, action.exercise],
+              }
+            : section,
+        );
+
+      case "remove-exercise":
+        return currentSections.map((section) => ({
+          ...section,
+          exercises: section.exercises.filter(
+            (e) => e.id !== action.exerciseId,
+          ),
+        }));
+
+      default:
+        return currentSections;
+    }
+  });
 
   useEffect(() => {
     if (!sectionId && workout.workoutSections?.length) {
       setSectionId(workout.workoutSections[0].id);
     }
   }, [workout.workoutSections, sectionId]);
+
+
+
 
   function saveName() {
     setEditing(false);
@@ -102,6 +158,22 @@ export default function WorkoutCard({
     });
   }
 
+
+  const startEditSection = (sectionId: string) => {
+  setEditingSectionId(sectionId);
+
+  setSectionTitles((prev) => {
+    if (prev[sectionId] !== undefined) return prev;
+
+    const section = optimisticSections.find((s) => s.id === sectionId);
+    if (!section) return prev;
+
+    return {
+      ...prev,
+      [sectionId]: section.title,
+    };
+  });
+};
   async function handleAddExercise() {
     if (!exerciseId || !sectionId) return;
 
@@ -134,11 +206,13 @@ export default function WorkoutCard({
       notes: notes || null,
     };
 
-    // Optimistic UI update
-    updateOptimisticSections({
-      type: "add-exercise",
-      sectionId,
-      exercise: optimisticExercise,
+    startTransition(() => {
+      updateOptimisticSections({
+        type: "add-exercise",
+        sectionId,
+        exerciseId,
+        exercise: optimisticExercise,
+      });
     });
 
     // Real server call
@@ -159,17 +233,85 @@ export default function WorkoutCard({
   }
 
   async function handleDeleteExercise(workoutExerciseId: string) {
-    // Optimistic remove
-    updateOptimisticSections({
-      type: "remove-exercise",
-      exerciseId: workoutExerciseId,
+    startTransition(() => {
+      updateOptimisticSections({
+        type: "remove-exercise",
+        exerciseId: workoutExerciseId,
+      });
     });
-
     try {
       await deleteWorkoutExercise(programId, workoutExerciseId);
     } catch (err) {
       console.error("Delete failed", err);
       // TODO: revert optimistic state
+    }
+  }
+
+  async function saveSectionTitle(sectionId: string, newTitle: string) {
+    if (!newTitle.trim()) {
+      // Optional: revert or show error
+      return;
+    }
+
+    const trimmed = newTitle.trim();
+
+    // Optimistic update
+    startTransition(() => {
+      updateOptimisticSections({
+        type: "update-section-title",
+        sectionId,
+        title: trimmed,
+      });
+    });
+
+    setEditingSectionId(null);
+
+    try {
+      await updateWorkoutSectionTitle(programId, sectionId, trimmed);
+    } catch (err) {
+      console.error("Failed to update section title", err);
+      // TODO: rollback (advanced) or show toast/error
+    }
+  }
+
+  async function handleAddSection() {
+    const tempId = crypto.randomUUID();
+
+    const optimisticSection: WorkoutSectionWithExercises = {
+      id: tempId,
+      title: "New Section",
+      order: optimisticSections.length,
+      exercises: [],
+    };
+
+    startTransition(() => {
+      updateOptimisticSections({
+        type: "add-section",
+        section: optimisticSection,
+      });
+    });
+
+    try {
+      const realSection = await createWorkoutSection(
+        programId,
+        workout.id,
+        "New Section",
+      );
+
+      startTransition(() => {
+        updateOptimisticSections({
+          type: "replace-section",
+          tempId,
+          section: {
+            ...realSection,
+            exercises: [],
+          },
+        });
+      });
+
+      setSectionId(realSection.id); // ✅ REAL ID
+    } catch (err) {
+      console.error("Failed to create section", err);
     }
   }
 
@@ -194,6 +336,17 @@ export default function WorkoutCard({
             {name}
           </h2>
         )}
+
+        <div className="flex justify-between items-center">
+          <h3 className="text-sm font-semibold text-gray-700">Sections</h3>
+
+          <button
+            className="text-sm underline text-blue-600"
+            onClick={handleAddSection}
+          >
+            + Add section
+          </button>
+        </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           <select
@@ -238,56 +391,99 @@ export default function WorkoutCard({
 
       {/* Sections + Exercises */}
       <div className="space-y-5">
-        {optimisticSections.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">
-            No sections yet. Add one to start building this workout.
-          </p>
-        ) : (
-          optimisticSections.map((section) => (
-            <div key={section.id} className="border rounded-md p-3 bg-gray-50">
-              <h3 className="font-semibold uppercase text-xs text-gray-600 mb-2.5 tracking-wide">
-                {section.title}
-              </h3>
+  {optimisticSections.length === 0 ? (
+    <p className="text-sm text-gray-500 italic">
+      No sections yet. Add one to start building this workout.
+    </p>
+  ) : (
+    optimisticSections.map((section) => (
+      <div
+        key={section.id}
+        className="border rounded-md p-3 bg-gray-50 group relative" // ← group here for hover
+      >
+        {/* Section title – either editable input or clickable h3 */}
+        <div className="mb-2.5 flex items-center gap-2">
+          {editingSectionId === section.id ? (
+            <input
+              type="text"
+              value={sectionTitles[section.id] ?? section.title}
+              onChange={(e) =>
+                setSectionTitles((prev) => ({
+                  ...prev,
+                  [section.id]: e.target.value,
+                }))
+              }
+              onBlur={() =>
+                saveSectionTitle(section.id, sectionTitles[section.id] ?? section.title)
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  saveSectionTitle(section.id, sectionTitles[section.id] ?? section.title);
+                }
+                if (e.key === "Escape") {
+                  setEditingSectionId(null);
+                  // Optional: revert title if you want
+                  // setSectionTitles((prev) => ({ ...prev, [section.id]: section.title }));
+                }
+              }}
+              className="font-semibold uppercase text-xs text-gray-700 border-b border-gray-400 px-1 py-0.5 bg-white focus:outline-none focus:border-blue-500 min-w-[140px] flex-1"
+              autoFocus
+            />
+          ) : (
+            <h3
+              className="font-semibold uppercase text-xs text-gray-600 tracking-wide cursor-pointer flex items-center gap-1.5 group-hover:text-gray-800"
+              onClick={() => startEditSection(section.id)}
+            >
+              {section.title}
+              <span className="opacity-0 group-hover:opacity-70 text-gray-400 text-[10px] hover:text-gray-600 transition-opacity">
+                ✎
+              </span>
+            </h3>
+          )}
+        </div>
 
-              <ul className="space-y-2">
-                {section.exercises.map((we) => (
-                  <li
-                    key={we.id}
-                    className="flex justify-between items-center text-sm"
+        {/* Exercises list */}
+        <ul className="space-y-2">
+          {section.exercises.length === 0 ? (
+            <li className="text-xs text-gray-500 italic pl-1">No exercises yet</li>
+          ) : (
+            section.exercises.map((we) => (
+              <li
+                key={we.id}
+                className="flex justify-between items-center text-sm py-0.5"
+              >
+                <div className="flex gap-2 items-baseline flex-1">
+                  <Link
+                    href={`/exercises/${we.exercise?.id}/modal`}
+                    scroll={false}
+                    className="text-blue-700 underline hover:text-blue-900"
                   >
-                    <div className="flex gap-2 items-baseline">
-                      <Link
-                        href={`/exercises/${we.exercise?.id}/modal`}
-                        scroll={false}
-                        className="text-blue-700 underline hover:text-blue-900"
-                      >
-                        {we.exercise?.name}
-                      </Link>
-
-                      <span className="text-gray-600">
-                        — {formatPrescribed(we.prescribed)}
-                      </span>
-
-                      {we.notes && (
-                        <span className="text-gray-500 text-xs italic">
-                          ({we.notes})
-                        </span>
-                      )}
-                    </div>
-
-                    <button
-                      onClick={() => handleDeleteExercise(we.id)}
-                      className="text-red-600 hover:text-red-800 text-xs"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        )}
+                    {we.exercise?.name || "Missing exercise"}
+                  </Link>
+                  <span className="text-gray-600">
+                    — {formatPrescribed(we.prescribed)}
+                  </span>
+                  {we.notes && (
+                    <span className="text-gray-500 text-xs italic">
+                      ({we.notes})
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => handleDeleteExercise(we.id)}
+                  className="text-red-600 hover:text-red-800 text-xs ml-2"
+                >
+                  Remove
+                </button>
+              </li>
+            ))
+          )}
+        </ul>
       </div>
+    ))
+  )}
+</div>
 
       {/* Add new exercise form */}
       <div className="border-t pt-4 mt-2">

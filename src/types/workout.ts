@@ -57,7 +57,6 @@ export type WorkoutWithSections = {
   }[];
 };
 
-
 export type WorkoutTemplate = {
   id: string;
   programId: string;
@@ -87,7 +86,6 @@ export type WorkoutWithExercises = {
   day: WorkoutDay;
 };
 
-
 export type ScheduledWorkoutWithProgram = {
   id: string;
   scheduledDate: Date;
@@ -114,49 +112,39 @@ export type ExerciseLog = {
   substitutionReason?: string | null;
 };
 
+export type ScheduledWorkoutWithLogs = Prisma.ScheduledWorkoutGetPayload<{
+  include: {
+    workout: {
+      include: {
+        workoutSections: {
+          include: {
+            exercises: {
+              include: {
+                exercise: true;
+              };
+            };
+          };
+        };
+      };
+    };
+    workoutLogs: {
+      include: {
+        exercises: {
+          include: {
+            exercise: true;
+          };
+        };
+      };
+    };
+  };
+}>;
 
-export type ScheduledWorkoutWithLogs =
-  Prisma.ScheduledWorkoutGetPayload<{
-    include: {
-      workout: {
-        include: {
-          workoutSections: {
-            include: {
-              exercises: {
-                include: {
-                  exercise: true
-                }
-              }
-            }
-          }
-        }
-      }
-      workoutLogs: {
-        include: {
-          exercises: {
-            include: {
-              exercise: true
-            }
-          }
-        }
-      }
-    }
-  }>
-
-
-  export type WorkoutSectionWithExercises = {
+export type WorkoutSectionWithExercises = {
   id: string;
   title: string;
   order: number;
-  exercises: {
-    id: string;
-    order: number;
-    prescribed: Prescribed;
-    notes?: string | null;
-    exercise: Exercise;
-  }[];
+  exercises: SectionExercise[];
 };
-
 
 export type ProgramWithWorkouts = {
   id: string;
@@ -190,7 +178,7 @@ export type ScheduledWorkoutDashboard = {
 export type SectionExercise = {
   id: string;
   order: number;
-  exercise: Exercise;
+  exercise: Exercise | null;
   exerciseId: string;
   prescribed: Prescribed;
   notes: string | null;

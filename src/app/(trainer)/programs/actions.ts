@@ -11,7 +11,27 @@ export async function deleteProgram(programId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  // delete children first (or rely on cascade if configured)
+  // 1️⃣ Delete workout exercises
+  await prisma.workoutExercise.deleteMany({
+    where: {
+      section: {
+        workout: {
+          programId,
+        },
+      },
+    },
+  });
+
+  // 2️⃣ Delete workout sections
+  await prisma.workoutSection.deleteMany({
+    where: {
+      workout: {
+        programId,
+      },
+    },
+  });
+
+  // 3️⃣ Delete scheduled workouts (clients)
   await prisma.scheduledWorkout.deleteMany({
     where: {
       workout: {
@@ -20,30 +40,20 @@ export async function deleteProgram(programId: string) {
     },
   });
 
-  // delete children first (or rely on cascade if configured)
-  const sectionIds = await prisma.workoutSection.findMany({
-    where: {
-      workout: {
-        programId,
-      },
-    },
-    select: { id: true },
+  // 4️⃣ Delete workout templates
+  await prisma.workoutTemplate.deleteMany({
+    where: { programId },
   });
 
-  await prisma.workoutExercise.deleteMany({
-    where: {
-      sectionId: {
-        in: sectionIds.map((s) => s.id),
-      },
-    },
-  });
-
+  // 5️⃣ Finally delete program
   await prisma.program.delete({
     where: { id: programId },
   });
 
   revalidatePath("/programs");
 }
+
+
 export async function duplicateProgram(programId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");

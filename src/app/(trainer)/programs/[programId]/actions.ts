@@ -26,6 +26,12 @@ export async function createWorkout(programId: string) {
       programId,
       name: "New Workout",
       order,
+      workoutSections: {
+        create: {
+          title: "Main",
+          order: 0,
+        },
+      },
     },
   });
 
@@ -192,4 +198,45 @@ export async function updateWorkoutDay(
   })
 
   revalidatePath(`/programs/${programId}`)
+}
+
+export async function createWorkoutSection(
+  programId: string,
+  workoutId: string,
+  title: string,
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  const order = await prisma.workoutSection.count({
+    where: { workoutId },
+  });
+
+  const section = await prisma.workoutSection.create({
+    data: {
+      workoutId,
+      title,
+      order,
+    },
+  });
+
+  revalidatePath(`/trainer/programs/${programId}`);
+
+  return section; // ✅ IMPORTANT
+}
+
+export async function updateWorkoutSectionTitle(
+  programId: string,
+  sectionId: string,
+  title: string,
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) throw new Error("Unauthorized");
+
+  await prisma.workoutSection.update({
+    where: { id: sectionId },
+    data: { title },
+  });
+
+  revalidatePath(`/trainer/programs/${programId}`);
 }
