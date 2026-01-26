@@ -4,7 +4,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import WorkoutRunner from "@/app/components/workout/WorkoutRunner";
-import Link from "next/link";
 import { BackButton } from "@/app/components/BackButton";
 
 export default async function ClientWorkoutPage({
@@ -15,33 +14,41 @@ export default async function ClientWorkoutPage({
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return notFound();
 
-  const scheduledWorkout = await prisma.scheduledWorkout.findFirst({
-    where: {
-      id: params.scheduledWorkoutId,
-      clientId: session.user.id,
-    },
-    include: {
-      workout: {
-        include: {
-          exercises: {
-            include: { exercise: true },
-            orderBy: { order: "asc" },
-          },
-        },
-      },
-      workoutLogs: {
-        orderBy: { createdAt: "desc" },
-        take: 1,
-        include: {
-          exercises: {
-            include: {
-              exercise: true, // 👈 so viewer can show names
+const scheduledWorkout = await prisma.scheduledWorkout.findFirst({
+  where: {
+    id: params.scheduledWorkoutId,
+    clientId: session.user.id,
+  },
+  include: {
+    workout: {
+      include: {
+        workoutSections: {
+          orderBy: { order: "asc" },
+          include: {
+            exercises: {
+              orderBy: { order: "asc" },
+              include: {
+                exercise: true,
+              },
             },
           },
         },
       },
     },
-  });
+    workoutLogs: {
+      orderBy: { createdAt: "desc" },
+      take: 1,
+      include: {
+        exercises: {
+          include: {
+            exercise: true,
+          },
+        },
+      },
+    },
+  },
+});
+
 
   if (!scheduledWorkout) return notFound();
 

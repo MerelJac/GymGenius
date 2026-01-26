@@ -57,7 +57,7 @@ export async function addWorkoutExercise(
   sectionId: string,
   exerciseId: string,
   prescribed: Prescribed,
-  notes?: string
+  notes?: string,
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -155,11 +155,10 @@ export async function duplicateWorkout(programId: string, workoutId: string) {
   return newWorkout.id;
 }
 
-
 export async function assignProgramToClient(
   programId: string,
   clientId: string,
-  startDate: Date
+  startDate: Date,
 ) {
   const program = await prisma.program.findUnique({
     where: { id: programId },
@@ -169,10 +168,7 @@ export async function assignProgramToClient(
   if (!program) throw new Error("Program not found");
 
   for (const workout of program.workouts) {
-    const scheduledDate = getNextDateForDay(
-      startDate,
-      workout.day
-    );
+    const scheduledDate = getNextDateForDay(startDate, workout.day);
 
     await prisma.scheduledWorkout.create({
       data: {
@@ -187,17 +183,17 @@ export async function assignProgramToClient(
 export async function updateWorkoutDay(
   programId: string,
   workoutId: string,
-  day: WorkoutDay
+  day: WorkoutDay,
 ) {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) throw new Error("Unauthorized")
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) throw new Error("Unauthorized");
 
   await prisma.workoutTemplate.update({
     where: { id: workoutId },
-    data: { day},
-  })
+    data: { day },
+  });
 
-  revalidatePath(`/programs/${programId}`)
+  revalidatePath(`/programs/${programId}`);
 }
 
 export async function createWorkoutSection(
@@ -239,4 +235,50 @@ export async function updateWorkoutSectionTitle(
   });
 
   revalidatePath(`/trainer/programs/${programId}`);
+}
+
+export async function moveWorkoutExercise(
+  programId: string,
+  workoutExerciseId: string,
+  newSectionId: string,
+) {
+  const newOrder = await prisma.workoutExercise.count({
+    where: { sectionId: newSectionId },
+  });
+
+  await prisma.workoutExercise.update({
+    where: { id: workoutExerciseId },
+    data: {
+      sectionId: newSectionId,
+      order: newOrder,
+    },
+  });
+
+  revalidatePath(`/trainer/programs/${programId}`);
+}
+export async function reorderWorkoutSections(
+  workoutId: string,
+  sectionIdsInOrder: string[],
+) {
+  await prisma.$transaction(async (tx) => {
+    // 1️⃣ Move all sections to a safe temp range
+    await Promise.all(
+      sectionIdsInOrder.map((id, index) =>
+        tx.workoutSection.update({
+          where: { id },
+          data: { order: index + 1000 }, // temp offset
+        }),
+      ),
+    );
+
+    // 2️⃣ Assign final order
+    await Promise.all(
+      sectionIdsInOrder.map((id, index) =>
+        tx.workoutSection.update({
+          where: { id },
+          data: { order: index },
+        }),
+      ),
+    );
+  });
 }

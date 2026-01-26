@@ -7,6 +7,8 @@ import {
   updateWorkoutDay,
   createWorkoutSection,
   updateWorkoutSectionTitle,
+  reorderWorkoutSections,
+  moveWorkoutExercise,
 } from "../(trainer)/programs/[programId]/actions";
 import {
   SectionExercise,
@@ -18,6 +20,7 @@ import { formatPrescribed } from "../utils/prescriptionFormatter";
 import { WorkoutDay } from "@/types/enums";
 import { Prescribed } from "@/types/prescribed";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function WorkoutCard({
   workout,
@@ -32,6 +35,7 @@ export default function WorkoutCard({
   onDelete: () => void;
   onDuplicate: () => void;
 }) {
+  const router = useRouter();
   const [exerciseId, setExerciseId] = useState(exercises[0]?.id || "");
   const [sectionId, setSectionId] = useState("");
 
@@ -96,6 +100,16 @@ export default function WorkoutCard({
         section: WorkoutSectionWithExercises;
       }
     | { type: "update-section-title"; sectionId: string; title: string }
+    | {
+        type: "move-exercise";
+        exerciseId: string;
+        fromSectionId: string;
+        toSectionId: string;
+      }
+    | {
+        type: "reorder-sections";
+        orderedSectionIds: string[];
+      }
   >(normalizeSections(workout.workoutSections), (currentSections, action) => {
     switch (action.type) {
       case "replace-section":
@@ -111,6 +125,12 @@ export default function WorkoutCard({
             ? { ...section, title: action.title }
             : section,
         );
+
+      case "reorder-sections":
+        return action.orderedSectionIds.map((id, index) => ({
+          ...currentSections.find((s) => s.id === id)!,
+          order: index,
+        }));
 
       case "add-exercise":
         return currentSections.map((section) =>
@@ -130,6 +150,35 @@ export default function WorkoutCard({
           ),
         }));
 
+      case "move-exercise": {
+        let movedExercise: SectionExercise | null = null;
+
+        const withoutExercise = currentSections.map((section) => {
+          if (section.id === action.fromSectionId) {
+            const remaining = section.exercises.filter((e) => {
+              if (e.id === action.exerciseId) {
+                movedExercise = e;
+                return false;
+              }
+              return true;
+            });
+            return { ...section, exercises: remaining };
+          }
+          return section;
+        });
+
+        if (!movedExercise) return currentSections;
+
+        return withoutExercise.map((section) =>
+          section.id === action.toSectionId
+            ? {
+                ...section,
+                exercises: [...section.exercises, movedExercise!],
+              }
+            : section,
+        );
+      }
+
       default:
         return currentSections;
     }
@@ -140,9 +189,6 @@ export default function WorkoutCard({
       setSectionId(workout.workoutSections[0].id);
     }
   }, [workout.workoutSections, sectionId]);
-
-
-
 
   function saveName() {
     setEditing(false);
@@ -158,22 +204,21 @@ export default function WorkoutCard({
     });
   }
 
-
   const startEditSection = (sectionId: string) => {
-  setEditingSectionId(sectionId);
+    setEditingSectionId(sectionId);
 
-  setSectionTitles((prev) => {
-    if (prev[sectionId] !== undefined) return prev;
+    setSectionTitles((prev) => {
+      if (prev[sectionId] !== undefined) return prev;
 
-    const section = optimisticSections.find((s) => s.id === sectionId);
-    if (!section) return prev;
+      const section = optimisticSections.find((s) => s.id === sectionId);
+      if (!section) return prev;
 
-    return {
-      ...prev,
-      [sectionId]: section.title,
-    };
-  });
-};
+      return {
+        ...prev,
+        [sectionId]: section.title,
+      };
+    });
+  };
   async function handleAddExercise() {
     if (!exerciseId || !sectionId) return;
 
@@ -315,6 +360,89 @@ export default function WorkoutCard({
     }
   }
 
+  function moveSectionUp(sectionId: string) {
+    const index = optimisticSections.findIndex((s) => s.id === sectionId);
+    if (index <= 0) return;
+
+    const reordered = [...optimisticSections];
+    [reordered[index - 1], reordered[index]] = [
+      reordered[index],
+      reordered[index - 1],
+    ];
+
+    const ids = reordered.map((s) => s.id);
+
+    startTransition(() => {
+      updateOptimisticSections({
+        type: "reorder-sections",
+        orderedSectionIds: ids,
+      });
+    });
+
+    reorderWorkoutSections(workout.id, ids);
+     router.refresh();
+  }
+
+  function moveSectionDown(sectionId: string) {
+    const index = optimisticSections.findIndex((s) => s.id === sectionId);
+    if (index === -1 || index >= optimisticSections.length - 1) return;
+
+    const reordered = [...optimisticSections];
+    [reordered[index], reordered[index + 1]] = [
+      reordered[index + 1],
+      reordered[index],
+    ];
+
+    const ids = reordered.map((s) => s.id);
+
+    startTransition(() => {
+      updateOptimisticSections({
+        type: "reorder-sections",
+        orderedSectionIds: ids,
+      });
+    });
+
+    reorderWorkoutSections(workout.id, ids);
+     router.refresh();
+  }
+
+  function moveExerciseWithinSection(
+    sectionId: string,
+    exerciseId: string,
+    direction: "up" | "down",
+  ) {
+    const section = optimisticSections.find((s) => s.id === sectionId);
+    if (!section) return;
+
+    const index = section.exercises.findIndex((e) => e.id === exerciseId);
+    if (index === -1) return;
+
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= section.exercises.length) return;
+
+    const reorderedExercises = [...section.exercises];
+    [reorderedExercises[index], reorderedExercises[targetIndex]] = [
+      reorderedExercises[targetIndex],
+      reorderedExercises[index],
+    ];
+
+    startTransition(() => {
+      updateOptimisticSections({
+        type: "replace-section",
+        tempId: section.id,
+        section: {
+          ...section,
+          exercises: reorderedExercises.map((e, i) => ({
+            ...e,
+            order: i,
+          })),
+        },
+      });
+    });
+
+     router.refresh();
+  }
+
   return (
     <div className="border p-4 space-y-4 rounded-lg shadow-sm">
       {/* Header */}
@@ -354,7 +482,7 @@ export default function WorkoutCard({
             onChange={(e) => setSectionId(e.target.value)}
             className="border px-2 py-1 text-sm rounded"
           >
-            {workout.workoutSections?.map((section) => (
+            {optimisticSections.map((section) => (
               <option key={section.id} value={section.id}>
                 {section.title}
               </option>
@@ -391,99 +519,174 @@ export default function WorkoutCard({
 
       {/* Sections + Exercises */}
       <div className="space-y-5">
-  {optimisticSections.length === 0 ? (
-    <p className="text-sm text-gray-500 italic">
-      No sections yet. Add one to start building this workout.
-    </p>
-  ) : (
-    optimisticSections.map((section) => (
-      <div
-        key={section.id}
-        className="border rounded-md p-3 bg-gray-50 group relative" // ← group here for hover
-      >
-        {/* Section title – either editable input or clickable h3 */}
-        <div className="mb-2.5 flex items-center gap-2">
-          {editingSectionId === section.id ? (
-            <input
-              type="text"
-              value={sectionTitles[section.id] ?? section.title}
-              onChange={(e) =>
-                setSectionTitles((prev) => ({
-                  ...prev,
-                  [section.id]: e.target.value,
-                }))
-              }
-              onBlur={() =>
-                saveSectionTitle(section.id, sectionTitles[section.id] ?? section.title)
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  saveSectionTitle(section.id, sectionTitles[section.id] ?? section.title);
-                }
-                if (e.key === "Escape") {
-                  setEditingSectionId(null);
-                  // Optional: revert title if you want
-                  // setSectionTitles((prev) => ({ ...prev, [section.id]: section.title }));
-                }
-              }}
-              className="font-semibold uppercase text-xs text-gray-700 border-b border-gray-400 px-1 py-0.5 bg-white focus:outline-none focus:border-blue-500 min-w-[140px] flex-1"
-              autoFocus
-            />
-          ) : (
-            <h3
-              className="font-semibold uppercase text-xs text-gray-600 tracking-wide cursor-pointer flex items-center gap-1.5 group-hover:text-gray-800"
-              onClick={() => startEditSection(section.id)}
+        {optimisticSections.length === 0 ? (
+          <p className="text-sm text-gray-500 italic">
+            No sections yet. Add one to start building this workout.
+          </p>
+        ) : (
+          optimisticSections.map((section) => (
+            <div
+              key={section.id}
+              className="border rounded-md p-3 bg-gray-50 group relative" // ← group here for hover
             >
-              {section.title}
-              <span className="opacity-0 group-hover:opacity-70 text-gray-400 text-[10px] hover:text-gray-600 transition-opacity">
-                ✎
-              </span>
-            </h3>
-          )}
-        </div>
-
-        {/* Exercises list */}
-        <ul className="space-y-2">
-          {section.exercises.length === 0 ? (
-            <li className="text-xs text-gray-500 italic pl-1">No exercises yet</li>
-          ) : (
-            section.exercises.map((we) => (
-              <li
-                key={we.id}
-                className="flex justify-between items-center text-sm py-0.5"
-              >
-                <div className="flex gap-2 items-baseline flex-1">
-                  <Link
-                    href={`/exercises/${we.exercise?.id}/modal`}
-                    scroll={false}
-                    className="text-blue-700 underline hover:text-blue-900"
+              {/* Section title – either editable input or clickable h3 */}
+              <div className="mb-2.5 flex items-center gap-2">
+                {editingSectionId === section.id ? (
+                  <input
+                    type="text"
+                    value={sectionTitles[section.id] ?? section.title}
+                    onChange={(e) =>
+                      setSectionTitles((prev) => ({
+                        ...prev,
+                        [section.id]: e.target.value,
+                      }))
+                    }
+                    onBlur={() =>
+                      saveSectionTitle(
+                        section.id,
+                        sectionTitles[section.id] ?? section.title,
+                      )
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        saveSectionTitle(
+                          section.id,
+                          sectionTitles[section.id] ?? section.title,
+                        );
+                      }
+                      if (e.key === "Escape") {
+                        setEditingSectionId(null);
+                        // Optional: revert title if you want
+                        // setSectionTitles((prev) => ({ ...prev, [section.id]: section.title }));
+                      }
+                    }}
+                    className="font-semibold uppercase text-xs text-gray-700 border-b border-gray-400 px-1 py-0.5 bg-white focus:outline-none focus:border-blue-500 min-w-[140px] flex-1"
+                    autoFocus
+                  />
+                ) : (
+                  <h3
+                    className="font-semibold uppercase text-xs text-gray-600 tracking-wide cursor-pointer flex items-center gap-1.5 group-hover:text-gray-800"
+                    onClick={() => startEditSection(section.id)}
                   >
-                    {we.exercise?.name || "Missing exercise"}
-                  </Link>
-                  <span className="text-gray-600">
-                    — {formatPrescribed(we.prescribed)}
-                  </span>
-                  {we.notes && (
-                    <span className="text-gray-500 text-xs italic">
-                      ({we.notes})
+                    {section.title}
+                    <span className="opacity-0 group-hover:opacity-70 text-gray-400 text-[10px] hover:text-gray-600 transition-opacity">
+                      ✎
                     </span>
-                  )}
+                  </h3>
+                )}
+                {/* section controls */}
+                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                  <button
+                    onClick={() => moveSectionUp(section.id)}
+                    className="text-xs text-gray-500 hover:text-black"
+                    title="Move section up"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={() => moveSectionDown(section.id)}
+                    className="text-xs text-gray-500 hover:text-black"
+                    title="Move section down"
+                  >
+                    ↓
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleDeleteExercise(we.id)}
-                  className="text-red-600 hover:text-red-800 text-xs ml-2"
-                >
-                  Remove
-                </button>
-              </li>
-            ))
-          )}
-        </ul>
+              </div>
+
+              {/* Exercises list */}
+              <ul className="space-y-2">
+                {section.exercises.length === 0 ? (
+                  <li className="text-xs text-gray-500 italic pl-1">
+                    No exercises yet
+                  </li>
+                ) : (
+                  section.exercises.map((we) => (
+                    <li
+                      key={we.id}
+                      className="flex justify-between items-center text-sm py-0.5"
+                    >
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() =>
+                            moveExerciseWithinSection(section.id, we.id, "up")
+                          }
+                          className="text-xs text-gray-400 hover:text-black"
+                          title="Move exercise up"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          onClick={() =>
+                            moveExerciseWithinSection(section.id, we.id, "down")
+                          }
+                          className="text-xs text-gray-400 hover:text-black"
+                          title="Move exercise down"
+                        >
+                          ↓
+                        </button>
+                      </div>
+
+                      <select
+                        value={section.id}
+                        onChange={async (e) => {
+                          const newSectionId = e.target.value;
+
+                          startTransition(() => {
+                            updateOptimisticSections({
+                              type: "move-exercise",
+                              exerciseId: we.id,
+                              fromSectionId: section.id,
+                              toSectionId: newSectionId,
+                            });
+                          });
+
+                          await moveWorkoutExercise(
+                            programId,
+                            we.id,
+                            newSectionId,
+                          );
+                        }}
+                        className="text-xs border rounded px-1 py-0.5"
+                      >
+                        {optimisticSections.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.title}
+                          </option>
+                        ))}
+                      </select>
+
+                      <div className="flex gap-2 items-baseline flex-1">
+                        <Link
+                          href={`/exercises/${we.exercise?.id}/modal`}
+                          scroll={false}
+                          className="text-blue-700 underline hover:text-blue-900"
+                        >
+                          {we.exercise?.name || "Missing exercise"}
+                        </Link>
+                        <span className="text-gray-600">
+                          — {formatPrescribed(we.prescribed)}
+                        </span>
+                        {we.notes && (
+                          <span className="text-gray-500 text-xs italic">
+                            ({we.notes})
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleDeleteExercise(we.id)}
+                        className="text-red-600 hover:text-red-800 text-xs ml-2"
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))
+                )}
+              </ul>
+            </div>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
 
       {/* Add new exercise form */}
       <div className="border-t pt-4 mt-2">
