@@ -161,6 +161,19 @@ for (const exercise of exercises) {
   }
 }
 
+
+await prisma.additionalWorkoutType.createMany({
+  data: [
+    { name: "Walk" },
+    { name: "Run" },
+    { name: "Tennis" },
+    { name: "HIIT" },
+    { name: "Bike" },
+    { name: "Yoga" },
+  ],
+  skipDuplicates: true,
+});
+
   console.log("✅ Seeded default exercises");
 }
 

@@ -41,10 +41,51 @@ export default async function ClientProfilePage() {
           },
         },
       },
+      additionalWorkouts: {
+        orderBy: { performedAt: "desc" },
+        take: 5,
+        include: {
+          type: true,
+        },
+      },
     },
   });
 
   if (!user) return notFound();
+
+  type HistoryItem =
+    | {
+        kind: "scheduled";
+        id: string;
+        title: string;
+        date: Date;
+        href: string;
+      }
+    | {
+        kind: "additional";
+        id: string;
+        title: string;
+        date: Date;
+      };
+
+  const historyItems: HistoryItem[] = [
+    ...user.workoutLogs.map((log) => ({
+      kind: "scheduled" as const,
+      id: log.id,
+      title: log.scheduled?.workout?.name ?? "Workout",
+      date: log.createdAt,
+      href: `/workouts/${log.scheduledId}`,
+    })),
+
+    ...user.additionalWorkouts.map((w) => ({
+      kind: "additional" as const,
+      id: w.id,
+      title: w.type.name,
+      date: w.performedAt,
+    })),
+  ]
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .slice(0, 10);
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
@@ -136,40 +177,52 @@ export default async function ClientProfilePage() {
       </section>
 
       {/* Workout History */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Recent Workouts</h2>
+<section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
+  <h2 className="text-lg font-semibold text-gray-900">
+    Recent Activity
+  </h2>
 
-        {user.workoutLogs.length === 0 ? (
-          <p className="text-sm text-gray-500">No completed workouts yet</p>
-        ) : (
-          <ul className="text-sm space-y-2">
-            {user.workoutLogs.map((log) => {
-              const workout = log.scheduled?.workout;
+  {historyItems.length === 0 ? (
+    <p className="text-sm text-gray-500">
+      No activity logged yet
+    </p>
+  ) : (
+    <ul className="text-sm space-y-2">
+      {historyItems.map((item) => (
+        <li
+          key={`${item.kind}-${item.id}`}
+          className="flex justify-between items-center"
+        >
+          <div className="flex items-center gap-2">
+            {item.kind === "scheduled" ? (
+              <Link
+                href={item.href}
+                className="font-medium text-gray-900 hover:underline hover:text-blue-600"
+              >
+                {item.title}
+              </Link>
+            ) : (
+              <span className="font-medium text-gray-900">
+                {item.title}
+              </span>
+            )}
 
-              return (
-                <li key={log.id} className="flex justify-between items-center">
-                  {workout ? (
-                    <Link
-                      href={`/workouts/${log.scheduledId}`}
-                      className="text-gray-900 font-medium hover:underline hover:text-blue-600 transition"
-                    >
-                      {workout.name}
-                    </Link>
-                  ) : (
-                    <span className="text-gray-400 italic">
-                      Workout unavailable
-                    </span>
-                  )}
+            {item.kind === "additional" && (
+              <span className="text-xs rounded-full bg-gray-100 px-2 py-0.5 text-gray-600">
+                Additional
+              </span>
+            )}
+          </div>
 
-                  <span className="text-gray-500">
-                    {log.createdAt.toLocaleDateString()}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+          <span className="text-gray-500">
+            {item.date.toLocaleDateString()}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )}
+</section>
+
 
       {/* Logout */}
       <div className="pt-2 text-center">

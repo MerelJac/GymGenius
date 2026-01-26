@@ -4,10 +4,13 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ScheduledWorkoutDashboard } from "@/types/workout";
+import { AdditionalWorkoutQuickAdd } from "../workout/AdditionalWorkoutQuickAdd";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
+
+  const clientId = session?.user?.id;
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -65,6 +68,9 @@ export default async function ClientDashboard() {
 
       <TodayWorkout workout={todaysWorkout} />
 
+<section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
+  <AdditionalWorkoutQuickAdd clientId={clientId} />
+</section>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UpcomingWorkouts workouts={futureWorkouts} />
         <PastWorkouts workouts={pastWorkouts} />

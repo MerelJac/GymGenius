@@ -49,13 +49,14 @@ model User {
   profile  Profile?
   programs Program[] @relation("TrainerPrograms")
 
-  sentMessages      Message[]          @relation("MessageSender")
-  receivedMessages  Message[]          @relation("MessageRecipient")
-  exercises         Exercise[]
-  scheduledWorkouts ScheduledWorkout[]
-  workoutLogs       WorkoutLog[]
-  invitesSent       Invite[]
-  bodyMetrics       BodyMetric[]
+  sentMessages       Message[]           @relation("MessageSender")
+  receivedMessages   Message[]           @relation("MessageRecipient")
+  exercises          Exercise[]
+  scheduledWorkouts  ScheduledWorkout[]
+  workoutLogs        WorkoutLog[]
+  invitesSent        Invite[]
+  bodyMetrics        BodyMetric[]
+  additionalWorkouts AdditionalWorkout[]
 }
 
 model Profile {
@@ -257,4 +258,31 @@ model WorkoutSection {
   exercises WorkoutExercise[]
 
   @@unique([workoutId, order])
+}
+
+model AdditionalWorkoutType {
+  id        String   @id @default(uuid())
+  name      String   @unique // "Walk", "Run", "Tennis", "HIIT"
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  workouts AdditionalWorkout[]
+}
+
+model AdditionalWorkout {
+  id       String @id @default(uuid())
+  clientId String
+  client   User   @relation(fields: [clientId], references: [id])
+
+  typeId String
+  type   AdditionalWorkoutType @relation(fields: [typeId], references: [id])
+
+  duration Int?
+  distance Float?
+  notes    String?
+
+  performedAt DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([clientId, performedAt])
 }

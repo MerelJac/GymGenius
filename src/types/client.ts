@@ -43,5 +43,10 @@ export type ClientProfilePageUser = Prisma.UserGetPayload<{
         };
       };
     };
+    additionalWorkouts: {
+      include: {
+        type: true;
+      };
+    };
   };
 }>;
