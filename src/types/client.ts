@@ -13,6 +13,7 @@ export type Client = {
   trainerId?: string | null;
   createdAt: Date;
   scheduledWorkouts: ScheduledWorkoutWithProgram[];
+
 };
 
 export type ClientWithWorkouts = {
@@ -50,3 +51,32 @@ export type ClientProfilePageUser = Prisma.UserGetPayload<{
     };
   };
 }>;
+
+
+
+export type TrainerClientProfile =
+  Prisma.UserGetPayload<{
+    include: {
+      profile: true;
+
+      bodyMetrics: {
+        orderBy: { recordedAt: "asc" };
+      };
+
+      scheduledWorkouts: {
+        include: {
+          workout: {
+            include: {
+              program: true;
+            };
+          };
+        };
+      };
+
+      additionalWorkouts: {
+        include: {
+          type: true;
+        };
+      };
+    };
+  }>;

@@ -24,6 +24,12 @@ export default async function ClientPage({
           },
         },
       },
+      additionalWorkouts: {
+        orderBy: { performedAt: "desc" },
+        include: {
+          type: true,
+        },
+      },
     },
   });
 

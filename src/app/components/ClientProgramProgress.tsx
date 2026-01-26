@@ -37,66 +37,80 @@ export function ClientProgramProgress({
   if (programs.length === 0) return null;
 
   return (
-    <div className="border rounded p-4 space-y-3">
-      {/* Client header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <div className="font-medium">
-            {client.profile?.firstName} {client.profile?.lastName}
-          </div>
-          <div className="text-xs text-gray-500">{client.email}</div>
+  <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 shadow-sm">
+    {/* Client header */}
+    <div className="flex items-start justify-between gap-4">
+      <div className="space-y-0.5">
+        <div className="font-semibold text-gray-900">
+          {client.profile?.firstName} {client.profile?.lastName}
         </div>
-
-        {showClientLink && (
-          <Link
-            href={`/clients/${client.id}`}
-            className="text-sm underline"
-          >
-            View
-          </Link>
-        )}
+        <div className="text-xs text-gray-500">
+          {client.email}
+        </div>
       </div>
 
-      {/* Program progress */}
-      <div className="space-y-2">
-        {programs.map(({ program, workouts }) => {
-          const completed = workouts.filter(
-            (w) => w.status === WorkoutStatus.COMPLETED
-          ).length;
-
-          const percent =
-            workouts.length > 0
-              ? Math.round((completed / workouts.length) * 100)
-              : 0;
-
-          const statusLabel =
-            percent === 0
-              ? "Not started"
-              : percent === 100
-              ? "Completed"
-              : "In progress";
-
-          return (
-            <div key={program.id} className="space-y-1">
-              <div className="flex justify-between text-sm">
-                <span className="font-medium">{program.name}</span>
-                <span className="text-gray-600">
-                  {statusLabel} · {completed}/{workouts.length}
-                </span>
-              </div>
-
-              <div className="w-full bg-gray-200 rounded h-2 overflow-hidden">
-                <div
-                  className={`h-2 ${
-                    percent === 100 ? "bg-green-600" : "bg-green-500"
-                  }`}
-                  style={{ width: `${percent}%` }}
-                />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      {showClientLink && (
+        <Link
+          href={`/clients/${client.id}`}
+          className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition"
+        >
+          View
+        </Link>
+      )}
     </div>
-  );
+
+    {/* Divider */}
+    <div className="border-t border-gray-100" />
+
+    {/* Program progress */}
+    <div className="space-y-4">
+      {programs.map(({ program, workouts }) => {
+        const completed = workouts.filter(
+          (w) => w.status === WorkoutStatus.COMPLETED
+        ).length;
+
+        const percent =
+          workouts.length > 0
+            ? Math.round((completed / workouts.length) * 100)
+            : 0;
+
+        const statusLabel =
+          percent === 0
+            ? "Not started"
+            : percent === 100
+            ? "Completed"
+            : "In progress";
+
+        return (
+          <div key={program.id} className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="font-medium text-gray-900">
+                {program.name}
+              </span>
+
+              <span className="text-gray-500">
+                {statusLabel} · {completed}/{workouts.length}
+              </span>
+            </div>
+
+            {/* Progress bar */}
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div
+                className={`h-2 rounded-full transition-all duration-500 ${
+                  percent === 100
+                    ? "bg-green-600"
+                    : percent > 0
+                    ? "bg-green-500"
+                    : "bg-gray-300"
+                }`}
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+);
+
 }

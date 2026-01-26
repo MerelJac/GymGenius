@@ -3,11 +3,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import { addBodyMetric } from "@/app/(trainer)/clients/[clientId]/actions";
-import { Client } from "@/types/client";
+import { Client, TrainerClientProfile } from "@/types/client";
 import { ScheduledWorkoutWithProgram } from "@/types/workout";
 import { ClientProfileEditor } from "./ClientProfileEditor";
 
-export default function ClientProfile({ client }: { client: Client }) {
+export default function ClientProfile({
+  client,
+}: {
+  client: TrainerClientProfile;
+}) {
   type ProgramGroup = {
     program: {
       id: string;
@@ -248,6 +252,55 @@ export default function ClientProfile({ client }: { client: Client }) {
             })}
           </div>
         )}
+
+        {/* Additional Workouts */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Additional Activity
+          </h2>
+
+          {client.additionalWorkouts.length === 0 ? (
+            <p className="text-gray-500 italic">
+              No additional activity logged.
+            </p>
+          ) : (
+            <ul className="space-y-3 text-sm">
+              {client.additionalWorkouts.map((w) => (
+                <li
+                  key={w.id}
+                  className="flex justify-between items-center border-b border-gray-100 pb-3 last:border-0 last:pb-0"
+                >
+                  <div className="space-y-0.5">
+                    <div className="font-medium text-gray-900">
+                      {w.type.name}
+                    </div>
+
+                    <div className="text-gray-500 text-xs">
+                      {w.duration
+                        ? `${w.duration} min`
+                        : "Duration not specified"}
+                      {w.distance != null && ` • ${w.distance} mi`}
+                    </div>
+
+                    {w.notes && (
+                      <div className="text-gray-500 italic text-xs">
+                        “{w.notes}”
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="text-gray-500 text-sm">
+                    {new Date(w.performedAt).toLocaleDateString(undefined, {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );
