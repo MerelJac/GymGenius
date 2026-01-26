@@ -34,49 +34,69 @@ export default async function ClientProfilePage() {
   if (!user) return notFound();
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Your Profile</h1>
+    <div className="max-w-3xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="space-y-1">
+        <h1 className="text-3xl font-bold text-gray-900">Your Profile</h1>
+        <p className="text-sm text-gray-500">
+          Manage your personal details and training history
+        </p>
+      </div>
 
       {/* Profile */}
-      <section className="border rounded p-4 space-y-1">
-        <h2 className="font-medium">Personal Info</h2>
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">Personal Info</h2>
 
-        <div className="text-sm">
+        <div className="text-sm space-y-1">
           <div>
-            <strong>Email:</strong> {user.email}
+            <span className="font-medium text-gray-700">Email:</span>{" "}
+            <span className="text-gray-900">{user.email}</span>
           </div>
-          <div>
-            <ClientProfileEditor
-              firstName={user.profile?.firstName}
-              lastName={user.profile?.lastName}
-            />
-            <strong>Name:</strong> {user.profile?.firstName}{" "}
-            {user.profile?.lastName}
+
+          <div className="space-y-1">
+            <span className="font-medium text-gray-700">Name:</span>
+
+            <div className="text-gray-900">
+              {user.profile?.firstName} {user.profile?.lastName}
+            </div>
           </div>
+
           {user.profile?.experience && (
             <div>
-              <strong>Experience:</strong> {user.profile.experience}
+              <span className="font-medium text-gray-700">Experience:</span>{" "}
+              <span className="text-gray-900">{user.profile.experience}</span>
             </div>
           )}
+
           {user.profile?.injuryNotes && (
-            <div className="text-red-600">
-              <strong>Injuries:</strong> {user.profile.injuryNotes}
+            <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+              <span className="font-medium">Injuries:</span>{" "}
+              {user.profile.injuryNotes}
             </div>
           )}
         </div>
       </section>
 
-      {/* Upcoming */}
-      <section className="border rounded p-4">
-        <h2 className="font-medium mb-2">Upcoming Workouts</h2>
+      <ClientProfileEditor
+        clientId={user.id}
+        firstName={user.profile?.firstName}
+        lastName={user.profile?.lastName}
+      />
+      {/* Upcoming Workouts */}
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Upcoming Workouts
+        </h2>
 
         {user.scheduledWorkouts.length === 0 ? (
-          <p className="text-sm text-gray-500">No upcoming workouts</p>
+          <p className="text-sm text-gray-500">
+            No upcoming workouts scheduled
+          </p>
         ) : (
-          <ul className="text-sm space-y-1">
+          <ul className="text-sm space-y-2">
             {user.scheduledWorkouts.map((sw) => (
-              <li key={sw.id} className="flex justify-between">
-                <span>{sw.workout.name}</span>
+              <li key={sw.id} className="flex justify-between items-center">
+                <span className="text-gray-900">{sw.workout.name}</span>
                 <span className="text-gray-500">
                   {sw.scheduledDate.toLocaleDateString()}
                 </span>
@@ -86,29 +106,38 @@ export default async function ClientProfilePage() {
         )}
       </section>
 
-      {/* Recent Body Metrics */}
-      <section className="border rounded p-4 space-y-2">
-        <h2 className="font-medium">Log Body Metrics</h2>
+      {/* Body Metrics */}
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Log Body Metrics
+        </h2>
         <BodyMetricLogger />
       </section>
 
-      {/* Recent History */}
-      <section className="border rounded p-4">
-        <h2 className="font-medium mb-2">Recent Workouts</h2>
+      {/* Workout History */}
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">Recent Workouts</h2>
 
         {user.workoutLogs.length === 0 ? (
           <p className="text-sm text-gray-500">No completed workouts yet</p>
         ) : (
-          <ul className="text-sm space-y-1">
+          <ul className="text-sm space-y-2">
             {user.workoutLogs.map((log) => (
-              <li key={log.id}>
-                Completed on {log.createdAt.toLocaleDateString()}
+              <li key={log.id} className="flex justify-between items-center">
+                <span className="text-gray-900">Workout completed</span>
+                <span className="text-gray-500">
+                  {log.createdAt.toLocaleDateString()}
+                </span>
               </li>
             ))}
           </ul>
         )}
       </section>
-      <LogoutButton/>
+
+      {/* Logout */}
+      <div className="pt-2 text-center">
+        <LogoutButton />
+      </div>
     </div>
   );
 }
