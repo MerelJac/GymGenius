@@ -7,7 +7,7 @@ import {
   stopWorkout,
 } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
 import { ExerciseLogger } from "./ExerciseLogger";
-import { ScheduledWorkoutWithLogs } from "@/types/workout";
+import { ExerciseLog, ScheduledWorkoutWithLogs } from "@/types/workout";
 import { ExerciseLogViewer } from "./ExerciseLogViewer";
 import { useRouter } from "next/navigation";
 import { assertPrescribed } from "@/app/utils/assertPrescribed";
@@ -17,6 +17,7 @@ export default function WorkoutRunner({
 }: {
   scheduledWorkout: ScheduledWorkoutWithLogs;
 }) {
+  console.log('schedueld workouts', scheduledWorkout)
   const activeLog = scheduledWorkout.workoutLogs[0] ?? null;
   const isActive = activeLog?.status === "IN_PROGRESS" && !activeLog.endedAt;
   const router = useRouter();
@@ -26,6 +27,35 @@ export default function WorkoutRunner({
     activeLog?.id ?? null,
   );
 
+
+const logs: ExerciseLog[] =
+  scheduledWorkout.workout.workoutSections.flatMap((section) =>
+    section.exercises.map((we) => {
+      const log = activeLog.exercises.find(
+        (l) => l.exerciseId === we.exercise?.id
+      );
+
+      return {
+        id: log?.id ?? `planned-${we.id}`,
+        workoutLogId: activeLog.id,
+        exerciseId: we.exercise!.id,
+        exerciseName: we.exercise!.name,
+
+        // 🔑 FIX: assert the JSON → domain type
+        prescribed: assertPrescribed(we.prescribed),
+
+        // 🔑 FIX: cast performed safely
+        performed: log?.performed
+          ? (log.performed as Performed)
+          : null,
+
+        substitutedFrom: log?.substitutedFrom ?? null,
+        substitutionReason: log?.substitutionReason ?? null,
+      };
+    })
+  );
+
+
   if (isCompleted) {
     return (
       <>
@@ -34,16 +64,7 @@ export default function WorkoutRunner({
         </div>
 
         <ExerciseLogViewer
-          logs={activeLog.exercises.map((log) => ({
-            id: log.id,
-            workoutLogId: log.workoutLogId,
-            exerciseId: log.exerciseId,
-            exerciseName: log.exercise?.name ?? "Exercise",
-            prescribed: log.prescribed as Prescribed,
-            performed: log.performed as Performed,
-            substitutedFrom: log.substitutedFrom,
-            substitutionReason: log.substitutionReason,
-          }))}
+          logs={logs}
         />
       </>
     );

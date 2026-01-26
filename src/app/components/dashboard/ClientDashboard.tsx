@@ -53,38 +53,35 @@ export default async function ClientDashboard() {
   );
   const pastWorkouts = upcomingWorkouts.filter((w) => w.scheduledDate <= today);
 
-return (
-  <div className="max-w-5xl mx-auto space-y-8">
-    {/* Header */}
-    <div className="space-y-1">
-      <h1 className="text-3xl font-bold text-gray-900">
-        Client Dashboard
-      </h1>
-      <p className="text-sm text-gray-500">
-        Your training overview at a glance
-      </p>
-    </div>
-
-    <TodayWorkout workout={todaysWorkout} />
-
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <UpcomingWorkouts workouts={futureWorkouts} />
-      <PastWorkouts workouts={pastWorkouts} />
-    </div>
-
-    {/* Placeholder cards */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
-        Progress overview coming soon
+  return (
+    <div className="max-w-5xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="space-y-1">
+        <h1 className="text-3xl font-bold text-gray-900">Client Dashboard</h1>
+        <p className="text-sm text-gray-500">
+          Your training overview at a glance
+        </p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
-        Messages from your trainer coming soon
+      <TodayWorkout workout={todaysWorkout} />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <UpcomingWorkouts workouts={futureWorkouts} />
+        <PastWorkouts workouts={pastWorkouts} />
+      </div>
+
+      {/* Placeholder cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
+          Progress overview coming soon
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
+          Messages from your trainer coming soon
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }
 
 function TodayWorkout({
@@ -103,9 +100,7 @@ function TodayWorkout({
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Today’s Workout
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900">Today’s Workout</h2>
         <span className="text-sm text-gray-500">
           {workout.scheduledDate.toLocaleDateString()}
         </span>
@@ -128,9 +123,11 @@ function TodayWorkout({
 
       <div className="pt-2">
         {workout.status === "COMPLETED" ? (
-          <span className="inline-block px-4 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
-            Workout completed ✅
-          </span>
+          <Link href={`/workouts/${workout.id}`}>
+            <span className="inline-block px-4 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
+              Workout completed ✅
+            </span>
+          </Link>
         ) : (
           <Link href={`/workouts/${workout.id}`}>
             <button className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
@@ -143,7 +140,6 @@ function TodayWorkout({
   );
 }
 
-
 function UpcomingWorkouts({
   workouts,
 }: {
@@ -153,16 +149,11 @@ function UpcomingWorkouts({
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
-      <h2 className="font-semibold text-gray-900">
-        Coming up
-      </h2>
+      <h2 className="font-semibold text-gray-900">Coming up</h2>
 
       <ul className="text-sm space-y-2">
         {workouts.map((w) => (
-          <li
-            key={w.id}
-            className="flex justify-between items-center"
-          >
+          <li key={w.id} className="flex justify-between items-center">
             <Link
               href={`/workouts/${w.id}`}
               className="text-gray-900 hover:underline"
@@ -179,25 +170,16 @@ function UpcomingWorkouts({
   );
 }
 
-function PastWorkouts({
-  workouts,
-}: {
-  workouts: ScheduledWorkoutDashboard[];
-}) {
+function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
   if (workouts.length === 0) return null;
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
-      <h2 className="font-semibold text-gray-900">
-        Completed
-      </h2>
+      <h2 className="font-semibold text-gray-900">Completed</h2>
 
       <ul className="text-sm space-y-2">
         {workouts.map((w) => (
-          <li
-            key={w.id}
-            className="flex justify-between items-center"
-          >
+          <li key={w.id} className="flex justify-between items-center">
             <Link
               href={`/workouts/${w.id}`}
               className="text-gray-900 hover:underline"
@@ -213,4 +195,3 @@ function PastWorkouts({
     </div>
   );
 }
-

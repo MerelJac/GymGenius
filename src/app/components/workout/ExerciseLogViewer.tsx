@@ -6,6 +6,8 @@ export function ExerciseLogViewer({
 }: {
   logs: ExerciseLog[];
 }) {
+
+  console.log('Exercise Log', logs)
  return (
   <ul className="space-y-4">
     {logs.map((log) => (
