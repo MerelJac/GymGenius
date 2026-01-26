@@ -19,6 +19,9 @@ export default async function ClientProfilePage() {
       profile: true,
       bodyMetrics: true,
       scheduledWorkouts: {
+        where: {
+          status: "SCHEDULED"
+        },
         orderBy: { scheduledDate: "asc" },
         take: 5,
         include: {
@@ -135,6 +138,7 @@ export default async function ClientProfilePage() {
             {user.workoutLogs.map((log) => (
               <li key={log.id} className="flex justify-between items-center">
                 <span className="text-gray-900">Workout completed</span>
+                
                 <span className="text-gray-500">
                   {log.createdAt.toLocaleDateString()}
                 </span>
