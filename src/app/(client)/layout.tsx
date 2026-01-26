@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { UserRound } from "lucide-react";
+import { ClientHeader } from "../components/clients/ClientHeader";
 
 // src/app/(client)/layout.tsx
 export default function DashboardLayout({
@@ -10,47 +8,9 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > 8);
-    };
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
   return (
     <div className="min-h-screen bg-gray-50">
-      <header
-        className={`sticky top-0 z-40 bg-white transition-shadow ${
-          scrolled ? "shadow-sm" : ""
-        }`}
-      >
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Brand */}
-          <div className="flex items-center gap-2">
-            <Link
-              href="/client"
-              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition"
-            >
-              <h2 className="text-lg font-semibold text-gray-900">GymGenius</h2>
-            </Link>
-          </div>
-
-          {/* Nav */}
-          <nav className="flex items-center gap-6">
-            <Link
-              href="/profile"
-              className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition"
-            >
-              {/* Avatar */}
-              <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-700">
-                <UserRound size={16} />
-              </div>
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <ClientHeader />
 
       <main className="p-6 max-w-6xl mx-auto">{children}</main>
     </div>
