@@ -72,7 +72,7 @@ export default async function ProgramBuilderPage({
         include: {
           workout: {
             include: {
-              program: true, // ✅ REQUIRED to satisfy ScheduledWorkout type
+              program: true, //  satisfy ScheduledWorkout type
             },
           },
         },

@@ -164,10 +164,6 @@ export default function ProgramBuilder({
               ))}
             </select>
 
-            {clientsAssignedProgram.map((client) => (
-              <ClientProgramProgress key={client.id} client={client} />
-            ))}
-
             <input
               type="date"
               value={startDate}
@@ -179,6 +175,10 @@ export default function ProgramBuilder({
               Assign
             </button>
           </div>
+
+          {clientsAssignedProgram.map((client) => (
+            <ClientProgramProgress key={client.id} client={client} />
+          ))}
         </>
       )}
 

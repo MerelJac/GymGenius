@@ -21,6 +21,14 @@ import { WorkoutDay } from "@/types/enums";
 import { Prescribed } from "@/types/prescribed";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 
 export default function WorkoutCard({
   workout,
@@ -380,7 +388,7 @@ export default function WorkoutCard({
     });
 
     reorderWorkoutSections(workout.id, ids);
-     router.refresh();
+    router.refresh();
   }
 
   function moveSectionDown(sectionId: string) {
@@ -403,7 +411,7 @@ export default function WorkoutCard({
     });
 
     reorderWorkoutSections(workout.id, ids);
-     router.refresh();
+    router.refresh();
   }
 
   function moveExerciseWithinSection(
@@ -440,39 +448,39 @@ export default function WorkoutCard({
       });
     });
 
-     router.refresh();
+    router.refresh();
   }
 
   return (
-    <div className="border p-4 space-y-4 rounded-lg shadow-sm">
-      {/* Header */}
-      <div className="flex flex-wrap justify-between items-center gap-3">
-        {editing ? (
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onBlur={saveName}
-            onKeyDown={(e) => e.key === "Enter" && saveName()}
-            className="border px-3 py-1.5 font-medium flex-1 min-w-[200px]"
-            autoFocus
-          />
-        ) : (
-          <h2
-            className="font-semibold text-lg cursor-pointer hover:underline"
-            onClick={() => setEditing(true)}
-          >
-            {name}
-          </h2>
-        )}
-
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      {/* Header Bar */}
+      <div className="px-5 py-4 border-b bg-gray-50/70 flex flex-wrap items-center justify-between gap-4">
+        <div className="flex-1 min-w-[220px]">
+          {editing ? (
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={saveName}
+              onKeyDown={(e) => e.key === "Enter" && saveName()}
+              className="w-full px-3 py-1.5 text-lg font-semibold border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+              autoFocus
+            />
+          ) : (
+            <h2
+              className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-2 group"
+              onClick={() => setEditing(true)}
+            >
+              {name}
+              <Pencil size={16} className="opacity-0 group-hover:opacity-60" />
+            </h2>
+          )}
+        </div>
         <div className="flex justify-between items-center">
-          <h3 className="text-sm font-semibold text-gray-700">Sections</h3>
-
           <button
-            className="text-sm underline text-blue-600"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
             onClick={handleAddSection}
           >
-            + Add section
+            <Plus size={16} /> Add section
           </button>
         </div>
 
@@ -480,7 +488,7 @@ export default function WorkoutCard({
           <select
             value={sectionId}
             onChange={(e) => setSectionId(e.target.value)}
-            className="border px-2 py-1 text-sm rounded"
+            className="min-w-[140px] px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           >
             {optimisticSections.map((section) => (
               <option key={section.id} value={section.id}>
@@ -492,7 +500,7 @@ export default function WorkoutCard({
           <select
             value={day}
             onChange={(e) => saveDay(e.target.value as WorkoutDay)}
-            className="border px-2 py-1 text-sm rounded"
+            className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
           >
             <option value="MONDAY">Mon</option>
             <option value="TUESDAY">Tue</option>
@@ -506,12 +514,15 @@ export default function WorkoutCard({
           <div className="flex gap-3 text-sm">
             <button
               onClick={onDuplicate}
-              className="text-blue-600 hover:underline"
+              className="inline-flex items-center gap-1.5 text-gray-700 hover:text-blue-700 transition"
             >
-              Duplicate
+              <Copy size={16} /> Duplicate
             </button>
-            <button onClick={onDelete} className="text-red-600 hover:underline">
-              Delete
+            <button
+              onClick={onDelete}
+              className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 transition"
+            >
+              <Trash2 size={16} /> Delete
             </button>
           </div>
         </div>
@@ -520,17 +531,18 @@ export default function WorkoutCard({
       {/* Sections + Exercises */}
       <div className="space-y-5">
         {optimisticSections.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">
-            No sections yet. Add one to start building this workout.
-          </p>
+          <div className="py-8 text-center text-gray-500 italic">
+            No sections yet — add one to start building the workout.
+          </div>
         ) : (
           optimisticSections.map((section) => (
             <div
               key={section.id}
-              className="border rounded-md p-3 bg-gray-50 group relative" // ← group here for hover
+              className="border border-gray-200 rounded-lg bg-white overflow-hidden transition-shadow hover:shadow-md"
             >
               {/* Section title – either editable input or clickable h3 */}
-              <div className="mb-2.5 flex items-center gap-2">
+              <div className="px-4 py-3 bg-gray-50 border-b flex items-center justify-between gap-4 group">
+                {" "}
                 {editingSectionId === section.id ? (
                   <input
                     type="text"
@@ -561,93 +573,82 @@ export default function WorkoutCard({
                         // setSectionTitles((prev) => ({ ...prev, [section.id]: section.title }));
                       }
                     }}
-                    className="font-semibold uppercase text-xs text-gray-700 border-b border-gray-400 px-1 py-0.5 bg-white focus:outline-none focus:border-blue-500 min-w-[140px] flex-1"
+                    className="flex-1 px-2 py-1 font-medium text-gray-900 bg-white border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                     autoFocus
                   />
                 ) : (
                   <h3
-                    className="font-semibold uppercase text-xs text-gray-600 tracking-wide cursor-pointer flex items-center gap-1.5 group-hover:text-gray-800"
+                    className="font-medium text-gray-800 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-2"
                     onClick={() => startEditSection(section.id)}
                   >
                     {section.title}
-                    <span className="opacity-0 group-hover:opacity-70 text-gray-400 text-[10px] hover:text-gray-600 transition-opacity">
-                      ✎
-                    </span>
+                    <Pencil
+                      size={14}
+                      className="opacity-0 group-hover:opacity-60"
+                    />
                   </h3>
                 )}
                 {/* section controls */}
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     onClick={() => moveSectionUp(section.id)}
-                    className="text-xs text-gray-500 hover:text-black"
-                    title="Move section up"
+                    className="p-1 text-gray-500 hover:text-gray-900 rounded hover:bg-gray-200 transition"
+                    title="Move up"
                   >
-                    ↑
+                    <ChevronUp size={16} />
                   </button>
                   <button
                     onClick={() => moveSectionDown(section.id)}
-                    className="text-xs text-gray-500 hover:text-black"
-                    title="Move section down"
+                    className="p-1 text-gray-500 hover:text-gray-900 rounded hover:bg-gray-200 transition"
+                    title="Move down"
                   >
-                    ↓
+                    <ChevronDown size={16} />
                   </button>
                 </div>
               </div>
 
-              {/* Exercises list */}
-              <ul className="space-y-2">
+             {/* Exercises */}
+              <div className="divide-y divide-gray-100">
                 {section.exercises.length === 0 ? (
-                  <li className="text-xs text-gray-500 italic pl-1">
-                    No exercises yet
-                  </li>
+                  <div className="px-4 py-5 text-sm text-gray-500 italic">
+                    No exercises in this section yet
+                  </div>
                 ) : (
                   section.exercises.map((we) => (
-                    <li
+                    <div
                       key={we.id}
-                      className="flex justify-between items-center text-sm py-0.5"
+                      className="px-4 py-3 flex items-center gap-4 hover:bg-gray-50/70 transition-colors"
                     >
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 text-gray-400">
                         <button
-                          onClick={() =>
-                            moveExerciseWithinSection(section.id, we.id, "up")
-                          }
-                          className="text-xs text-gray-400 hover:text-black"
-                          title="Move exercise up"
+                          onClick={() => moveExerciseWithinSection(section.id, we.id, "up")}
+                          className="p-1 hover:text-gray-700 rounded hover:bg-gray-200/60"
                         >
-                          ↑
+                          <ChevronUp size={16} />
                         </button>
                         <button
-                          onClick={() =>
-                            moveExerciseWithinSection(section.id, we.id, "down")
-                          }
-                          className="text-xs text-gray-400 hover:text-black"
-                          title="Move exercise down"
+                          onClick={() => moveExerciseWithinSection(section.id, we.id, "down")}
+                          className="p-1 hover:text-gray-700 rounded hover:bg-gray-200/60"
                         >
-                          ↓
+                          <ChevronDown size={16} />
                         </button>
                       </div>
 
                       <select
                         value={section.id}
                         onChange={async (e) => {
-                          const newSectionId = e.target.value;
-
-                          startTransition(() => {
+                          const target = e.target.value;
+                          startTransition(() =>
                             updateOptimisticSections({
                               type: "move-exercise",
                               exerciseId: we.id,
                               fromSectionId: section.id,
-                              toSectionId: newSectionId,
-                            });
-                          });
-
-                          await moveWorkoutExercise(
-                            programId,
-                            we.id,
-                            newSectionId,
+                              toSectionId: target,
+                            }),
                           );
+                          await moveWorkoutExercise(programId, we.id, target);
                         }}
-                        className="text-xs border rounded px-1 py-0.5"
+                        className="min-w-[110px] text-sm border border-gray-200 rounded px-2 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       >
                         {optimisticSections.map((s) => (
                           <option key={s.id} value={s.id}>
@@ -656,46 +657,53 @@ export default function WorkoutCard({
                         ))}
                       </select>
 
-                      <div className="flex gap-2 items-baseline flex-1">
-                        <Link
-                          href={`/exercises/${we.exercise?.id}/modal`}
-                          scroll={false}
-                          className="text-blue-700 underline hover:text-blue-900"
-                        >
-                          {we.exercise?.name || "Missing exercise"}
-                        </Link>
-                        <span className="text-gray-600">
-                          — {formatPrescribed(we.prescribed)}
-                        </span>
-                        {we.notes && (
-                          <span className="text-gray-500 text-xs italic">
-                            ({we.notes})
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline gap-2">
+                          <Link
+                            href={`/exercises/${we.exercise?.id}/modal`}
+                            scroll={false}
+                            className="font-medium text-blue-700 hover:text-blue-900 truncate"
+                          >
+                            {we.exercise?.name || "Missing exercise"}
+                          </Link>
+                          <span className="text-gray-600 text-sm">
+                            — {formatPrescribed(we.prescribed)}
                           </span>
+                        </div>
+                        {we.notes && (
+                          <p className="text-xs text-gray-500 mt-0.5 italic">
+                            {we.notes}
+                          </p>
                         )}
                       </div>
+
                       <button
                         onClick={() => handleDeleteExercise(we.id)}
-                        className="text-red-600 hover:text-red-800 text-xs ml-2"
+                        className="p-1.5 text-red-600 hover:text-red-800 rounded hover:bg-red-50 transition"
+                        title="Remove exercise"
                       >
-                        Remove
+                        <Trash2 size={16} />
                       </button>
-                    </li>
+                    </div>
                   ))
                 )}
-              </ul>
+              </div>
             </div>
           ))
         )}
       </div>
 
-      {/* Add new exercise form */}
-      <div className="border-t pt-4 mt-2">
-        <div className="flex flex-wrap gap-2 items-end">
-          <div className="min-w-[180px]">
+     {/* Add Exercise Form */}
+      <div className="px-5 py-5 border-t bg-gray-50/40">
+        <div className="flex flex-wrap gap-3 items-end">
+          <div className="min-w-[220px] flex-1">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Exercise
+            </label>
             <select
               value={exerciseId}
               onChange={(e) => setExerciseId(e.target.value)}
-              className="border px-3 py-1.5 w-full rounded"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
             >
               {exercises.map((ex) => (
                 <option key={ex.id} value={ex.id}>
@@ -707,60 +715,77 @@ export default function WorkoutCard({
 
           {showStrengthFields && (
             <>
-              <input
-                type="number"
-                value={sets}
-                onChange={(e) => setSets(Number(e.target.value))}
-                placeholder="Sets"
-                className="border px-2 py-1.5 w-16 rounded"
-              />
-              <input
-                type="number"
-                value={reps}
-                onChange={(e) => setReps(Number(e.target.value))}
-                placeholder="Reps"
-                className="border px-2 py-1.5 w-16 rounded"
-              />
-              {selectedExercise?.type !== "BODYWEIGHT" && (
+              <div className="w-20">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Sets
+                </label>
                 <input
                   type="number"
-                  value={weight ?? ""}
-                  onChange={(e) =>
-                    setWeight(e.target.value ? Number(e.target.value) : null)
-                  }
-                  placeholder="Weight"
-                  className="border px-2 py-1.5 w-20 rounded"
+                  value={sets}
+                  onChange={(e) => setSets(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
+              </div>
+              <div className="w-20">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Reps
+                </label>
+                <input
+                  type="number"
+                  value={reps}
+                  onChange={(e) => setReps(Number(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              {selectedExercise?.type !== "BODYWEIGHT" && (
+                <div className="w-24">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                    Weight
+                  </label>
+                  <input
+                    type="number"
+                    value={weight ?? ""}
+                    onChange={(e) => setWeight(e.target.value ? Number(e.target.value) : null)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
               )}
             </>
           )}
 
           {showTimedFields && (
-            <input
-              type="number"
-              value={time ?? ""}
-              onChange={(e) =>
-                setTime(e.target.value ? Number(e.target.value) : null)
-              }
-              placeholder="Seconds"
-              className="border px-2 py-1.5 w-24 rounded"
-            />
+            <div className="w-28">
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                Duration (s)
+              </label>
+              <input
+                type="number"
+                value={time ?? ""}
+                onChange={(e) => setTime(e.target.value ? Number(e.target.value) : null)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
           )}
 
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Notes / tempo / cues / rest"
-            className="border px-3 py-2 text-sm flex-1 min-w-[220px] rounded resize-none"
-            rows={2}
-          />
+          <div className="flex-1 min-w-[260px]">
+            <label className="block text-xs font-medium text-gray-700 mb-1">
+              Notes / tempo / rest
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. 3-0-1-0 tempo, 90s rest"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+              rows={2}
+            />
+          </div>
 
           <button
             onClick={handleAddExercise}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 text-sm font-medium"
             disabled={!exerciseId || !sectionId}
+            className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            Add
+            Add Exercise
           </button>
         </div>
       </div>
