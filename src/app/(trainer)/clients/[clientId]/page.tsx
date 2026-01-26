@@ -7,8 +7,9 @@ export default async function ClientPage({
 }: {
   params: { clientId: string };
 }) {
+  const { clientId } = params;
   const client = await prisma.user.findUnique({
-    where: { id: params.clientId },
+    where: { id: clientId },
     include: {
       profile: true,
       bodyMetrics: {
@@ -27,8 +28,6 @@ export default async function ClientPage({
   });
 
   if (!client) notFound();
-
-  
 
   return <ClientProfile client={client} />;
 }

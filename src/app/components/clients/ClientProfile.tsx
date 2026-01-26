@@ -88,29 +88,12 @@ export default function ClientProfile({ client }: { client: Client }) {
         </dl>
       </div>
 
-      <div className="bg-yellow-50 p-4 rounded border border-yellow-200 text-sm">
-  <pre className="whitespace-pre-wrap">
-    {JSON.stringify(
-      {
-        profileExists: !!client.profile,
-        firstNameRaw: client.profile?.firstName,
-        lastNameRaw: client.profile?.lastName,
-        fullClient: client,
-      },
-      null,
-      2
-    )}
-  </pre>
-</div>
-
       {/* Profile editor */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <ClientProfileEditor
+      <ClientProfileEditor
         clientId={client.id}
-          firstName={client.profile?.firstName}
-          lastName={client.profile?.lastName}
-        />
-      </div>
+        firstName={client.profile?.firstName}
+        lastName={client.profile?.lastName}
+      />
 
       {/* Add metric form */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">

@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import ExerciseForm from "../../../../components/exercise/ExerciseForm";
 import { parseExerciseType } from "@/lib/exerciseValidation";
 import SubstitutionsEditor from "@/app/components/exercise/SubstitutionsEditor";
+import { BackButton } from "@/app/components/BackButton";
 
 export default async function EditExercisePage({
   params,
@@ -47,18 +48,15 @@ export default async function EditExercisePage({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10 max-w-4xl mx-auto pb-12">
+      <BackButton route={"/exercises"} />
       <ExerciseForm
         title="Edit Exercise"
         submitLabel="Update Exercise"
         exercise={exercise}
         action={updateExercise}
       />
-
-      <SubstitutionsEditor
-        exercise={exercise}
-        allExercises={allExercises}
-      />
+      <SubstitutionsEditor exercise={exercise} allExercises={allExercises} />
     </div>
   );
 }
