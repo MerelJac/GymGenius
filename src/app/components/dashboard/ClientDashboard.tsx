@@ -25,11 +25,16 @@ export default async function ClientDashboard() {
     include: {
       workout: {
         include: {
-          exercises: {
-            include: {
-              exercise: true,
-            },
+          workoutSections: {
             orderBy: { order: "asc" },
+            include: {
+              exercises: {
+                orderBy: { order: "asc" },
+                include: {
+                  exercise: true,
+                },
+              },
+            },
           },
         },
       },
@@ -95,9 +100,11 @@ function TodayWorkout({
       </p>
 
       <ul className="text-sm list-disc pl-5">
-        {workout.workout.exercises.map((we) => (
-          <li key={we.id}>{we.exercise.name}</li>
-        ))}
+        {workout.workout.workoutSections.flatMap((section) =>
+          section.exercises.map((we) => (
+            <li key={we.id}>{we.exercise?.name}</li>
+          )),
+        )}
       </ul>
 
       <button className="mt-2 text-sm underline">Start workout</button>

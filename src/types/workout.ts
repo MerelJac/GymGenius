@@ -1,57 +1,84 @@
-import { Prisma, WorkoutDay, WorkoutStatus } from "@prisma/client"
-import type { ExerciseType , Exercise} from "./exercise"
-import { Performed, Prescribed } from "./prescribed"
+import { Prisma, WorkoutDay, WorkoutStatus } from "@prisma/client";
+import type { ExerciseType, Exercise } from "./exercise";
+import { Performed, Prescribed } from "./prescribed";
 
 export type Workout = {
-  id: string
-  programId: string
-  name: string
-  order: number
-  createdAt?: string
-}
+  id: string;
+  programId: string;
+  name: string;
+  order: number;
+  createdAt?: string;
+};
 
 export type Prescription = {
-  sets?: number
-  reps?: number
-  weight?: number
-  durationSeconds?: number
-  distanceMeters?: number
-}
+  sets?: number;
+  reps?: number;
+  weight?: number;
+  durationSeconds?: number;
+  distanceMeters?: number;
+};
 
 export type WorkoutExercise = {
-  id: string
-  workoutId: string
-  exerciseId: string
-  order: number
+  id: string;
+  workoutId: string;
+  exerciseId: string;
+  order: number;
 
-  type: ExerciseType
-  prescription: Prescription
-}
+  type: ExerciseType;
+  prescription: Prescription;
+};
 
 export type WorkoutExerciseWithExercise = WorkoutExercise & {
-  exercise: Exercise
-}
+  exercise: Exercise;
+};
 
+export type WorkoutWithSections = {
+  id: string;
+  name: string;
+  order: number;
+  day: WorkoutDay;
+  sections: {
+    id: string;
+    title: string;
+    order: number;
+    exercises: {
+      id: string;
+      order: number;
+      prescribed: Prescribed;
+      notes?: string | null;
+      exercise: Exercise;
+    }[];
+  }[];
+};
+
+export type WorkoutTemplate = {
+  id: string;
+  programId: string;
+  name: string;
+  order: number;
+  day: WorkoutDay;
+};
+
+export type WorkoutSection = {
+  id: string;
+  workoutId: string;
+  title: string;
+  order: number;
+};
 
 export type WorkoutWithExercises = {
-  id: string
-  name: string
-  order: number
+  id: string;
+  name: string;
+  order: number;
   exercises: {
     notes?: string | null;
-    id: string
-    order: number
-    prescribed: Prescribed
-    exercise: Exercise
-  }[],
-  day: WorkoutDay
-}
-
-export type ProgramWithWorkouts = {
-  id: string
-  name: string
-  workouts: WorkoutWithExercises[]
-}
+    id: string;
+    order: number;
+    prescribed: Prescribed;
+    exercise: Exercise;
+  }[];
+  day: WorkoutDay;
+};
 
 
 export type ScheduledWorkoutWithProgram = {
@@ -81,41 +108,72 @@ export type ExerciseLog = {
 };
 
 
-export type ScheduledWorkoutDashboard = Prisma.ScheduledWorkoutGetPayload<{
-  include: {
-    workout: {
-      include: {
-        exercises: {
-          include: {
-            exercise: true;
-          };
-        };
-      };
-    };
-  };
-}>;
-
-
 export type ScheduledWorkoutWithLogs =
   Prisma.ScheduledWorkoutGetPayload<{
     include: {
       workout: {
         include: {
-          exercises: {
+          workoutSections: {
             include: {
-              exercise: true;
-            };
-          };
-        };
-      };
+              exercises: {
+                include: {
+                  exercise: true
+                }
+              }
+            }
+          }
+        }
+      }
       workoutLogs: {
         include: {
           exercises: {
             include: {
-              exercise: true;
-            };
-          };
-        };
-      };
-    };
-  }>;
+              exercise: true
+            }
+          }
+        }
+      }
+    }
+  }>
+
+
+  export type WorkoutSectionWithExercises = {
+  id: string;
+  title: string;
+  order: number;
+  exercises: {
+    id: string;
+    order: number;
+    prescribed: Prescribed;
+    notes?: string | null;
+    exercise: Exercise;
+  }[];
+};
+
+
+export type ProgramWithWorkouts = {
+  id: string;
+  name: string;
+  workouts: WorkoutWithSections[];
+};
+export type ScheduledWorkoutDashboard = {
+  id: string;
+  scheduledDate: Date;
+  workout: {
+    id: string;
+    name: string;
+    workoutSections: {
+      id: string;
+      title: string;
+      order: number;
+      exercises: {
+        id: string;
+        order: number;
+        exercise: {
+          id: string;
+          name: string;
+        } | null;
+      }[];
+    }[];
+  };
+};

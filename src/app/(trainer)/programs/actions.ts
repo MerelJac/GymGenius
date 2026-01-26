@@ -11,7 +11,7 @@ export async function deleteProgram(programId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-    // delete children first (or rely on cascade if configured)
+  // delete children first (or rely on cascade if configured)
   await prisma.scheduledWorkout.deleteMany({
     where: {
       workout: {
@@ -21,16 +21,21 @@ export async function deleteProgram(programId: string) {
   });
 
   // delete children first (or rely on cascade if configured)
-  await prisma.workoutExercise.deleteMany({
+  const sectionIds = await prisma.workoutSection.findMany({
     where: {
       workout: {
         programId,
       },
     },
+    select: { id: true },
   });
 
-  await prisma.workoutTemplate.deleteMany({
-    where: { programId },
+  await prisma.workoutExercise.deleteMany({
+    where: {
+      sectionId: {
+        in: sectionIds.map((s) => s.id),
+      },
+    },
   });
 
   await prisma.program.delete({
@@ -39,7 +44,6 @@ export async function deleteProgram(programId: string) {
 
   revalidatePath("/programs");
 }
-
 export async function duplicateProgram(programId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -47,12 +51,16 @@ export async function duplicateProgram(programId: string) {
   const program = await prisma.program.findUnique({
     where: { id: programId },
     include: {
-      trainer: true,
       workouts: {
         orderBy: { order: "asc" },
         include: {
-          exercises: {
+          workoutSections: {
             orderBy: { order: "asc" },
+            include: {
+              exercises: {
+                orderBy: { order: "asc" },
+              },
+            },
           },
         },
       },
@@ -71,12 +79,22 @@ export async function duplicateProgram(programId: string) {
         create: program.workouts.map((w) => ({
           name: w.name,
           order: w.order,
-          exercises: {
-            create: w.exercises.map((we) => ({
-              order: we.order,
-              prescribed: we.prescribed as Prisma.InputJsonValue,
-              exercise: {
-                connect: { id: we.exerciseId },
+          day: w.day,
+
+          workoutSections: {
+            create: w.workoutSections.map((section) => ({
+              title: section.title,
+              order: section.order,
+
+              exercises: {
+                create: section.exercises.map((we) => ({
+                  order: we.order,
+                  prescribed: we.prescribed as Prisma.InputJsonValue,
+                  notes: we.notes,
+                  exercise: we.exerciseId
+                    ? { connect: { id: we.exerciseId } }
+                    : undefined,
+                })),
               },
             })),
           },

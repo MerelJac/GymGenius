@@ -141,19 +141,22 @@ model WorkoutTemplate {
   day               WorkoutDay         @default(MONDAY)
   exercises         WorkoutExercise[]
   scheduledWorkouts ScheduledWorkout[]
+  workoutSections   WorkoutSection[]
 }
 
 model WorkoutExercise {
-  id        String          @id @default(uuid())
-  workoutId String
-  workout   WorkoutTemplate @relation(fields: [workoutId], references: [id])
+  id String @id @default(uuid())
 
-  exerciseId String
-  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  sectionId String
+  section   WorkoutSection @relation(fields: [sectionId], references: [id])
 
-  prescribed Json
-  order      Int
-  notes      String?
+  prescribed        Json
+  order             Int
+  notes             String?
+  workoutTemplate   WorkoutTemplate? @relation(fields: [workoutTemplateId], references: [id])
+  workoutTemplateId String?
+  exercise          Exercise?        @relation(fields: [exerciseId], references: [id])
+  exerciseId        String?
 }
 
 model ScheduledWorkout {
@@ -241,4 +244,17 @@ model Invite {
   accepted  Boolean  @default(false)
   createdAt DateTime @default(now())
   expiresAt DateTime
+}
+
+model WorkoutSection {
+  id        String          @id @default(uuid())
+  workoutId String
+  workout   WorkoutTemplate @relation(fields: [workoutId], references: [id])
+
+  title String
+  order Int
+
+  exercises WorkoutExercise[]
+
+  @@unique([workoutId, order])
 }

@@ -77,18 +77,29 @@ export default function WorkoutRunner({
       )}
 
       {/* EXERCISES */}
-      <ul className="space-y-3">
-        {scheduledWorkout.workout.exercises.map((we) => (
-          <ExerciseLogger
-            key={we.id}
-            exercise={we.exercise}
-            notes={we.notes}
-            prescribed={we.prescribed as Prescribed}
-            workoutLogId={workoutLogId}
-            disabled={!isActive}
-          />
+      <div className="space-y-6">
+        {scheduledWorkout.workout.workoutSections.map((section) => (
+          <div key={section.id} className="space-y-3">
+            {/* SECTION HEADER */}
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600">
+              {section.title}
+            </h3>
+
+            <ul className="space-y-3">
+              {section.exercises.map((we) => (
+                <ExerciseLogger
+                  key={we.id}
+                  exercise={we.exercise}
+                  notes={we.notes}
+                  prescribed={we.prescribed as Prescribed}
+                  workoutLogId={workoutLogId}
+                  disabled={!isActive}
+                />
+              ))}
+            </ul>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

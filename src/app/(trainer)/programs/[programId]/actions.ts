@@ -45,10 +45,10 @@ export async function deleteWorkoutExercise(
 
   runRevalidate(programId);
 }
-
 export async function addWorkoutExercise(
   programId: string,
   workoutId: string,
+  sectionId: string,
   exerciseId: string,
   prescribed: Prescribed,
   notes?: string
@@ -57,12 +57,12 @@ export async function addWorkoutExercise(
   if (!session?.user?.id) throw new Error("Unauthorized");
 
   const order = await prisma.workoutExercise.count({
-    where: { workoutId },
+    where: { sectionId },
   });
 
   await prisma.workoutExercise.create({
     data: {
-      workoutId,
+      sectionId,
       exerciseId,
       order,
       prescribed,
@@ -72,7 +72,6 @@ export async function addWorkoutExercise(
 
   runRevalidate(programId);
 }
-
 export async function updateWorkoutName(
   programId: string,
   workoutId: string,
@@ -92,9 +91,8 @@ export async function updateWorkoutName(
 export async function deleteWorkout(programId: string, workoutId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
-
   await prisma.workoutExercise.deleteMany({
-    where: { workoutId },
+    where: { section: { workoutId } },
   });
 
   await prisma.workoutTemplate.delete({
@@ -103,13 +101,17 @@ export async function deleteWorkout(programId: string, workoutId: string) {
 
   revalidatePath(`/trainer/programs/${programId}`);
 }
-
 export async function duplicateWorkout(programId: string, workoutId: string) {
   const workout = await prisma.workoutTemplate.findUnique({
     where: { id: workoutId },
     include: {
-      exercises: {
+      workoutSections: {
         orderBy: { order: "asc" },
+        include: {
+          exercises: {
+            orderBy: { order: "asc" },
+          },
+        },
       },
     },
   });
@@ -121,12 +123,22 @@ export async function duplicateWorkout(programId: string, workoutId: string) {
       programId,
       name: `${workout.name} (Copy)`,
       order: workout.order + 1,
-      exercises: {
-        create: workout.exercises.map((we) => ({
-          order: we.order,
-          prescribed: we.prescribed as Prisma.InputJsonValue, 
-          exercise: {
-            connect: { id: we.exerciseId },
+      day: workout.day,
+
+      workoutSections: {
+        create: workout.workoutSections.map((section) => ({
+          title: section.title,
+          order: section.order,
+
+          exercises: {
+            create: section.exercises.map((we) => ({
+              order: we.order,
+              prescribed: we.prescribed as Prisma.InputJsonValue,
+              notes: we.notes,
+              exercise: we.exerciseId
+                ? { connect: { id: we.exerciseId } }
+                : undefined,
+            })),
           },
         })),
       },
@@ -134,7 +146,6 @@ export async function duplicateWorkout(programId: string, workoutId: string) {
   });
 
   revalidatePath(`/programs/${programId}`);
-
   return newWorkout.id;
 }
 
