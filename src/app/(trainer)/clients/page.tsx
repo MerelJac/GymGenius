@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import AddClientForm from "@/app/components/clients/AddClientForm";
 import Link from "next/link";
 
+
 export default async function TrainerClientsPage() {
   const clients = await prisma.user.findMany({
     where: {
@@ -15,6 +16,7 @@ export default async function TrainerClientsPage() {
     },
     orderBy: { createdAt: "desc" },
   });
+
 
   return (
   <div className="space-y-8">

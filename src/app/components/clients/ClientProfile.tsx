@@ -2,10 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { addBodyMetric } from "@/app/(trainer)/clients/[clientId]/actions";
+import {
+  addBodyMetric,
+  deleteClient,
+} from "@/app/(trainer)/clients/[clientId]/actions";
 import { TrainerClientProfile } from "@/types/client";
 import { ScheduledWorkoutWithProgram } from "@/types/workout";
 import { ClientProfileEditor } from "./ClientProfileEditor";
+import { BackButton } from "../BackButton";
+import { useRouter } from "next/navigation";
+import { Trash } from "lucide-react";
 
 export default function ClientProfile({
   client,
@@ -22,6 +28,8 @@ export default function ClientProfile({
 
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const router = useRouter();
 
   async function handleAddMetric() {
     await addBodyMetric(
@@ -53,16 +61,29 @@ export default function ClientProfile({
     }, {}),
   );
 
+  async function handleDeleteClient() {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this client?\n\nThis action is irreversible.",
+    );
+
+    if (!confirmed) return;
+
+    setDeleting(true);
+
+    try {
+      await deleteClient(client.id);
+      router.push("/clients");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete client");
+      setDeleting(false);
+    }
+  }
+
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       {/* Header with back + name */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <Link
-          href="/clients"
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
-        >
-          ← Back to Clients
-        </Link>
+        <BackButton route={"/clients"} />
 
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
           {client.profile?.firstName} {client.profile?.lastName}
@@ -258,7 +279,9 @@ export default function ClientProfile({
         </h2>
 
         {client.additionalWorkouts.length === 0 ? (
-          <p className="text-gray-500 italic py-4">No additional activity logged.</p>
+          <p className="text-gray-500 italic py-4">
+            No additional activity logged.
+          </p>
         ) : (
           <ul className="space-y-3 text-sm">
             {client.additionalWorkouts.map((w) => (
@@ -294,6 +317,27 @@ export default function ClientProfile({
             ))}
           </ul>
         )}
+      </div>
+
+      {/* Danger zone */}
+      <div className="border border-red-200 bg-red-50 rounded-xl p-6 space-y-3">
+        <h2 className="text-sm font-semibold text-red-800 uppercase tracking-wide">
+          Danger Zone
+        </h2>
+
+        <p className="text-sm text-red-700">
+          Deleting a client will permanently remove all workouts, metrics, and
+          activity associated with this client.
+        </p>
+
+        <button
+          onClick={handleDeleteClient}
+          disabled={deleting}
+          className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+        >
+          <Trash size={16} />
+          {deleting ? "Deleting…" : "Delete Client"}
+        </button>
       </div>
     </div>
   );
