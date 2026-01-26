@@ -15,6 +15,7 @@ import { User, WorkoutDay } from "@prisma/client";
 import { BackButton } from "./BackButton";
 import { ClientProgramProgress } from "./ClientProgramProgress";
 import { ClientWithWorkouts } from "@/types/client";
+import { Plus, Users, Calendar } from "lucide-react";
 
 export default function ProgramBuilder({
   program,
@@ -49,9 +50,9 @@ export default function ProgramBuilder({
   const [programName, setProgramName] = useState(program.name);
   const [clientId, setClientId] = useState("");
   const [startDate, setStartDate] = useState("");
+
   async function saveProgramName() {
     setEditingName(false);
-
     startTransition(() => {
       updateProgramName(program.id, programName);
     });
@@ -59,8 +60,10 @@ export default function ProgramBuilder({
 
   async function handleAssign() {
     if (!clientId || !startDate) return;
-
     await assignProgramToClient(program.id, clientId, new Date(startDate));
+    // Optional: reset form after success
+    setClientId("");
+    setStartDate("");
   }
 
   async function handleAddWorkout() {
@@ -69,7 +72,6 @@ export default function ProgramBuilder({
       name: "New Workout",
       order: optimisticWorkouts.length,
       day: WorkoutDay.MONDAY,
-
       workoutSections: [
         {
           id: crypto.randomUUID(),
@@ -97,7 +99,6 @@ export default function ProgramBuilder({
         id: workout.id,
       });
     });
-
     await deleteWorkout(program.id, workout.id);
   }
 
@@ -106,12 +107,10 @@ export default function ProgramBuilder({
       ...workout,
       id: crypto.randomUUID(),
       name: `${workout.name} (Copy)`,
-
       workoutSections: workout.workoutSections.map((section, sectionIndex) => ({
         ...section,
         id: crypto.randomUUID(),
         order: sectionIndex,
-
         exercises: section.exercises.map((we, exerciseIndex) => ({
           ...we,
           id: crypto.randomUUID(),
@@ -131,71 +130,139 @@ export default function ProgramBuilder({
   }
 
   return (
-    <div className="space-y-6">
-      {editingName ? (
-        <input
-          value={programName}
-          onChange={(e) => setProgramName(e.target.value)}
-          onBlur={saveProgramName}
-          onKeyDown={(e) => e.key === "Enter" && saveProgramName()}
-          className="border px-2 py-1 text-2xl font-semibold w-full"
-          autoFocus
-        />
-      ) : (
-        <>
-          <BackButton route={"/programs"} />
-          <h1
-            className="text-2xl font-semibold cursor-pointer hover:underline"
-            onClick={() => setEditingName(true)}
-          >
-            {programName}
-          </h1>
-          <div className="flex gap-2 items-center">
-            <select
-              value={clientId}
-              onChange={(e) => setClientId(e.target.value)}
-              className="border px-2 py-1"
+    <div className="space-y-8 pb-12">
+      {/* Header & Program Name */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="px-6 py-5 border-b bg-gray-50/70">
+          <div className="flex items-start justify-between gap-6 flex-wrap">
+            <div className="flex-1 min-w-[300px]">
+              {editingName ? (
+                <input
+                  value={programName}
+                  onChange={(e) => setProgramName(e.target.value)}
+                  onBlur={saveProgramName}
+                  onKeyDown={(e) => e.key === "Enter" && saveProgramName()}
+                  className="w-full px-4 py-2.5 text-2xl font-bold border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                  autoFocus
+                />
+              ) : (
+                <h1
+                  className="text-2xl md:text-3xl font-bold text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
+                  onClick={() => setEditingName(true)}
+                >
+                  {programName}
+                  <span className="opacity-0 group-hover:opacity-70 text-gray-400">
+                    ✎
+                  </span>
+                </h1>
+              )}
+            </div>
+
+            <BackButton route="/programs" />
+          </div>
+        </div>
+
+        {/* Assignment Area */}
+        <div className="px-6 py-5 border-b">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="min-w-[240px] flex-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Assign to Client
+              </label>
+              <div className="relative">
+                <select
+                  value={clientId}
+                  onChange={(e) => setClientId(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
+                >
+                  <option value="">Select a client…</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.email}
+                    </option>
+                  ))}
+                </select>
+                <Users className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              </div>
+            </div>
+
+            <div className="min-w-[180px]">
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Start Date
+              </label>
+              <div className="relative">
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+              </div>
+            </div>
+
+            <button
+              onClick={handleAssign}
+              disabled={!clientId || !startDate}
+              className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              <option value="">Assign to client…</option>
-              {clients.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.email}
-                </option>
-              ))}
-            </select>
-
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="border px-2 py-1"
-            />
-
-            <button onClick={handleAssign} className="border px-3 py-1 rounded">
-              Assign
+              Assign Program
             </button>
           </div>
+        </div>
 
-          {clientsAssignedProgram.map((client) => (
-            <ClientProgramProgress key={client.id} client={client} />
-          ))}
-        </>
-      )}
+        {/* Assigned Clients Progress */}
+        {clientsAssignedProgram.length > 0 && (
+          <div className="px-6 py-5 border-b last:border-b-0">
+            <h3 className="text-sm font-semibold text-gray-700 mb-4">Assigned Clients</h3>
+            <div className="space-y-4">
+              {clientsAssignedProgram.map((client) => (
+                <ClientProgramProgress key={client.id} client={client} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
-      <button onClick={handleAddWorkout} className="border px-3 py-1 rounded">
-        + Add Workout
-      </button>
+      {/* Workouts Section */}
+      <div className="space-y-5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-semibold text-gray-900">Workouts</h2>
+          <button
+            onClick={handleAddWorkout}
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition"
+          >
+            <Plus size={18} />
+            Add Workout
+          </button>
+        </div>
 
-      {optimisticWorkouts.map((workout) => (
-        <WorkoutCard
-          key={workout.id}
-          workout={workout}
-          exercises={exercises}
-          programId={program.id}
-          onDelete={() => handleDeleteWorkout(workout)}
-          onDuplicate={() => handleDuplicateWorkout(workout)}
-        />
-      ))}
+        {optimisticWorkouts.length === 0 ? (
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-10 text-center">
+            <p className="text-gray-600 mb-4">No workouts in this program yet</p>
+            <button
+              onClick={handleAddWorkout}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              <Plus size={18} />
+              Create your first workout
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {optimisticWorkouts.map((workout) => (
+              <WorkoutCard
+                key={workout.id}
+                workout={workout}
+                exercises={exercises}
+                programId={program.id}
+                onDelete={() => handleDeleteWorkout(workout)}
+                onDuplicate={() => handleDuplicateWorkout(workout)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
