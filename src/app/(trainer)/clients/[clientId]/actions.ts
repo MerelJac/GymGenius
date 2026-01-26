@@ -26,6 +26,7 @@ export async function addBodyMetric(
 
 
 export async function updateClientProfile(
+  clientId: string,
   firstName: string,
   lastName: string,
 ) {
@@ -35,16 +36,20 @@ export async function updateClientProfile(
     throw new Error("Unauthorized");
   }
 
+    if (!clientId) {
+    throw new Error("Missing Data");
+  }
+
   await prisma.profile.upsert({
     where: {
-      userId: session.user.id,
+      userId: clientId,
     },
     update: {
       firstName,
       lastName,
     },
     create: {
-      userId: session.user.id,
+      userId: clientId,
       firstName,
       lastName,
     },

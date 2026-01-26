@@ -18,19 +18,19 @@ export default function AddClientForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 mb-6">
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        placeholder="Client email"
-        className="border px-3 py-2 flex-1"
+        placeholder="client@example.com"
         required
+        className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
       />
-
       <button
         type="submit"
-        className="border px-4 py-2 rounded"
+        className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50"
+        disabled={!email.trim()}
       >
         Add Client
       </button>

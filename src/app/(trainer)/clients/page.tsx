@@ -1,6 +1,7 @@
 // src/app/trainer/clients/page.tsx
+
 import { prisma } from "@/lib/prisma";
-import AddClientForm from "@/app/components/AddClientFomr";
+import AddClientForm from "@/app/components/clients/AddClientForm";
 import Link from "next/link";
 
 export default async function TrainerClientsPage() {
@@ -16,31 +17,55 @@ export default async function TrainerClientsPage() {
   });
 
   return (
-    <div>
-      <h1 className="text-2xl font-semibold mb-4">Clients</h1>
+  <div className="space-y-8">
+    {/* Header */}
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Clients</h1>
 
-      <AddClientForm />
+      {/* Assuming AddClientForm renders a nice button or modal trigger */}
+      <div className="flex-shrink-0">
+        <AddClientForm />
+      </div>
+    </div>
 
-      <ul className="space-y-2">
+    {/* Clients List */}
+    {clients.length === 0 ? (
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-10 text-center">
+        <h3 className="text-lg font-medium text-gray-700 mb-3">
+          No clients added yet
+        </h3>
+        <p className="text-gray-600 mb-6 max-w-md mx-auto">
+          Add your first client to start tracking progress, assigning programs, and logging metrics.
+        </p>
+        {/* If AddClientForm has a standalone button variant, you could place it here too */}
+      </div>
+    ) : (
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden divide-y divide-gray-100">
         {clients.map((c) => (
-          <li key={c.id} className="border p-3 flex justify-between">
-            <div>
-              <div className="font-medium">{c.email}</div>
-              <div className="text-sm text-gray-500">{c.email}</div>
+          <div
+            key={c.id}
+            className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-gray-50/70 transition-colors group"
+          >
+            <div className="min-w-0">
+              <div className="font-medium text-gray-900 truncate group-hover:text-blue-700 transition-colors">
+                {c.profile?.firstName} {c.profile?.lastName || ""}
+                {!c.profile?.firstName && !c.profile?.lastName && (
+                  <span className="text-gray-500">(no name)</span>
+                )}
+              </div>
+              <div className="text-sm text-gray-500 mt-0.5">{c.email}</div>
             </div>
+
             <Link
               href={`/clients/${c.id}`}
-              className="border px-3 py-1 rounded text-sm hover:bg-gray-50 flex items-center"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition whitespace-nowrap flex-shrink-0"
             >
-              View client
+              View Profile
             </Link>
-          </li>
+          </div>
         ))}
-
-        {clients.length === 0 && (
-          <div className="text-sm text-gray-500">No clients yet.</div>
-        )}
-      </ul>
-    </div>
-  );
+      </div>
+    )}
+  </div>
+);
 }

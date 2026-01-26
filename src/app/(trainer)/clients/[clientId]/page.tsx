@@ -1,15 +1,14 @@
 import { prisma } from "@/lib/prisma";
 import ClientProfile from "@/app/components/clients/ClientProfile";
 import { notFound } from "next/navigation";
+
 export default async function ClientPage({
   params,
 }: {
-  params: Promise<{ clientId: string }>;
+  params: { clientId: string };
 }) {
-  const { clientId } = await params;
-
   const client = await prisma.user.findUnique({
-    where: { id: clientId },
+    where: { id: params.clientId },
     include: {
       profile: true,
       bodyMetrics: {
@@ -28,6 +27,8 @@ export default async function ClientPage({
   });
 
   if (!client) notFound();
+
+  
 
   return <ClientProfile client={client} />;
 }
