@@ -8,7 +8,7 @@ import {
   duplicateWorkout,
 } from "../(trainer)/programs/[programId]/actions";
 import WorkoutCard from "./WorkoutCard";
-import { ProgramWithWorkouts, WorkoutWithExercises, WorkoutWithSections } from "@/types/workout";
+import { ProgramWithWorkouts, WorkoutWithSections } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
 import { updateProgramName } from "../(trainer)/programs/actions";
 import { User, WorkoutDay } from "@prisma/client";
@@ -66,7 +66,7 @@ async function handleAddWorkout() {
     order: optimisticWorkouts.length,
     day: WorkoutDay.MONDAY,
 
-    sections: [
+    workoutSections: [
       {
         id: crypto.randomUUID(),
         title: "Main",
@@ -103,7 +103,7 @@ async function handleDuplicateWorkout(workout: WorkoutWithSections) {
     id: crypto.randomUUID(),
     name: `${workout.name} (Copy)`,
 
-    sections: workout.sections.map((section, sectionIndex) => ({
+    workoutSections: workout.workoutSections.map((section, sectionIndex) => ({
       ...section,
       id: crypto.randomUUID(),
       order: sectionIndex,

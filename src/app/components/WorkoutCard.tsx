@@ -6,7 +6,7 @@ import {
   deleteWorkoutExercise,
   updateWorkoutDay,
 } from "../(trainer)/programs/[programId]/actions";
-import { WorkoutWithSections } from "@/types/workout"; // ← update this type!
+import { SectionExercise, WorkoutWithSections } from "@/types/workout"; // ← update this type!
 import { Exercise } from "@/types/exercise";
 import { formatPrescribed } from "../utils/prescriptionFormatter";
 import { WorkoutDay } from "@/types/enums";
@@ -50,11 +50,11 @@ export default function WorkoutCard({
 
   // ── Optimistic updates for sections + nested exercises ──
   const [optimisticSections, updateOptimisticSections] = useOptimistic(
-    workout.sections,
+    workout.workoutSections,
     (
       currentSections,
       action:
-        | { type: "add-exercise"; sectionId: string; exercise: any }
+        | { type: "add-exercise"; sectionId: string; exercise: SectionExercise }
         | { type: "remove-exercise"; exerciseId: string },
     ) => {
       switch (action.type) {
@@ -83,10 +83,10 @@ export default function WorkoutCard({
   );
 
   useEffect(() => {
-    if (!sectionId && workout.sections?.length) {
-      setSectionId(workout.sections[0].id);
+    if (!sectionId && workout.workoutSections?.length) {
+      setSectionId(workout.workoutSections[0].id);
     }
-  }, [workout.sections, sectionId]);
+  }, [workout.workoutSections, sectionId]);
 
   function saveName() {
     setEditing(false);
@@ -201,7 +201,7 @@ export default function WorkoutCard({
             onChange={(e) => setSectionId(e.target.value)}
             className="border px-2 py-1 text-sm rounded"
           >
-            {workout.sections?.map((section) => (
+            {workout.workoutSections?.map((section) => (
               <option key={section.id} value={section.id}>
                 {section.title}
               </option>
@@ -257,11 +257,11 @@ export default function WorkoutCard({
                   >
                     <div className="flex gap-2 items-baseline">
                       <Link
-                        href={`/exercises/${we.exercise.id}/modal`}
+                        href={`/exercises/${we.exercise?.id}/modal`}
                         scroll={false}
                         className="text-blue-700 underline hover:text-blue-900"
                       >
-                        {we.exercise.name}
+                        {we.exercise?.name}
                       </Link>
 
                       <span className="text-gray-600">

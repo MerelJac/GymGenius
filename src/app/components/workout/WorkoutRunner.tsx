@@ -10,6 +10,7 @@ import { ExerciseLogger } from "./ExerciseLogger";
 import { ScheduledWorkoutWithLogs } from "@/types/workout";
 import { ExerciseLogViewer } from "./ExerciseLogViewer";
 import { useRouter } from "next/navigation";
+import { assertPrescribed } from "@/app/utils/assertPrescribed";
 
 export default function WorkoutRunner({
   scheduledWorkout,
@@ -86,16 +87,20 @@ export default function WorkoutRunner({
             </h3>
 
             <ul className="space-y-3">
-              {section.exercises.map((we) => (
-                <ExerciseLogger
-                  key={we.id}
-                  exercise={we.exercise}
-                  notes={we.notes}
-                  prescribed={we.prescribed as Prescribed}
-                  workoutLogId={workoutLogId}
-                  disabled={!isActive}
-                />
-              ))}
+              {section.exercises.map((we) => {
+                if (!we.exercise) return null;
+
+                return (
+                  <ExerciseLogger
+                    key={we.id}
+                    exercise={we.exercise}
+                    prescribed={assertPrescribed(we.prescribed)}
+                    workoutLogId={workoutLogId}
+                    disabled={!isActive}
+                    notes={we.notes}
+                  />
+                );
+              })}
             </ul>
           </div>
         ))}
