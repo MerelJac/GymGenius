@@ -160,6 +160,8 @@ async function handleDuplicateWorkout(workout: WorkoutWithSections) {
               ))}
             </select>
 
+            
+
             <input
               type="date"
               value={startDate}
