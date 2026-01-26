@@ -48,11 +48,9 @@ export default async function ClientDashboard() {
   const todaysWorkout = upcomingWorkouts.find(
     (w) => w.scheduledDate < tomorrow,
   );
-
   const futureWorkouts = upcomingWorkouts.filter(
     (w) => w.scheduledDate >= tomorrow,
   );
-
   const pastWorkouts = upcomingWorkouts.filter((w) => w.scheduledDate <= today);
 
   return (
@@ -92,13 +90,11 @@ function TodayWorkout({
   return (
     <div className="rounded border p-4 space-y-2">
       <h2 className="font-medium">Today’s Workout</h2>
-
       <p className="text-sm text-gray-600">
         <Link href={`/workouts/${workout.id}`}>
           <button>{workout.workout.name}</button>
         </Link>
       </p>
-
       <ul className="text-sm list-disc pl-5">
         {workout.workout.workoutSections.flatMap((section) =>
           section.exercises.map((we) => (
@@ -107,7 +103,17 @@ function TodayWorkout({
         )}
       </ul>
 
-      <button className="mt-2 text-sm underline">Start workout</button>
+      {workout.status === "COMPLETED" ? (
+        <span className="px-4 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
+          Workout completed ✅
+        </span>
+      ) : (
+        <Link href={`/workouts/${workout.id}`}>
+          <button className="px-4 py-2 rounded-lg bg-blue-600 text-white">
+            Start workout
+          </button>
+        </Link>
+      )}
     </div>
   );
 }

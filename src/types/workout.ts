@@ -32,8 +32,6 @@ export type WorkoutExerciseWithExercise = WorkoutExercise & {
   exercise: Exercise;
 };
 
-// types/workout.ts
-
 export type WorkoutWithSections = {
   id: string;
   name: string;
@@ -86,7 +84,6 @@ export type WorkoutWithExercises = {
   day: WorkoutDay;
 };
 
-
 export type ScheduledWorkout = {
   status: WorkoutStatus;
   workout: {
@@ -96,7 +93,6 @@ export type ScheduledWorkout = {
     };
   };
 };
-
 
 export type ScheduledWorkoutWithProgram = {
   id: string;
@@ -116,7 +112,7 @@ export type ExerciseLog = {
   id: string;
   workoutLogId: string;
   exerciseId: string;
-
+  exerciseName: string;
   prescribed: Prescribed | null;
   performed: Performed | null;
 
@@ -168,6 +164,7 @@ export type ProgramWithWorkouts = {
 export type ScheduledWorkoutDashboard = {
   id: string;
   scheduledDate: Date;
+    status: WorkoutStatus;
   workout: {
     id: string;
     name: string;

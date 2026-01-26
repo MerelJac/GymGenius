@@ -35,9 +35,14 @@ export default function WorkoutRunner({
 
         <ExerciseLogViewer
           logs={activeLog.exercises.map((log) => ({
-            ...log,
+            id: log.id,
+            workoutLogId: log.workoutLogId,
+            exerciseId: log.exerciseId,
+            exerciseName: log.exercise?.name ?? "Exercise",
             prescribed: log.prescribed as Prescribed,
             performed: log.performed as Performed,
+            substitutedFrom: log.substitutedFrom,
+            substitutionReason: log.substitutionReason,
           }))}
         />
       </>

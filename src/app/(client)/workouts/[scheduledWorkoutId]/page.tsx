@@ -9,14 +9,15 @@ import { BackButton } from "@/app/components/BackButton";
 export default async function ClientWorkoutPage({
   params,
 }: {
-  params: { scheduledWorkoutId: string };
+  params: Promise<{ scheduledWorkoutId: string }>;
 }) {
+  const { scheduledWorkoutId } = await params;
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return notFound();
 
 const scheduledWorkout = await prisma.scheduledWorkout.findFirst({
   where: {
-    id: params.scheduledWorkoutId,
+    id: scheduledWorkoutId,
     clientId: session.user.id,
   },
   include: {
