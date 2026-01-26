@@ -72,11 +72,56 @@ export default async function ClientProfilePage() {
       </section>
 
       {/* Body Metrics */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Log Body Metrics
-        </h2>
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">Body Metrics</h2>
+
         <BodyMetricLogger />
+
+        {user.bodyMetrics.length === 0 ? (
+          <p className="text-sm text-gray-500 italic">
+            No body metrics logged yet.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {user.bodyMetrics
+              .slice()
+              .sort(
+                (a, b) =>
+                  new Date(b.recordedAt).getTime() -
+                  new Date(a.recordedAt).getTime(),
+              )
+              .map((metric) => (
+                <div
+                  key={metric.id}
+                  className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-sm"
+                >
+                  {/* LEFT */}
+                  <div className="space-y-1">
+                    <div className="font-medium text-gray-900">
+                      {new Date(metric.recordedAt).toLocaleDateString()}
+                    </div>
+                  </div>
+
+                  {/* RIGHT */}
+                  <div className="flex gap-4 text-right">
+                    <div>
+                      <div className="text-xs text-gray-500">Weight</div>
+                      <div className="font-medium">
+                        {metric.weight ? `${metric.weight} lb` : "—"}
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-xs text-gray-500">Body Fat</div>
+                      <div className="font-medium">
+                        {metric.bodyFat ? `${metric.bodyFat}%` : "—"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        )}
       </section>
 
       {/* Workout History */}
