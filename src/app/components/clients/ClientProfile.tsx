@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { addBodyMetric } from "@/app/(trainer)/clients/[clientId]/actions";
-import { Client, TrainerClientProfile } from "@/types/client";
+import { TrainerClientProfile } from "@/types/client";
 import { ScheduledWorkoutWithProgram } from "@/types/workout";
 import { ClientProfileEditor } from "./ClientProfileEditor";
 
@@ -178,15 +178,13 @@ export default function ClientProfile({
       </div>
 
       {/* Assigned Programs */}
-      <div className="space-y-6">
-        <h2 className="text-xl font-semibold text-gray-900">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <h2 className="text-xl font-semibold text-gray-900 mb-4">
           Assigned Programs
         </h2>
 
         {programs.length === 0 ? (
-          <p className="text-gray-500 italic bg-white border border-gray-200 rounded-xl p-6">
-            No programs assigned yet.
-          </p>
+          <p className="text-gray-500 italic py-4">No programs assigned yet.</p>
         ) : (
           <div className="space-y-5">
             {programs.map(({ program, workouts }) => {
@@ -252,55 +250,50 @@ export default function ClientProfile({
             })}
           </div>
         )}
+      </div>
+      {/* Additional Workouts */}
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          Additional Activity
+        </h2>
 
-        {/* Additional Workouts */}
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Additional Activity
-          </h2>
+        {client.additionalWorkouts.length === 0 ? (
+          <p className="text-gray-500 italic py-4">No additional activity logged.</p>
+        ) : (
+          <ul className="space-y-3 text-sm">
+            {client.additionalWorkouts.map((w) => (
+              <li
+                key={w.id}
+                className="flex justify-between items-center border-b border-gray-100 pb-3 last:border-0 last:pb-0"
+              >
+                <div className="space-y-0.5">
+                  <div className="font-medium text-gray-900">{w.type.name}</div>
 
-          {client.additionalWorkouts.length === 0 ? (
-            <p className="text-gray-500 italic">
-              No additional activity logged.
-            </p>
-          ) : (
-            <ul className="space-y-3 text-sm">
-              {client.additionalWorkouts.map((w) => (
-                <li
-                  key={w.id}
-                  className="flex justify-between items-center border-b border-gray-100 pb-3 last:border-0 last:pb-0"
-                >
-                  <div className="space-y-0.5">
-                    <div className="font-medium text-gray-900">
-                      {w.type.name}
-                    </div>
-
-                    <div className="text-gray-500 text-xs">
-                      {w.duration
-                        ? `${w.duration} min`
-                        : "Duration not specified"}
-                      {w.distance != null && ` • ${w.distance} mi`}
-                    </div>
-
-                    {w.notes && (
-                      <div className="text-gray-500 italic text-xs">
-                        “{w.notes}”
-                      </div>
-                    )}
+                  <div className="text-gray-500 text-xs">
+                    {w.duration
+                      ? `${w.duration} min`
+                      : "Duration not specified"}
+                    {w.distance != null && ` • ${w.distance} mi`}
                   </div>
 
-                  <div className="text-gray-500 text-sm">
-                    {new Date(w.performedAt).toLocaleDateString(undefined, {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+                  {w.notes && (
+                    <div className="text-gray-500 italic py-4 text-xs">
+                      “{w.notes}”
+                    </div>
+                  )}
+                </div>
+
+                <div className="text-gray-500 text-sm">
+                  {new Date(w.performedAt).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
