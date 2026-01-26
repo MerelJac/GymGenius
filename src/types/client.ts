@@ -15,7 +15,6 @@ export type Client = {
   scheduledWorkouts: ScheduledWorkoutWithProgram[];
 };
 
-
 export type ClientWithWorkouts = {
   id: string;
   email: string;
@@ -26,16 +25,23 @@ export type ClientWithWorkouts = {
   scheduledWorkouts: ScheduledWorkout[];
 };
 
-export type ClientProfilePageUser =
-  Prisma.UserGetPayload<{
-    include: {
-      profile: true;
-      bodyMetrics: true;
-      scheduledWorkouts: {
-        include: {
-          workout: true;
+export type ClientProfilePageUser = Prisma.UserGetPayload<{
+  include: {
+    profile: true;
+    bodyMetrics: true;
+    scheduledWorkouts: {
+      include: {
+        workout: true;
+      };
+    };
+    workoutLogs: {
+      include: {
+        scheduled: {
+          include: {
+            workout: true;
+          };
         };
       };
-      workoutLogs: true;
     };
-  }>;
+  };
+}>;

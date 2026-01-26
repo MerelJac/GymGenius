@@ -8,6 +8,7 @@ import { BodyMetricLogger } from "@/app/components/clients/BodyMetricLogger";
 import { LogoutButton } from "@/app/components/Logout";
 import ClientProfileSection from "@/app/components/clients/ClientProfileSection";
 import { ClientProfilePageUser } from "@/types/client";
+import Link from "next/link";
 
 export default async function ClientProfilePage() {
   const session = await getServerSession(authOptions);
@@ -20,7 +21,7 @@ export default async function ClientProfilePage() {
       bodyMetrics: true,
       scheduledWorkouts: {
         where: {
-          status: "SCHEDULED"
+          status: "SCHEDULED",
         },
         orderBy: { scheduledDate: "asc" },
         take: 5,
@@ -32,6 +33,13 @@ export default async function ClientProfilePage() {
         where: { status: "COMPLETED" },
         orderBy: { createdAt: "desc" },
         take: 5,
+        include: {
+          scheduled: {
+            include: {
+              workout: true,
+            },
+          },
+        },
       },
     },
   });
@@ -135,15 +143,30 @@ export default async function ClientProfilePage() {
           <p className="text-sm text-gray-500">No completed workouts yet</p>
         ) : (
           <ul className="text-sm space-y-2">
-            {user.workoutLogs.map((log) => (
-              <li key={log.id} className="flex justify-between items-center">
-                <span className="text-gray-900">Workout completed</span>
-                
-                <span className="text-gray-500">
-                  {log.createdAt.toLocaleDateString()}
-                </span>
-              </li>
-            ))}
+            {user.workoutLogs.map((log) => {
+              const workout = log.scheduled?.workout;
+
+              return (
+                <li key={log.id} className="flex justify-between items-center">
+                  {workout ? (
+                    <Link
+                      href={`/workouts/${log.scheduledId}`}
+                      className="text-gray-900 font-medium hover:underline hover:text-blue-600 transition"
+                    >
+                      {workout.name}
+                    </Link>
+                  ) : (
+                    <span className="text-gray-400 italic">
+                      Workout unavailable
+                    </span>
+                  )}
+
+                  <span className="text-gray-500">
+                    {log.createdAt.toLocaleDateString()}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>

@@ -43,7 +43,7 @@ const logs: ExerciseLog[] =
 
         // 🔑 FIX: assert the JSON → domain type
         prescribed: assertPrescribed(we.prescribed),
-
+        
         // 🔑 FIX: cast performed safely
         performed: log?.performed
           ? (log.performed as Performed)
@@ -59,7 +59,7 @@ const logs: ExerciseLog[] =
   if (isCompleted) {
     return (
       <>
-        <div className="rounded bg-green-50 border p-3 text-green-700">
+        <div className="rounded bg-green-50 border p-3 text-green-700 my-4">
           Workout completed 🎉
         </div>
 
