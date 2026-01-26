@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 export async function addBodyMetric(
   clientId: string,
   weight: number | null,
-  bodyFat: number | null
+  bodyFat: number | null,
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
@@ -24,11 +24,15 @@ export async function addBodyMetric(
   revalidatePath(`/clients/${clientId}`);
 }
 
-
 export async function updateClientProfile(
   clientId: string,
-  firstName: string,
-  lastName: string,
+  data: {
+    firstName: string;
+    lastName: string;
+    dob?: Date | null;
+    experience?: string | null;
+    injuryNotes?: string | null;
+  },
 ) {
   const session = await getServerSession(authOptions);
 
@@ -36,22 +40,25 @@ export async function updateClientProfile(
     throw new Error("Unauthorized");
   }
 
-    if (!clientId) {
-    throw new Error("Missing Data");
+  if (!clientId) {
+    throw new Error("Missing crucial Data");
   }
-
   await prisma.profile.upsert({
-    where: {
-      userId: clientId,
-    },
+    where: { userId: clientId },
     update: {
-      firstName,
-      lastName,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dob: data.dob,
+      experience: data.experience,
+      injuryNotes: data.injuryNotes,
     },
     create: {
       userId: clientId,
-      firstName,
-      lastName,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      dob: data.dob,
+      experience: data.experience,
+      injuryNotes: data.injuryNotes,
     },
   });
 }

@@ -4,14 +4,16 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { BodyMetricLogger } from "@/app/components/clients/BodyMetricLogger";
-import { ClientProfileEditor } from "@/app/components/clients/ClientProfileEditor";
+
 import { LogoutButton } from "@/app/components/Logout";
+import ClientProfileSection from "@/app/components/clients/ClientProfileSection";
+import { ClientProfilePageUser } from "@/types/client";
 
 export default async function ClientProfilePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return notFound();
 
-  const user = await prisma.user.findUnique({
+  const user: ClientProfilePageUser | null = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: {
       profile: true,
@@ -44,44 +46,7 @@ export default async function ClientProfilePage() {
       </div>
 
       {/* Profile */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Personal Info</h2>
-
-        <div className="text-sm space-y-1">
-          <div>
-            <span className="font-medium text-gray-700">Email:</span>{" "}
-            <span className="text-gray-900">{user.email}</span>
-          </div>
-
-          <div className="space-y-1">
-            <span className="font-medium text-gray-700">Name:</span>
-
-            <div className="text-gray-900">
-              {user.profile?.firstName} {user.profile?.lastName}
-            </div>
-          </div>
-
-          {user.profile?.experience && (
-            <div>
-              <span className="font-medium text-gray-700">Experience:</span>{" "}
-              <span className="text-gray-900">{user.profile.experience}</span>
-            </div>
-          )}
-
-          {user.profile?.injuryNotes && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
-              <span className="font-medium">Injuries:</span>{" "}
-              {user.profile.injuryNotes}
-            </div>
-          )}
-        </div>
-      </section>
-
-      <ClientProfileEditor
-        clientId={user.id}
-        firstName={user.profile?.firstName}
-        lastName={user.profile?.lastName}
-      />
+      <ClientProfileSection user={user} />
       {/* Upcoming Workouts */}
       <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
         <h2 className="text-lg font-semibold text-gray-900">

@@ -1,6 +1,7 @@
 import { Profile } from "./profile";
 import { BodyMetric } from "./bodyMetric";
 import { ScheduledWorkout, ScheduledWorkoutWithProgram } from "./workout";
+import { Prisma } from "@prisma/client";
 
 export type Client = {
   id: string;
@@ -24,3 +25,17 @@ export type ClientWithWorkouts = {
   } | null;
   scheduledWorkouts: ScheduledWorkout[];
 };
+
+export type ClientProfilePageUser =
+  Prisma.UserGetPayload<{
+    include: {
+      profile: true;
+      bodyMetrics: true;
+      scheduledWorkouts: {
+        include: {
+          workout: true;
+        };
+      };
+      workoutLogs: true;
+    };
+  }>;

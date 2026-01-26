@@ -7,13 +7,27 @@ export function ClientProfileEditor({
   clientId,
   firstName: initialFirstName,
   lastName: initialLastName,
+  dob: initialDob,
+  experience: initialExperience,
+  injuryNotes: initialInjuryNotes,
+  onSave,
 }: {
   clientId: string;
   firstName?: string;
   lastName?: string;
+  dob?: Date | null;
+  experience?: string | null;
+  injuryNotes?: string | null;
+  onSave?: () => void;
 }) {
   const [firstName, setFirstName] = useState(initialFirstName ?? "");
   const [lastName, setLastName] = useState(initialLastName ?? "");
+  const [dob, setDob] = useState(
+    initialDob ? initialDob.toISOString().split("T")[0] : "",
+  );
+  const [experience, setExperience] = useState(initialExperience ?? "");
+  const [injuryNotes, setInjuryNotes] = useState(initialInjuryNotes ?? "");
+
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -21,9 +35,17 @@ export function ClientProfileEditor({
     setSaving(true);
 
     startTransition(async () => {
-      await updateClientProfile(clientId, firstName, lastName);
+      await updateClientProfile(clientId, {
+        firstName,
+        lastName,
+        dob: dob ? new Date(dob) : null,
+        experience: experience || null,
+        injuryNotes: injuryNotes || null,
+      });
+
       setSaving(false);
       setIsEditing(false);
+      onSave?.();
     });
   }
 
@@ -73,6 +95,43 @@ export function ClientProfileEditor({
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Date of Birth
+            </label>
+            <input
+              type="date"
+              value={dob}
+              onChange={(e) => setDob(e.target.value)}
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Training Experience
+            </label>
+            <input
+              value={experience}
+              onChange={(e) => setExperience(e.target.value)}
+              placeholder="e.g. Beginner, 2 years lifting, former athlete"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Injuries or limitations
+            </label>
+            <textarea
+              value={injuryNotes}
+              onChange={(e) => setInjuryNotes(e.target.value)}
+              rows={3}
+              placeholder="Anything your trainer should know"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+            />
+          </div>
+
           <div className="flex items-center gap-3 pt-2">
             <button
               onClick={handleSave}
@@ -92,14 +151,51 @@ export function ClientProfileEditor({
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-between py-2">
+        <div className="space-y-4 py-2">
+          {/* NAME */}
           <div className="text-gray-900">
-            <span className="font-medium text-lg">
+            <span className="text-xl font-semibold">
               {firstName || "—"} {lastName || ""}
             </span>
             {!firstName && !lastName && (
-              <span className="text-gray-400 italic ml-2 text-sm">
+              <span className="ml-2 text-sm text-gray-400 italic">
                 (not set)
+              </span>
+            )}
+          </div>
+
+          {/* DETAILS */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            {/* DOB */}
+            <div>
+              <span className="block text-gray-500">Date of Birth</span>
+              <span className="font-medium text-gray-900">
+                {dob ? new Date(dob).toLocaleDateString() : "Not set"}
+              </span>
+            </div>
+
+            {/* EXPERIENCE */}
+            <div>
+              <span className="block text-gray-500">Experience</span>
+              <span className="font-medium text-gray-900">
+                {experience || "Not set"}
+              </span>
+            </div>
+          </div>
+
+          {/* INJURIES */}
+          <div>
+            <span className="block text-sm text-gray-500 mb-1">
+              Injuries / Limitations
+            </span>
+
+            {injuryNotes ? (
+              <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+                {injuryNotes}
+              </div>
+            ) : (
+              <span className="text-sm text-gray-400 italic">
+                None reported
               </span>
             )}
           </div>
