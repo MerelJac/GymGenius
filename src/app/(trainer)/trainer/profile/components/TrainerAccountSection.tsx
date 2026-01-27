@@ -8,7 +8,7 @@ type TrainerAccountSectionProps = {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
-  phone: string | null;
+  phone: string | null |  undefined;
 };
 
 export function TrainerAccountSection({

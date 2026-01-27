@@ -7,18 +7,25 @@ import { updateTrainerProfile } from "@/app/(trainer)/trainer/profile/actions";
 export function TrainerProfileEditor({
   initialFirstName,
   initialLastName,
+  initialEmail,
+
+  initialPhone,
 }: {
   initialFirstName?: string | null;
   initialLastName?: string | null;
+  initialEmail: string;
+  initialPhone: string | null | undefined;
 }) {
   const [firstName, setFirstName] = useState(initialFirstName ?? "");
   const [lastName, setLastName] = useState(initialLastName ?? "");
+    const [email, setEmail] = useState(initialEmail ?? "");
+      const [phone, setPhone] = useState(initialPhone ?? "");
   const [saving, setSaving] = useState(false);
 
   function save() {
     setSaving(true);
     startTransition(async () => {
-      await updateTrainerProfile(firstName, lastName);
+      await updateTrainerProfile(firstName, lastName, email, phone);
       setSaving(false);
     });
   }
@@ -39,6 +46,22 @@ export function TrainerProfileEditor({
           placeholder="Last name"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}
+        />
+
+                <input
+          className="rounded-lg border px-3 py-2 text-base"
+          placeholder="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+
+                <input
+          className="rounded-lg border px-3 py-2 text-base"
+          placeholder="Phone"
+          type="phone"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
         />
       </div>
 

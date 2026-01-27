@@ -60,6 +60,7 @@ export default async function TrainerProfilePage() {
         firstName={trainer.profile?.firstName}
         lastName={trainer.profile?.lastName}
         email={trainer.email}
+        phone={trainer.profile?.phone}
       />
       {/* Clients */}
       <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
