@@ -3,6 +3,8 @@ export type ExerciseType =
   | "TIMED"
   | "HYBRID"
   | "BODYWEIGHT"
+  | "MOBILITY"
+  | "CORE"
 
 export type Exercise = {
   id: string

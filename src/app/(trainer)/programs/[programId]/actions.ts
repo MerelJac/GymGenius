@@ -204,22 +204,27 @@ export async function createWorkoutSection(
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  const order = await prisma.workoutSection.count({
-    where: { workoutId },
-  });
+  const section = await prisma.$transaction(async (tx) => {
+    const maxOrder = await tx.workoutSection.aggregate({
+      where: { workoutId },
+      _max: { order: true },
+    });
 
-  const section = await prisma.workoutSection.create({
-    data: {
-      workoutId,
-      title,
-      order,
-    },
+    const nextOrder = (maxOrder._max.order ?? -1) + 1;
+
+    return tx.workoutSection.create({
+      data: {
+        workoutId,
+        title,
+        order: nextOrder,
+      },
+    });
   });
 
   revalidatePath(`/trainer/programs/${programId}`);
-
-  return section; // ✅ IMPORTANT
+  return section;
 }
+
 
 export async function updateWorkoutSectionTitle(
   programId: string,
@@ -281,4 +286,51 @@ export async function reorderWorkoutSections(
       ),
     );
   });
+}
+
+export async function deleteWorkoutSection(
+  programId: string,
+  sectionId: string,
+) {
+  // Safety check: section belongs to program
+  const section = await prisma.workoutSection.findFirst({
+    where: {
+      id: sectionId,
+      workout: {
+        programId,
+      },
+    },
+    include: { exercises: true },
+  });
+
+  if (!section) return;
+
+  // OPTION A: delete exercises + section
+  await prisma.$transaction([
+    prisma.workoutExercise.deleteMany({
+      where: { sectionId },
+    }),
+    prisma.workoutSection.delete({
+      where: { id: sectionId },
+    }),
+  ]);
+
+  // OPTIONAL: reorder remaining sections
+  const remaining = await prisma.workoutSection.findMany({
+    where: {
+      workout: {
+        programId,
+      },
+    },
+    orderBy: { order: "asc" },
+  });
+
+  await Promise.all(
+    remaining.map((s, i) =>
+      prisma.workoutSection.update({
+        where: { id: s.id },
+        data: { order: i },
+      }),
+    ),
+  );
 }

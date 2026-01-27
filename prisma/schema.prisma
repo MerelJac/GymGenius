@@ -33,6 +33,8 @@ enum ExerciseType {
   TIMED
   HYBRID
   BODYWEIGHT
+  MOBILITY
+  CORE
 }
 
 model User {

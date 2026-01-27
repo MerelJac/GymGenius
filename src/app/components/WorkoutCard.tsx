@@ -9,6 +9,7 @@ import {
   updateWorkoutSectionTitle,
   reorderWorkoutSections,
   moveWorkoutExercise,
+  deleteWorkoutSection,
 } from "../(trainer)/programs/[programId]/actions";
 import {
   SectionExercise,
@@ -118,6 +119,10 @@ export default function WorkoutCard({
         type: "reorder-sections";
         orderedSectionIds: string[];
       }
+    | {
+        type: "delete-section";
+        sectionId: string;
+      }
   >(normalizeSections(workout.workoutSections), (currentSections, action) => {
     switch (action.type) {
       case "replace-section":
@@ -157,6 +162,18 @@ export default function WorkoutCard({
             (e) => e.id !== action.exerciseId,
           ),
         }));
+
+      case "delete-section": {
+        const remaining = currentSections.filter(
+          (s) => s.id !== action.sectionId,
+        );
+
+        // Reindex section order so UI stays consistent
+        return remaining.map((s, index) => ({
+          ...s,
+          order: index,
+        }));
+      }
 
       case "move-exercise": {
         let movedExercise: SectionExercise | null = null;
@@ -365,6 +382,13 @@ export default function WorkoutCard({
       setSectionId(realSection.id); // ✅ REAL ID
     } catch (err) {
       console.error("Failed to create section", err);
+
+      startTransition(() => {
+        updateOptimisticSections({
+          type: "delete-section",
+          sectionId: tempId,
+        });
+      });
     }
   }
 
@@ -414,6 +438,29 @@ export default function WorkoutCard({
     router.refresh();
   }
 
+  function handleDeleteSection(sectionId: string) {
+    const section = optimisticSections.find((s) => s.id === sectionId);
+    if (!section) return;
+
+    const confirmed = confirm(
+      section.exercises.length > 0
+        ? "Delete this section and all its exercises?"
+        : "Delete this section?",
+    );
+
+    if (!confirmed) return;
+
+    startTransition(() =>
+      updateOptimisticSections({
+        type: "delete-section",
+        sectionId,
+      }),
+    );
+
+    deleteWorkoutSection(programId, sectionId);
+    router.refresh();
+  }
+
   function moveExerciseWithinSection(
     sectionId: string,
     exerciseId: string,
@@ -452,7 +499,7 @@ export default function WorkoutCard({
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-white border border-blue-200 rounded-xl shadow-sm overflow-hidden">
       {/* Header Bar */}
       <div className="px-5 py-4 border-b bg-gray-50/70 flex flex-wrap items-center justify-between gap-4">
         <div className="flex-1 min-w-[220px]">
@@ -604,10 +651,17 @@ export default function WorkoutCard({
                   >
                     <ChevronDown size={16} />
                   </button>
+                  <button
+                    onClick={() => handleDeleteSection(section.id)}
+                    className="p-1 text-red-500 hover:text-red-700 rounded hover:bg-red-50 transition"
+                    title="Delete section"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                 </div>
               </div>
 
-             {/* Exercises */}
+              {/* Exercises */}
               <div className="divide-y divide-gray-100">
                 {section.exercises.length === 0 ? (
                   <div className="px-4 py-5 text-sm text-gray-500 italic">
@@ -621,13 +675,17 @@ export default function WorkoutCard({
                     >
                       <div className="flex items-center gap-1 text-gray-400">
                         <button
-                          onClick={() => moveExerciseWithinSection(section.id, we.id, "up")}
+                          onClick={() =>
+                            moveExerciseWithinSection(section.id, we.id, "up")
+                          }
                           className="p-1 hover:text-gray-700 rounded hover:bg-gray-200/60"
                         >
                           <ChevronUp size={16} />
                         </button>
                         <button
-                          onClick={() => moveExerciseWithinSection(section.id, we.id, "down")}
+                          onClick={() =>
+                            moveExerciseWithinSection(section.id, we.id, "down")
+                          }
                           className="p-1 hover:text-gray-700 rounded hover:bg-gray-200/60"
                         >
                           <ChevronDown size={16} />
@@ -693,7 +751,7 @@ export default function WorkoutCard({
         )}
       </div>
 
-     {/* Add Exercise Form */}
+      {/* Add Exercise Form */}
       <div className="px-5 py-5 border-t bg-gray-50/40">
         <div className="flex flex-wrap gap-3 items-end">
           <div className="min-w-[220px] flex-1">
@@ -745,7 +803,9 @@ export default function WorkoutCard({
                   <input
                     type="number"
                     value={weight ?? ""}
-                    onChange={(e) => setWeight(e.target.value ? Number(e.target.value) : null)}
+                    onChange={(e) =>
+                      setWeight(e.target.value ? Number(e.target.value) : null)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
@@ -761,7 +821,9 @@ export default function WorkoutCard({
               <input
                 type="number"
                 value={time ?? ""}
-                onChange={(e) => setTime(e.target.value ? Number(e.target.value) : null)}
+                onChange={(e) =>
+                  setTime(e.target.value ? Number(e.target.value) : null)
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
