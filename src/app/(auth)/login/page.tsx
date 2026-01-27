@@ -93,17 +93,8 @@ export default function LoginPage() {
             Sign in
           </button>
 
-          <Link href="/signup">
-            <button
-              type="button"
-              className="w-full py-2.5 rounded-lg border border-gray-300
-               text-gray-700 font-medium
-               hover:bg-gray-50 hover:border-gray-400
-               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-               transition mb-6"
-            >
-              Sign Up
-            </button>
+          <Link href="/signup" className="text-sm text-center block underline">
+            New here? Get Started
           </Link>
 
           {/* Footer */}
