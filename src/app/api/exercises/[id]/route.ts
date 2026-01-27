@@ -1,13 +1,15 @@
 // src/app/api/exercises/route.ts
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
-  _: Request,
-  { params }: { params: { id: string } }
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await context.params;
+
   const exercise = await prisma.exercise.findUnique({
-    where: { id: params.id },
+    where: { id },
     include: {
       substitutionsFrom: {
         include: {

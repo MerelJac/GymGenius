@@ -1,4 +1,5 @@
 import { renderPrescribed } from "@/app/utils/workoutFunctions";
+import { Prescribed } from "@/types/prescribed";
 import { ExerciseLog } from "@/types/workout";
 
 export function ExerciseLogViewer({
@@ -25,7 +26,7 @@ export function ExerciseLogViewer({
         {/* Prescribed */}
         <div className="text-sm text-gray-600 bg-gray-50 border rounded-lg px-3 py-2">
           <span className="font-medium text-gray-700">Prescribed:</span>{" "}
-          {log.prescribed ? renderPrescribed(log.prescribed) : "N/A"}
+          {log.prescribed ? renderPrescribed(log.prescribed as Prescribed) : "N/A"}
         </div>
 
         {/* Performed */}

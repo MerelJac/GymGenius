@@ -45,8 +45,8 @@ export default async function WorkoutBuilderPage({
       <ul className="mt-6 space-y-4">
         {workout.exercises.map((we) => (
           <li key={we.id} className="border p-4">
-            <strong>{we.exercise.name}</strong>
-            <div className="text-sm text-gray-500">{we.exercise.type}</div>
+            <strong>{we.exercise?.name}</strong>
+            <div className="text-sm text-gray-500">{we.exercise?.type}</div>
 
             <pre className="text-xs mt-2">
               {JSON.stringify(we.prescribed, null, 2)}

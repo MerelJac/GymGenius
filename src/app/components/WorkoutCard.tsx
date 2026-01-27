@@ -85,7 +85,7 @@ export default function WorkoutCard({
               ...we.exercise,
             } as Exercise)
           : null,
-        prescribed: we.prescribed,
+        prescribed: we.prescribed as Prescribed | null,
         notes: we.notes,
       })),
     }));
@@ -667,7 +667,7 @@ export default function WorkoutCard({
                             {we.exercise?.name || "Missing exercise"}
                           </Link>
                           <span className="text-gray-600 text-sm">
-                            — {formatPrescribed(we.prescribed)}
+                            — {formatPrescribed(we.prescribed as Prescribed)}
                           </span>
                         </div>
                         {we.notes && (

@@ -1,13 +1,12 @@
-import { NextResponse } from "next/server"
+import { NextResponse, NextRequest } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { randomUUID } from "crypto"
-import { getToken } from "@next-auth/prisma-adapter"
+import { getToken } from "next-auth/jwt";
 
 export async function POST(req: Request) {
   const token = await getToken({
-    req,
+    req: req as NextRequest,
     secret: process.env.NEXTAUTH_SECRET!,
-    salt: "gymgenius-auth",
   })
 
   if (!token || token.role !== "TRAINER") {

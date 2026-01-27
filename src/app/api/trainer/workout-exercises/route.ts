@@ -11,8 +11,7 @@ export async function POST(req: Request) {
   }
 
   const formData = await req.formData();
-
-  const workoutId = String(formData.get("workoutId"));
+  const sectionId = String(formData.get("sectionId"));
   const exerciseId = String(formData.get("exerciseId"));
 
   const exercise = await prisma.exercise.findUnique({
@@ -61,12 +60,12 @@ export async function POST(req: Request) {
   }
 
   const order = await prisma.workoutExercise.count({
-    where: { workoutId },
+    where: { sectionId },
   });
 
   await prisma.workoutExercise.create({
     data: {
-      workoutId,
+      sectionId,
       exerciseId,
       order,
       prescribed,

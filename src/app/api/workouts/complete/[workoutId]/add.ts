@@ -21,12 +21,12 @@ export async function POST(
   }
 
   const count = await prisma.workoutExercise.count({
-    where: { workoutId: params.workoutId },
+    where: { sectionId: params.workoutId },
   })
 
   await prisma.workoutExercise.create({
     data: {
-      workoutId: params.workoutId,
+      sectionId: params.workoutId,
       exerciseId,
       order: count + 1,
       prescribed: {},

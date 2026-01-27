@@ -1,6 +1,7 @@
 import { Prisma, WorkoutDay, WorkoutStatus } from "@prisma/client";
 import type { ExerciseType, Exercise } from "./exercise";
 import { Performed, Prescribed } from "./prescribed";
+import { JsonValue } from "@prisma/client/runtime/client";
 
 export type Workout = {
   id: string;
@@ -44,7 +45,7 @@ export type WorkoutWithSections = {
     exercises: {
       id: string;
       order: number;
-      prescribed: Prescribed;
+      prescribed: Prescribed | JsonValue| null;
       notes: string | null;
       exercise: {
         id: string;
@@ -78,7 +79,7 @@ export type WorkoutWithExercises = {
     notes?: string | null;
     id: string;
     order: number;
-    prescribed: Prescribed;
+    prescribed: Prescribed | JsonValue| null;
     exercise: Exercise;
   }[];
   day: WorkoutDay;
@@ -113,7 +114,7 @@ export type ExerciseLog = {
   workoutLogId: string;
   exerciseId: string;
   exerciseName: string;
-  prescribed: Prescribed | null;
+  prescribed:Prescribed | JsonValue | null;
   performed: Performed | null;
 
   substitutedFrom?: string | null;
@@ -189,6 +190,6 @@ export type SectionExercise = {
   order: number;
   exercise: Exercise | null;
   exerciseId: string;
-  prescribed: Prescribed;
+  prescribed: Prescribed | null;
   notes: string | null;
 };
