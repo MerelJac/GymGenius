@@ -538,7 +538,7 @@ export default function WorkoutCard({
           optimisticSections.map((section) => (
             <div
               key={section.id}
-              className="border border-gray-200 rounded-lg bg-white overflow-hidden transition-shadow hover:shadow-md"
+              className="border border-gray-200 rounded-lg bg-white overflow-hidden transition-shadow hover:shadow-md m-2"
             >
               {/* Section title – either editable input or clickable h3 */}
               <div className="px-4 py-3 bg-gray-50 border-b flex items-center justify-between gap-4 group">
