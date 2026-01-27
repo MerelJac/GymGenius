@@ -142,7 +142,7 @@ export default function SignupPage() {
                text-gray-700 font-medium
                hover:bg-gray-50 hover:border-gray-400
                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-               transition"
+               transition mb-6"
             >
               Login
             </button>
@@ -150,7 +150,7 @@ export default function SignupPage() {
 
           {/* Footer */}
           <p className="text-xs text-center text-gray-500">
-            By creating an account, you agree to our Terms & Privacy Policy
+            By creating an account, you agree to our <a className="underline" href="/terms">Terms & Privacy Policy</a>
           </p>
         </form>
       </div>
