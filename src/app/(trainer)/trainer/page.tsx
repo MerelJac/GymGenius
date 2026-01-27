@@ -1,6 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import Link from "next/link";
-import { WorkoutStatus } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ClientProgramProgress } from "@/app/components/ClientProgramProgress";

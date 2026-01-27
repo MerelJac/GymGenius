@@ -1,0 +1,56 @@
+// src/app/components/trainer/TrainerProfileEditor.tsx
+"use client";
+
+import { useState, startTransition } from "react";
+import { updateTrainerProfile } from "@/app/(trainer)/trainer/profile/actions";
+
+export function TrainerProfileEditor({
+  initialFirstName,
+  initialLastName,
+}: {
+  initialFirstName?: string | null;
+  initialLastName?: string | null;
+}) {
+  const [firstName, setFirstName] = useState(initialFirstName ?? "");
+  const [lastName, setLastName] = useState(initialLastName ?? "");
+  const [saving, setSaving] = useState(false);
+
+  function save() {
+    setSaving(true);
+    startTransition(async () => {
+      await updateTrainerProfile(firstName, lastName);
+      setSaving(false);
+    });
+  }
+
+  return (
+    <div className="bg-white border rounded-xl p-6 space-y-4">
+      <h3 className="font-semibold text-gray-900">Edit Profile</h3>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <input
+          className="rounded-lg border px-3 py-2"
+          placeholder="First name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+        />
+        <input
+          className="rounded-lg border px-3 py-2"
+          placeholder="Last name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+      </div>
+
+      <div className="flex justify-end">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
+        >
+          {saving ? "Saving…" : "Save"}
+        </button>
+      </div>
+    </div>
+  );
+}

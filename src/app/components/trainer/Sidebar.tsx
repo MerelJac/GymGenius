@@ -2,7 +2,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LogoutButton } from "../Logout";
-import { LayoutDashboard, Users, Dumbbell, ClipboardList } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  Dumbbell,
+  ClipboardList,
+  User2,
+} from "lucide-react";
 
 const navItems = [
   { href: "/trainer", label: "Dashboard", icon: LayoutDashboard },
@@ -19,7 +25,7 @@ export default function SidebarLayout({
   const pathname = usePathname();
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-gray-50 max-h-screen">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r flex flex-col">
         {/* Brand */}
@@ -46,7 +52,7 @@ export default function SidebarLayout({
             ? "bg-blue-50 text-blue-700"
             : "text-gray-700 hover:bg-gray-100"
         }
-      `}
+        `}
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 {item.label}
@@ -55,9 +61,22 @@ export default function SidebarLayout({
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="px-4 py-4 border-t">
-          <LogoutButton />
+        <div className="flex flex-col px-4 py-6 space-y-1">
+          <Link
+            key={"/trainer/profile"}
+            href={"/trainer/profile"}
+            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition
+        text-gray-700 hover:bg-gray-100
+        
+        "
+          >
+            <User2 size={16} />
+            Profile
+          </Link>
+          {/* Footer */}
+          <div className="px-4 py-4 border-t">
+            <LogoutButton />
+          </div>
         </div>
       </aside>
 
