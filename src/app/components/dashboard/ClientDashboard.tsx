@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { ScheduledWorkoutDashboard } from "@/types/workout";
 import { AdditionalWorkoutQuickAdd } from "../workout/AdditionalWorkoutQuickAdd";
+import { ClientDashboardStats } from "../clients/ClientDashboardStats";
+import { getClientDashboardStats } from "@/lib/clients/getClientDashboardStats";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
@@ -12,6 +14,7 @@ export default async function ClientDashboard() {
 
   const clientId = session?.user?.id;
 
+  const stats = await getClientDashboardStats(clientId);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -61,16 +64,25 @@ export default async function ClientDashboard() {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-3xl font-bold text-gray-900">Client Dashboard</h1>
-        <p className="text-sm text-gray-500">
-          Your training overview at a glance
+        <p className="text-sm text-gray-600">
+          Nice to see you! You’re staying consistent — great work.
         </p>
+      </div>
+
+      <div className="space-y-6">
+        <ClientDashboardStats
+          streak={stats.onPlanStreak}
+          completed={stats.completedThisWeek}
+          scheduled={stats.scheduledThisWeek}
+          nextWorkoutDate={stats.nextWorkoutDate}
+        />
       </div>
 
       <TodayWorkout workout={todaysWorkout} />
 
-<section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
-  <AdditionalWorkoutQuickAdd clientId={clientId} />
-</section>
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
+        <AdditionalWorkoutQuickAdd clientId={clientId} />
+      </section>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UpcomingWorkouts workouts={futureWorkouts} />
         <PastWorkouts workouts={pastWorkouts} />
