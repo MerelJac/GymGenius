@@ -10,6 +10,7 @@ import {
   reorderWorkoutSections,
   moveWorkoutExercise,
   deleteWorkoutSection,
+  reorderExercisesInSection,
 } from "../(trainer)/programs/[programId]/actions";
 import {
   SectionExercise,
@@ -461,42 +462,48 @@ export default function WorkoutCard({
     router.refresh();
   }
 
-  function moveExerciseWithinSection(
-    sectionId: string,
-    exerciseId: string,
-    direction: "up" | "down",
-  ) {
-    const section = optimisticSections.find((s) => s.id === sectionId);
-    if (!section) return;
+ function moveExerciseWithinSection(
+  sectionId: string,
+  exerciseId: string,
+  direction: "up" | "down",
+) {
+  const section = optimisticSections.find((s) => s.id === sectionId);
+  if (!section) return;
 
-    const index = section.exercises.findIndex((e) => e.id === exerciseId);
-    if (index === -1) return;
+  const index = section.exercises.findIndex((e) => e.id === exerciseId);
+  if (index === -1) return;
 
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= section.exercises.length) return;
+  const targetIndex = direction === "up" ? index - 1 : index + 1;
+  if (targetIndex < 0 || targetIndex >= section.exercises.length) return;
 
-    const reorderedExercises = [...section.exercises];
-    [reorderedExercises[index], reorderedExercises[targetIndex]] = [
-      reorderedExercises[targetIndex],
-      reorderedExercises[index],
-    ];
+  const reorderedExercises = [...section.exercises];
+  [reorderedExercises[index], reorderedExercises[targetIndex]] = [
+    reorderedExercises[targetIndex],
+    reorderedExercises[index],
+  ];
 
-    startTransition(() => {
-      updateOptimisticSections({
-        type: "replace-section",
-        tempId: section.id,
-        section: {
-          ...section,
-          exercises: reorderedExercises.map((e, i) => ({
-            ...e,
-            order: i,
-          })),
-        },
-      });
+  // 1️⃣ Optimistic UI update
+  startTransition(() => {
+    updateOptimisticSections({
+      type: "replace-section",
+      tempId: section.id,
+      section: {
+        ...section,
+        exercises: reorderedExercises.map((e, i) => ({
+          ...e,
+          order: i,
+        })),
+      },
     });
+  });
 
-    router.refresh();
-  }
+  // 2️⃣ Persist to server
+  reorderExercisesInSection(
+    programId,
+    sectionId,
+    reorderedExercises.map((e) => e.id)
+  );
+}
 
   return (
     <div className="bg-white border border-blue-200 rounded-xl shadow-sm overflow-hidden">
@@ -532,18 +539,6 @@ export default function WorkoutCard({
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <select
-            value={sectionId}
-            onChange={(e) => setSectionId(e.target.value)}
-            className="min-w-[140px] px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-          >
-            {optimisticSections.map((section) => (
-              <option key={section.id} value={section.id}>
-                {section.title}
-              </option>
-            ))}
-          </select>
-
           <select
             value={day}
             onChange={(e) => saveDay(e.target.value as WorkoutDay)}
@@ -753,6 +748,18 @@ export default function WorkoutCard({
 
       {/* Add Exercise Form */}
       <div className="px-5 py-5 border-t bg-gray-50/40">
+        <p>Add exercise to section:</p>
+        <select
+          value={sectionId}
+          onChange={(e) => setSectionId(e.target.value)}
+          className="min-w-[140px] px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        >
+          {optimisticSections.map((section) => (
+            <option key={section.id} value={section.id}>
+              {section.title}
+            </option>
+          ))}
+        </select>
         <div className="flex flex-wrap gap-3 items-end">
           <div className="min-w-[220px] flex-1">
             <label className="block text-xs font-medium text-gray-700 mb-1">

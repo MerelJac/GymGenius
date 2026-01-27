@@ -225,7 +225,6 @@ export async function createWorkoutSection(
   return section;
 }
 
-
 export async function updateWorkoutSectionTitle(
   programId: string,
   sectionId: string,
@@ -286,6 +285,43 @@ export async function reorderWorkoutSections(
       ),
     );
   });
+}
+
+export async function reorderExercisesInSection(
+  programId: string,
+  sectionId: string,
+  orderedExerciseIds: string[],
+) {
+  // 1️⃣ Fetch exercises to validate ownership
+  const exercises = await prisma.workoutExercise.findMany({
+    where: {
+      id: { in: orderedExerciseIds },
+      section: {
+        id: sectionId,
+        workout: {
+          programId,
+        },
+      },
+    },
+    select: { id: true },
+  });
+
+  // 2️⃣ Safety check
+  if (exercises.length !== orderedExerciseIds.length) {
+    throw new Error("Invalid exercise reorder request");
+  }
+
+  // 3️⃣ Persist order atomically
+  await prisma.$transaction(
+    orderedExerciseIds.map((id, index) =>
+      prisma.workoutExercise.update({
+        where: { id },
+        data: { order: index },
+      }),
+    ),
+  );
+
+  revalidatePath(`/trainer/programs/${programId}`);
 }
 
 export async function deleteWorkoutSection(
