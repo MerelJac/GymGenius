@@ -1,7 +1,10 @@
 import { Performed, Prescribed } from "@/types/prescribed";
 export function buildPerformedFromPrescribed(
-  prescribed: Prescribed
+  prescribed: Prescribed,
 ): Performed {
+  function assertNever(x: never): never {
+    throw new Error(`Unhandled prescribed kind: ${JSON.stringify(x)}`);
+  }
   switch (prescribed.kind) {
     case "strength":
     case "hybrid":
@@ -26,11 +29,30 @@ export function buildPerformedFromPrescribed(
         kind: "timed",
         duration: prescribed.duration,
       };
+    case "core":
+      return {
+        kind: "core",
+        sets: Array.from({ length: prescribed.sets ?? 0 }, () => ({
+          reps: prescribed.reps ?? 0,
+          weight: prescribed.weight ?? null,
+        })),
+        duration: prescribed.duration ?? 0,
+      };
+
+    case "mobility":
+      return {
+        kind: "mobility",
+        sets: Array.from({ length: prescribed.sets ?? 0 }, () => ({
+          reps: prescribed.reps ?? 0,
+          weight: prescribed.weight ?? null,
+        })),
+        duration: prescribed.duration ?? 0,
+      };
+
+    default:
+      return assertNever(prescribed);
   }
 }
-
-
-
 
 export function renderPrescribed(prescribed: Prescribed) {
   switch (prescribed.kind) {
@@ -45,6 +67,11 @@ export function renderPrescribed(prescribed: Prescribed) {
 
     case "timed":
       return `${prescribed.duration} seconds`;
+    case "core":
+    case "mobility":
+      return prescribed.duration
+        ? `${prescribed.duration} seconds`
+        : `${prescribed.sets} sets`;
 
     default:
       return "";

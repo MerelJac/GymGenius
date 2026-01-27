@@ -57,6 +57,32 @@ export async function POST(req: Request) {
         duration: Number(formData.get("duration")),
       };
       break;
+
+    case "CORE":
+      prescribed = {
+        kind: "core",
+        sets: Number(formData.get("sets")),
+        reps: Number(formData.get("reps")),
+        weight: formData.get("weight") ? Number(formData.get("weight")) : null,
+        duration: Number(formData.get("duration")),
+      };
+      break;
+
+    case "MOBILITY":
+      prescribed = {
+        kind: "mobility",
+        sets: Number(formData.get("sets")),
+        reps: Number(formData.get("reps")),
+        weight: formData.get("weight") ? Number(formData.get("weight")) : null,
+        duration: Number(formData.get("duration")),
+      };
+      break;
+
+    default:
+      return NextResponse.json(
+        { error: "Unsupported exercise type" },
+        { status: 400 },
+      );
   }
 
   const order = await prisma.workoutExercise.count({

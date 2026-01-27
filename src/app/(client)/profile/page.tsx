@@ -90,13 +90,19 @@ export default async function ClientProfilePage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold text-gray-900">Your Profile</h1>
-        <p className="text-sm text-gray-500">
-          Manage your personal details and training history
-        </p>
-      </div>
+      <div className="flex flex-row justify-between items-center">
+        <div className="space-y-1">
+          <h1 className="text-3xl font-bold text-gray-900">Your Profile</h1>
+          <p className="text-sm text-gray-500">
+            Manage your personal details and training history
+          </p>
+        </div>
 
+        {/* Logout */}
+        <div className="pt-2 text-center">
+          <LogoutButton />
+        </div>
+      </div>
       {/* Profile */}
       <ClientProfileSection user={user} />
       {/* Upcoming Workouts */}
@@ -218,11 +224,6 @@ export default async function ClientProfilePage() {
           </ul>
         )}
       </section>
-
-      {/* Logout */}
-      <div className="pt-2 text-center">
-        <LogoutButton />
-      </div>
     </div>
   );
 }

@@ -36,15 +36,30 @@ export default function ClientProfileSection({
             {user.profile?.lastName}
           </div>
           <div>
-            <span className="font-medium">DOB:</span> {user.profile?.dob ? new Date(user.profile.dob).toLocaleDateString() : "N/A"}
+            <span className="font-medium">DOB:</span>{" "}
+            {user.profile?.dob
+              ? new Date(user.profile.dob).toLocaleDateString()
+              : "N/A"}
           </div>
           <div>
-            <span className="font-medium">Experience:</span> {user.profile?.experience}
+            <span className="font-medium">Experience:</span>{" "}
+            {user.profile?.experience}
           </div>
 
           {user.profile?.injuryNotes && (
             <div className="bg-red-50 border border-red-200 rounded p-2 text-red-700">
               <strong>Injuries:</strong> {user.profile.injuryNotes}
+            </div>
+          )}
+
+          {user.profile?.waiverSignedAt && (
+            <div>
+              <span className="font-medium">
+                Signed Waiver {user.profile?.waiverVersion}:
+              </span>{" "}
+              <a className="underline" target="_blank" href="/waiver">
+                {new Date(user.profile?.waiverSignedAt).toLocaleDateString()}
+              </a>
             </div>
           )}
         </div>

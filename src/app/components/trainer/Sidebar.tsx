@@ -79,14 +79,17 @@ export default function SidebarLayout({
       )}
 
       {/* Sidebar */}
-      <aside
-        className={`
-          fixed z-50 inset-y-0 left-0 w-64 bg-white border-r flex flex-col
-          transform transition-transform duration-200
-          md:static md:translate-x-0
-          ${open ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}
-      >
+<aside
+  className={`
+    fixed inset-y-0 left-0 z-50
+    w-64 bg-white border-r flex flex-col
+    transform transition-transform duration-200
+    ${open ? "translate-x-0" : "-translate-x-full"}
+
+    md:sticky md:top-0 md:translate-x-0 md:h-screen
+  `}
+>
+
         {/* Brand */}
         <div className="px-6 py-5 border-b flex items-center justify-between">
           <div>

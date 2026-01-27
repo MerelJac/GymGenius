@@ -23,11 +23,29 @@ export type TimedPrescribed = {
   duration: number;
 };
 
+export type CorePrescribed = {
+  kind: "core";
+  duration: number | null;
+  sets: number | null;
+  reps: number | null;
+  weight: number | null;
+};
+
+export type MobilityPrescribed = {
+  kind: "mobility";
+  duration: number | null;
+  sets: number | null;
+  reps: number | null;
+  weight: number | null;
+};
+
 export type Prescribed =
   | StrengthPrescribed
   | TimedPrescribed
   | BodyweightPrescribed
-  | HybridPrescribed;
+  | HybridPrescribed
+  | CorePrescribed
+  | MobilityPrescribed;
 
 export type StrengthPerformed = {
   kind: "strength";
@@ -57,8 +75,28 @@ export type TimedPerformed = {
   duration: number;
 };
 
+export type CorePerformed = {
+  kind: "core";
+  sets: {
+    reps: number;
+    weight: number | null;
+  }[];
+  duration: number;
+};
+
+export type MobilityPerformed = {
+  kind: "mobility";
+  sets: {
+    reps: number;
+    weight: number | null;
+  }[];
+  duration: number;
+};
+
 export type Performed =
   | StrengthPerformed
   | HybridPerformed
   | BodyweightPerformed
-  | TimedPerformed;
+  | TimedPerformed
+  | CorePerformed
+  | MobilityPerformed;
