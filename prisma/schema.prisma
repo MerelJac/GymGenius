@@ -9,6 +9,7 @@ datasource db {
 enum Role {
   TRAINER
   CLIENT
+  ADMIN
 }
 
 enum WorkoutDay {

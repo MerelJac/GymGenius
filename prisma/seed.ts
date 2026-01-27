@@ -13,15 +13,15 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
 //   // Optional: seed users (uncomment when needed)
 
-//   const passwordHash = await bcrypt.hash("testingtest", 10)
+//   const passwordHash = await bcrypt.hash("Testingtest", 10)
 
 //   const trainer = await prisma.user.upsert({
-//     where: { email: "trainer@gymgenius.dev" },
+//     where: { email: "coachmerel.training@gmail.com" },
 //     update: {},
 //     create: {
 //       email: "trainer@gymgenius.dev",
 //       password: passwordHash,
-//       role: "TRAINER",
+//       role: "ADMIN",
 //     },
 //   })
 

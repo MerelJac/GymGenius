@@ -13,6 +13,8 @@ export default async function DashboardPage() {
   console.log("ROLE", session.user?.role);
   if (session.user?.role === "TRAINER") {
     redirect("/trainer");
+  } else if (session.user?.role === "ADMIN") {
+    redirect("/trainer");
   } else if (session.user?.role === "CLIENT") {
     return <ClientDashboard />;
   } else {

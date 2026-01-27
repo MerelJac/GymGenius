@@ -15,6 +15,10 @@ export default async function ClientPage() {
     redirect("/trainer"); // or /dashboard, wherever trainers should land
   }
 
+  if (session.user?.role === "ADMIN") {
+    redirect("/trainer"); // or /dashboard, wherever trainers should land
+  }
+
   // Only clients reach here
   return <ClientDashboard />;
 }

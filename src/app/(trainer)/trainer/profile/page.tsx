@@ -4,8 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { TrainerStats } from "./components/TrainerStats";
-import { Pencil } from "lucide-react";
 import { TrainerAccountSection } from "./components/TrainerAccountSection";
+import InviteTrainer from "./components/InviteTrainer";
 
 export default async function TrainerProfilePage() {
   const session = await getServerSession(authOptions);
@@ -28,6 +28,14 @@ export default async function TrainerProfilePage() {
 
   if (!trainer) return notFound();
 
+  const invitedTrainers = await prisma.user.findMany({
+    where: {
+      trainerId: trainer.id, // 👈 users invited by me
+      role: "TRAINER",
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
@@ -36,6 +44,11 @@ export default async function TrainerProfilePage() {
         <p className="text-sm text-gray-500">
           Your account details and clients
         </p>
+        {trainer.role === "ADMIN" && (
+          <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700 border border-green-300">
+            ADMIN & TRAINER
+          </span>
+        )}
       </div>
 
       {/* Stats */}
@@ -105,6 +118,48 @@ export default async function TrainerProfilePage() {
           Billing controls coming soon.
         </div>
       </section>
+
+      {/* Invite Trainer */}
+      {trainer.role === "ADMIN" && (
+        <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+          <h3 className="font-semibold text-gray-900">Invite Trainers</h3>
+
+          <InviteTrainer />
+          {invitedTrainers.length === 0 ? (
+            <p className="text-sm text-gray-500 italic">
+              No trainers invited yet.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {invitedTrainers.map((t) => (
+                <li
+                  key={t.id}
+                  className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-2"
+                >
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-900">
+                      {t.email}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      Invited {new Date(t.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+
+                  {t.password ? (
+                    <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
+                      Active
+                    </span>
+                  ) : (
+                    <span className="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
+                      Pending
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      )}
 
       {/* Danger Zone */}
       <section className="border border-red-200 bg-red-50 rounded-xl p-6 space-y-3">
