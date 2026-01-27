@@ -10,9 +10,9 @@ export function ExerciseLogViewer({
 
  return (
   <ul className="space-y-4">
-    {logs.map((log) => (
+    {logs.map((log, index) => (
       <li
-        key={log.id}
+        key={`${log.id}-${index}`}
         className="rounded-xl border border-gray-200 bg-white p-4 space-y-4 shadow-sm"
       >
         {/* Header */}

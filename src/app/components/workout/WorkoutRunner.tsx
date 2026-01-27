@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Performed, Prescribed } from "@/types/prescribed";
+import { Performed } from "@/types/prescribed";
 import {
   startWorkout,
   stopWorkout,
@@ -17,7 +17,7 @@ export default function WorkoutRunner({
 }: {
   scheduledWorkout: ScheduledWorkoutWithLogs;
 }) {
-  console.log('schedueld workouts', scheduledWorkout)
+  console.log("schedueld workouts", scheduledWorkout);
   const activeLog = scheduledWorkout.workoutLogs[0] ?? null;
   const isActive = activeLog?.status === "IN_PROGRESS" && !activeLog.endedAt;
   const router = useRouter();
@@ -27,34 +27,26 @@ export default function WorkoutRunner({
     activeLog?.id ?? null,
   );
 
+  console.log("Scheduled workouts", scheduledWorkout.workout.workoutSections);
+  const logs: ExerciseLog[] = scheduledWorkout.workout.workoutSections.flatMap(
+    (section) =>
+      section.exercises.map((we) => {
+        const log = activeLog
+          ? activeLog.exercises.find((l) => l.exerciseId === we.exercise?.id)
+          : null;
 
-const logs: ExerciseLog[] =
-  scheduledWorkout.workout.workoutSections.flatMap((section) =>
-    section.exercises.map((we) => {
-      const log = activeLog.exercises.find(
-        (l) => l.exerciseId === we.exercise?.id
-      );
-
-      return {
-        id: log?.id ?? `planned-${we.id}`,
-        workoutLogId: activeLog.id,
-        exerciseId: we.exercise!.id,
-        exerciseName: we.exercise!.name,
-
-        // 🔑 FIX: assert the JSON → domain type
-        prescribed: assertPrescribed(we.prescribed),
-        
-        // 🔑 FIX: cast performed safely
-        performed: log?.performed
-          ? (log.performed as Performed)
-          : null,
-
-        substitutedFrom: log?.substitutedFrom ?? null,
-        substitutionReason: log?.substitutionReason ?? null,
-      };
-    })
+        return {
+          id: log?.id ?? `planned-${we.id}`,
+          workoutLogId: activeLog?.id ?? "planned",
+          exerciseId: we.exercise!.id,
+          exerciseName: we.exercise!.name,
+          prescribed: assertPrescribed(we.prescribed),
+          performed: log?.performed ? (log.performed as Performed) : null,
+          substitutedFrom: log?.substitutedFrom ?? null,
+          substitutionReason: log?.substitutionReason ?? null,
+        };
+      }),
   );
-
 
   if (isCompleted) {
     return (
@@ -63,9 +55,7 @@ const logs: ExerciseLog[] =
           Workout completed 🎉
         </div>
 
-        <ExerciseLogViewer
-          logs={logs}
-        />
+        <ExerciseLogViewer logs={logs} />
       </>
     );
   }
