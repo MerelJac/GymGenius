@@ -18,6 +18,15 @@ bun dev
 restart ts server is prisma isnt updating:
 cmd shift P > TypeScript: Restart Typescript Server
 
+to migrate db to neon:
+```
+npx prisma migrate dev
+```
+if already migrated but updating, run 
+```
+npx prisma migrate deploy
+```
+
 Next.js App Router
 
 Prisma 7
