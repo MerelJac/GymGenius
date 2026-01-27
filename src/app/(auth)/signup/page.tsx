@@ -1,49 +1,22 @@
-import { prisma } from "@/lib/prisma";
-import { redirect } from "next/navigation";
-import bcrypt from "bcryptjs";
-import { Role } from "@prisma/client";
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { signupAction } from "./actions";
 
 export default function SignupPage() {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
   async function signup(formData: FormData) {
-    "use server";
-
-    const firstName = String(formData.get("firstName"));
-    const lastName = String(formData.get("lastName"));
-    const email = String(formData.get("email")).toLowerCase();
-    const password = String(formData.get("password"));
-
-    if (!firstName || !lastName || !email || !password) {
-      throw new Error("Missing required fields");
+    setError(null);
+    try {
+      await signupAction(formData);
+      router.push("/login");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Signup failed");
     }
-
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
-      throw new Error("User already exists");
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        role: Role.CLIENT, // ✅ unattached client
-        trainerId: null,
-
-        profile: {
-          create: {
-            firstName,
-            lastName,
-          },
-        },
-      },
-    });
-
-    redirect("/login");
   }
 
   return (
@@ -53,48 +26,16 @@ export default function SignupPage() {
           action={signup}
           className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 space-y-6"
         >
-          {/* Header */}
-          <div className="text-center space-y-1">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Create your account
-            </h1>
-            <p className="text-sm text-gray-500">
-              Start building programs in GymGenius
-            </p>
-          </div>
+          <h1 className="text-2xl font-bold text-center">
+            Create your account
+          </h1>
 
-          {/* Name */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-gray-700">
-                First name
-              </label>
-              <input
-                name="firstName"
-                placeholder="Jane"
-                required
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                         transition"
-              />
+          {error && (
+            <div className="rounded bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+              {error}
             </div>
+          )}
 
-            <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-gray-700">
-                Last name
-              </label>
-              <input
-                name="lastName"
-                placeholder="Doe"
-                required
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                         transition"
-              />
-            </div>
-          </div>
-
-          {/* Email */}
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700">
               Email
@@ -102,15 +43,13 @@ export default function SignupPage() {
             <input
               name="email"
               type="email"
-              placeholder="you@example.com"
               required
+              placeholder="Email"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
                        transition"
             />
           </div>
-
-          {/* Password */}
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700">
               Password
@@ -118,15 +57,28 @@ export default function SignupPage() {
             <input
               name="password"
               type="password"
-              placeholder="••••••••"
               required
+              placeholder="Password"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
                        transition"
             />
           </div>
-
-          {/* Submit */}
+           <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              Confirm Password
+            </label>
+            <input
+              name="password-confirm"
+                            type="password"
+              required
+              placeholder="Password"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       transition"
+            />
+          </div>
+          
           <button
             type="submit"
             className="w-full py-2.5 rounded-lg bg-blue-600 text-white font-medium
@@ -135,23 +87,10 @@ export default function SignupPage() {
           >
             Create account
           </button>
-          <Link href="/login">
-            <button
-              type="button"
-              className="w-full py-2.5 rounded-lg border border-gray-300
-               text-gray-700 font-medium
-               hover:bg-gray-50 hover:border-gray-400
-               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-               transition mb-6"
-            >
-              Login
-            </button>
-          </Link>
 
-          {/* Footer */}
-          <p className="text-xs text-center text-gray-500">
-            By creating an account, you agree to our <a className="underline" href="/terms">Terms & Privacy Policy</a>
-          </p>
+          <Link href="/login" className="text-sm text-center block underline">
+            Already have an account?
+          </Link>
         </form>
       </div>
     </div>

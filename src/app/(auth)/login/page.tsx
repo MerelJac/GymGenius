@@ -17,6 +17,7 @@ export default function LoginPage() {
     const res = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
+      passwordConfrim: formData.get("password-confirm"),
       redirect: false,
     });
 
