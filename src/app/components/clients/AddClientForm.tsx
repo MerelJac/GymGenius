@@ -36,7 +36,7 @@ export default function AddClientForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="client@example.com"
           required
-          className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+          className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-base"
         />
         <button
           onClick={handleSubmit}

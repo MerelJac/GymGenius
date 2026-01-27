@@ -86,7 +86,7 @@ export function TrainerAccountSection({
                 <input
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full rounded-lg border px-3 py-2"
+                  className="w-full rounded-lg border px-3 py-2 text-base"
                 />
               </div>
 
@@ -97,7 +97,7 @@ export function TrainerAccountSection({
                 <input
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full rounded-lg border px-3 py-2"
+                  className="w-full rounded-lg border px-3 py-2 text-base"
                 />
               </div>
 

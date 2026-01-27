@@ -136,7 +136,7 @@ export default function ClientProfile({
               placeholder="e.g. 172.5"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-base"
             />
           </div>
 
@@ -150,7 +150,7 @@ export default function ClientProfile({
               placeholder="e.g. 18.4"
               value={bodyFat}
               onChange={(e) => setBodyFat(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-base"
             />
           </div>
 

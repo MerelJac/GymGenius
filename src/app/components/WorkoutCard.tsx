@@ -516,7 +516,7 @@ export default function WorkoutCard({
               onChange={(e) => setName(e.target.value)}
               onBlur={saveName}
               onKeyDown={(e) => e.key === "Enter" && saveName()}
-              className="w-full px-3 py-1.5 text-lg font-semibold border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-1.5 text-lg font-semibold border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-base text-base"
               autoFocus
             />
           ) : (
@@ -615,7 +615,7 @@ export default function WorkoutCard({
                         // setSectionTitles((prev) => ({ ...prev, [section.id]: section.title }));
                       }
                     }}
-                    className="flex-1 px-2 py-1 font-medium text-gray-900 bg-white border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                    className="flex-1 px-2 py-1 font-medium text-gray-900 bg-white border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-base"
                     autoFocus
                   />
                 ) : (
@@ -788,7 +788,7 @@ export default function WorkoutCard({
                   type="number"
                   value={sets}
                   onChange={(e) => setSets(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
                 />
               </div>
               <div className="w-20">
@@ -799,7 +799,7 @@ export default function WorkoutCard({
                   type="number"
                   value={reps}
                   onChange={(e) => setReps(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
                 />
               </div>
               {selectedExercise?.type !== "BODYWEIGHT" && (
@@ -813,7 +813,7 @@ export default function WorkoutCard({
                     onChange={(e) =>
                       setWeight(e.target.value ? Number(e.target.value) : null)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
                   />
                 </div>
               )}
@@ -831,7 +831,7 @@ export default function WorkoutCard({
                 onChange={(e) =>
                   setTime(e.target.value ? Number(e.target.value) : null)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
               />
             </div>
           )}
@@ -844,7 +844,7 @@ export default function WorkoutCard({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. 3-0-1-0 tempo, 90s rest"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none text-base"
               rows={2}
             />
           </div>
@@ -852,7 +852,7 @@ export default function WorkoutCard({
           <button
             onClick={handleAddExercise}
             disabled={!exerciseId || !sectionId}
-            className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none  focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             Add Exercise
           </button>

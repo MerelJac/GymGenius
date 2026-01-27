@@ -35,7 +35,7 @@ export function BodyMetricLogger() {
           placeholder="lbs"
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-base"
         />
       </div>
 
@@ -50,7 +50,7 @@ export function BodyMetricLogger() {
           placeholder="%"
           value={bodyFat}
           onChange={(e) => setBodyFat(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none text-base"
         />
       </div>
     </div>

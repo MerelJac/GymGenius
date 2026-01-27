@@ -46,7 +46,7 @@ export default async function ExerciseLibraryPage({
           name="q"
           defaultValue={query}
           placeholder="Search exercises by name..."
-          className="w-full px-4 py-2.5 pl-11 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-gray-900 placeholder:text-gray-400"
+          className="w-full px-4 py-2.5 pl-11 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-gray-900 placeholder:text-gray-400 text-base"
         />
         <Search
           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"

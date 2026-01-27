@@ -47,7 +47,7 @@ export default function SignupPage() {
               placeholder="Email"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition"
+                       transition text-base"
             />
           </div>
           <div className="space-y-1.5">
@@ -61,7 +61,7 @@ export default function SignupPage() {
               placeholder="Password"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition"
+                       transition text-base"
             />
           </div>
            <div className="space-y-1.5">
@@ -75,7 +75,7 @@ export default function SignupPage() {
               placeholder="Password"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition"
+                       transition text-base"
             />
           </div>
           

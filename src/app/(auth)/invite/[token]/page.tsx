@@ -29,6 +29,7 @@ export default function InvitePage({
         <input
           type="password"
           name="password"
+          className="text-base"
           placeholder="Create password"
         />
         <button type="submit">Create Account</button>

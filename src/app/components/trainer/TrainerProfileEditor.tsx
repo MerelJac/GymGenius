@@ -29,13 +29,13 @@ export function TrainerProfileEditor({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <input
-          className="rounded-lg border px-3 py-2"
+          className="rounded-lg border px-3 py-2 text-base"
           placeholder="First name"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
         />
         <input
-          className="rounded-lg border px-3 py-2"
+          className="rounded-lg border px-3 py-2 text-base"
           placeholder="Last name"
           value={lastName}
           onChange={(e) => setLastName(e.target.value)}

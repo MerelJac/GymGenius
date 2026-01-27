@@ -78,7 +78,7 @@ export function ClientProfileEditor({
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="First name"
                 autoFocus
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-base"
               />
             </div>
 
@@ -90,7 +90,7 @@ export function ClientProfileEditor({
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Last name"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm"
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-base"
               />
             </div>
           </div>
@@ -103,7 +103,7 @@ export function ClientProfileEditor({
               type="date"
               value={dob}
               onChange={(e) => setDob(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
             />
           </div>
 
@@ -115,7 +115,7 @@ export function ClientProfileEditor({
               value={experience}
               onChange={(e) => setExperience(e.target.value)}
               placeholder="e.g. Beginner, 2 years lifting, former athlete"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
             />
           </div>
 

@@ -73,7 +73,7 @@ export default function NewProgramPage() {
                   focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
                   focus:outline-none transition-all
                   placeholder:text-gray-400
-                  disabled:opacity-60 disabled:cursor-not-allowed
+                  disabled:opacity-60 disabled:cursor-not-allowed text-base
                 `}
                 disabled={isSubmitting}
                 autoFocus

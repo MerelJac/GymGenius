@@ -143,7 +143,7 @@ export default function ProgramBuilder({
                   onChange={(e) => setProgramName(e.target.value)}
                   onBlur={saveProgramName}
                   onKeyDown={(e) => e.key === "Enter" && saveProgramName()}
-                  className="w-full px-4 py-2.5 text-2xl font-bold border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                  className="w-full px-4 py-2.5 text-2xl font-bold border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-base"
                   autoFocus
                 />
               ) : (
@@ -197,7 +197,7 @@ export default function ProgramBuilder({
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
                 />
               </div>
             </div>

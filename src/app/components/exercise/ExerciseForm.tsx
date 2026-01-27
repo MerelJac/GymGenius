@@ -36,7 +36,7 @@ export default function ExerciseForm({
             defaultValue={exercise?.name ?? ""}
             required
             autoFocus
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-base"
           />
         </div>
 
@@ -52,7 +52,7 @@ export default function ExerciseForm({
             id="type"
             name="type"
             defaultValue={exercise?.type ?? "STRENGTH"}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm bg-white"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm bg-white "
           >
             <option value="STRENGTH">Strength</option>
             <option value="TIMED">Timed</option>
@@ -74,7 +74,7 @@ export default function ExerciseForm({
             name="equipment"
             placeholder="e.g. Barbell, Bench"
             defaultValue={exercise?.equipment ?? ""}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-base"
           />
         </div>
 
@@ -91,7 +91,7 @@ export default function ExerciseForm({
             name="videoUrl"
             placeholder="https://youtube.com/watch?v=..."
             defaultValue={exercise?.videoUrl ?? ""}
-            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm"
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-base"
           />
         </div>
 
