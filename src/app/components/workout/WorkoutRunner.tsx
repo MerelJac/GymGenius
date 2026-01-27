@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Performed } from "@/types/prescribed";
 import {
   startWorkout,
@@ -27,6 +27,7 @@ export default function WorkoutRunner({
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(
     activeLog?.id ?? null,
   );
+  const autoSaveFns = useRef<(() => Promise<void>)[]>([]);
 
   console.log("Scheduled workouts", scheduledWorkout.workout.workoutSections);
   const logs: ExerciseLog[] = scheduledWorkout.workout.workoutSections.flatMap(
@@ -85,6 +86,8 @@ export default function WorkoutRunner({
           onClick={async () => {
             if (!workoutLogId) return;
 
+            // 🔐 Auto-save all unsaved exercises
+            await Promise.all(autoSaveFns.current.map((fn) => fn()));
             await stopWorkout(workoutLogId);
             setWorkoutLogId(null);
             router.refresh();
@@ -116,6 +119,7 @@ export default function WorkoutRunner({
                     clientId={clientId}
                     disabled={!isActive}
                     notes={we.notes}
+                    onRegisterAutoSave={(fn) => autoSaveFns.current.push(fn)}
                   />
                 );
               })}

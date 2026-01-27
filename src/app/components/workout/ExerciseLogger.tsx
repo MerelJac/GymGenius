@@ -16,6 +16,7 @@ export function ExerciseLogger({
   clientId,
   disabled,
   notes,
+  onRegisterAutoSave,
 }: {
   exercise: Exercise;
   prescribed: Prescribed;
@@ -24,10 +25,14 @@ export function ExerciseLogger({
 
   disabled: boolean;
   notes?: string | null;
+  onRegisterAutoSave?: (fn: () => Promise<void>) => void;
 }) {
   const [performed, setPerformed] = useState<Performed>(
     buildPerformedFromPrescribed(prescribed),
   );
+  const [hasSaved, setHasSaved] = useState(false);
+
+  const [isSaving, setIsSaving] = useState(false);
   const [note, setNote] = useState("");
   const [openExerciseId, setOpenExerciseId] = useState<string | null>(null);
   const [oneRepMax, setOneRepMax] = useState<number | null>(null);
@@ -35,8 +40,29 @@ export function ExerciseLogger({
   function updatePerformed<K extends keyof Performed>(
     updater: (prev: Performed) => Performed,
   ) {
+    setHasSaved(false);
     setPerformed((prev) => updater(prev));
   }
+
+  useEffect(() => {
+  if (!onRegisterAutoSave) return;
+
+  onRegisterAutoSave(async () => {
+    if (!workoutLogId || hasSaved) return;
+
+    await logExercise(
+      workoutLogId,
+      exercise.id,
+      prescribed,
+      performed,
+      note,
+    );
+
+    setHasSaved(true);
+  });
+}, [workoutLogId, hasSaved, performed, note, exercise.id, onRegisterAutoSave, prescribed]);
+
+
   useEffect(() => {
     async function loadOneRepMax() {
       const res = await fetch(
@@ -118,7 +144,8 @@ export function ExerciseLogger({
                       type="number"
                       className="w-16 rounded-lg border border-gray-300 px-2 py-1 text-sm"
                       value={set.reps}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        setHasSaved(false);
                         setPerformed((prev) => {
                           if (
                             prev.kind !== "strength" &&
@@ -133,8 +160,8 @@ export function ExerciseLogger({
                           };
 
                           return { ...prev, sets };
-                        })
-                      }
+                        });
+                      }}
                     />
                     <span className="text-sm text-gray-500">reps</span>
 
@@ -150,6 +177,7 @@ export function ExerciseLogger({
                       }
                       onFocus={() => {
                         if (!set.weight && recommendedWeight) {
+                          setHasSaved(false);
                           setPerformed((prev) => {
                             if (
                               prev.kind !== "strength" &&
@@ -167,7 +195,8 @@ export function ExerciseLogger({
                           });
                         }
                       }}
-                      onChange={(e) =>
+                      onChange={(e) => {
+                        setHasSaved(false);
                         setPerformed((prev) => {
                           if (
                             prev.kind !== "strength" &&
@@ -184,8 +213,8 @@ export function ExerciseLogger({
                           };
 
                           return { ...prev, sets };
-                        })
-                      }
+                        });
+                      }}
                     />
                     <span className="text-sm text-gray-500">lb</span>
                   </div>
@@ -210,7 +239,8 @@ export function ExerciseLogger({
                     type="number"
                     className="w-16 rounded-lg border border-gray-300 px-2 py-1 text-sm"
                     value={set.reps}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      setHasSaved(false);
                       setPerformed((prev) => {
                         if (prev.kind !== "bodyweight") return prev;
 
@@ -218,8 +248,8 @@ export function ExerciseLogger({
                         sets[index] = { reps: Number(e.target.value) };
 
                         return { kind: "bodyweight", sets };
-                      })
-                    }
+                      });
+                    }}
                   />
                   <span className="text-sm text-gray-500">reps</span>
                 </div>
@@ -244,19 +274,30 @@ export function ExerciseLogger({
           {/* Save */}
           <div className="pt-1">
             <button
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition"
-              onClick={() =>
-                workoutLogId &&
-                logExercise(
+              disabled={isSaving}
+              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
+                hasSaved
+                  ? "bg-green-600 hover:bg-green-700"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }`}
+              onClick={async () => {
+                if (!workoutLogId) return;
+
+                setIsSaving(true);
+
+                await logExercise(
                   workoutLogId,
                   exercise.id,
                   prescribed,
                   performed,
                   note,
-                )
-              }
+                );
+
+                setIsSaving(false);
+                setHasSaved(true);
+              }}
             >
-              Save
+              {hasSaved ? "Saved ✓" : "Save"}
             </button>
           </div>
         </div>
