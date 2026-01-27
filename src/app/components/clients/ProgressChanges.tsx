@@ -6,10 +6,8 @@ export function ProgressChanges({
   bodyFat,
 }: ProgressChangesProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-6">
-      <h3 className="text-sm font-semibold text-gray-700">
-        Progress Changes
-      </h3>
+    <>
+      <h3 className="text-sm font-semibold text-gray-700">Progress Changes</h3>
 
       {/* Strength */}
       <div className="space-y-3">
@@ -18,9 +16,7 @@ export function ProgressChanges({
         </div>
 
         {strength.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            Not enough data yet
-          </p>
+          <p className="text-sm text-gray-500">Not enough data yet</p>
         ) : (
           strength.map((lift) => {
             const diff = lift.current1RM - lift.previous1RM;
@@ -31,14 +27,10 @@ export function ProgressChanges({
                 key={lift.exerciseName}
                 className="flex justify-between items-center text-sm"
               >
-                <span className="text-gray-800">
-                  {lift.exerciseName}
-                </span>
+                <span className="text-gray-800">{lift.exerciseName}</span>
                 <span
                   className={
-                    positive
-                      ? "text-green-600 font-medium"
-                      : "text-gray-500"
+                    positive ? "text-green-600 font-medium" : "text-gray-500"
                   }
                 >
                   {positive && "+"}
@@ -88,6 +80,6 @@ export function ProgressChanges({
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }

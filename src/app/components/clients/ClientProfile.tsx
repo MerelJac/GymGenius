@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import {
   addBodyMetric,
   deleteClient,
@@ -108,7 +107,15 @@ export default function ClientProfile({
           </div>
           <div>
             <dt className="text-gray-500 font-medium">Email</dt>
-            <dd className="mt-1 text-gray-900">{client.email}</dd>
+            <dd className="mt-1 text-gray-900"> <a href={`mailto:${client.email}`}>{client.email}</a></dd>
+          </div>
+          <div>
+            <dt className="text-gray-500 font-medium">Phone</dt>
+            <dd className="mt-1 text-gray-900">
+              <a href={`sms:${client.profile?.phone}`}>
+                {client.profile?.phone}
+              </a>
+            </dd>
           </div>
           <div>
             <dt className="text-gray-500 font-medium">Waiver Signed</dt>

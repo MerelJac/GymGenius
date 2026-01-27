@@ -5,23 +5,42 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { normalizeEmail } from "@/app/utils/format/normalizeEmail";
 
 export async function updateTrainerProfile(
   firstName: string,
   lastName: string,
+  email: string,
+  phone: string | null,
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  await prisma.profile.upsert({
-    where: { userId: session.user.id },
-    update: { firstName, lastName },
-    create: {
-      userId: session.user.id,
-      firstName,
-      lastName,
-    },
-  });
+  const userId = session.user.id;
+
+  await prisma.$transaction([
+    // 1️⃣ Update USER (email only)
+    prisma.user.update({
+      where: { id: userId },
+      data: { email },
+    }),
+
+    // 2️⃣ Upsert PROFILE (name + phone)
+    prisma.profile.upsert({
+      where: { userId },
+      update: {
+        firstName,
+        lastName,
+        phone,
+      },
+      create: {
+        userId,
+        firstName,
+        lastName,
+        phone,
+      },
+    }),
+  ]);
 
   revalidatePath("/trainer/profile");
 }
@@ -31,7 +50,7 @@ export async function createTrainer(email: string) {
   if (!session?.user?.id) throw new Error("Unauthorized");
 
   // ✅ normalize email
-  const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = normalizeEmail(email);
 
   // ✅ check for existing user
   const existing = await prisma.user.findUnique({

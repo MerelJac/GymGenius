@@ -10,6 +10,7 @@ import { getClientDashboardStats } from "@/lib/clients/getClientDashboardStats";
 import { getClientProgressSummary } from "@/lib/clients/clientProgress";
 import { ProgressChanges } from "../clients/ProgressChanges";
 import { redirect } from "next/navigation";
+import { ContactTrainer } from "../clients/ContactTrainer";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
@@ -23,11 +24,23 @@ export default async function ClientDashboard() {
 
   const profile = await prisma.profile.findUnique({
     where: { userId: clientId },
-    select: { waiverSignedAt: true },
+    include: {
+      user: {
+        include: {
+          trainer: true, // assumes User → trainer relation
+        },
+      },
+    },
   });
 
   if (!profile?.waiverSignedAt) {
     redirect("/waiver");
+  }
+
+  const trainer = profile.user?.trainer;
+
+  if (!trainer) {
+    throw new Error("Trainer not found for client");
   }
 
   const tomorrow = new Date(today);
@@ -110,9 +123,7 @@ export default async function ClientDashboard() {
           />
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
-          Messages from your trainer coming soon
-        </div>
+        <ContactTrainer trainer={trainer} />
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import { formatNextWorkout } from "@/app/utils/formatNextWorkout";
+import { formatNextWorkout } from "@/app/utils/format/formatNextWorkout";
 import { Flame, CheckCircle, Calendar } from "lucide-react";
 
 export function ClientDashboardStats({

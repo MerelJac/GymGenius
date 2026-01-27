@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { normalizePhoneNumber } from "@/app/utils/format/formatPhoneNumber";
+import { normalizeEmail } from "@/app/utils/format/normalizeEmail";
 
 export async function addBodyMetric(
   clientId: string,
@@ -66,6 +68,8 @@ export async function updateClientProfile(
     dob?: Date | null;
     experience?: string | null;
     injuryNotes?: string | null;
+    phone?: string | null;
+    email?: string | null;
   },
 ) {
   const session = await getServerSession(authOptions);
@@ -77,22 +81,45 @@ export async function updateClientProfile(
   if (!clientId) {
     throw new Error("Missing crucial Data");
   }
-  await prisma.profile.upsert({
-    where: { userId: clientId },
-    update: {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      dob: data.dob,
-      experience: data.experience,
-      injuryNotes: data.injuryNotes,
-    },
-    create: {
-      userId: clientId,
-      firstName: data.firstName,
-      lastName: data.lastName,
-      dob: data.dob,
-      experience: data.experience,
-      injuryNotes: data.injuryNotes,
-    },
-  });
+
+  let normalizedPhone;
+  if (data.phone) {
+    normalizedPhone = normalizePhoneNumber(data.phone);
+  }
+
+  let normalizedEmail;
+  if (data.email) {
+    normalizedEmail = normalizeEmail(data.email);
+  }
+  await prisma.$transaction([
+    // 1️⃣ Update USER (email only)
+    prisma.user.update({
+      where: { id: clientId },
+      data: {
+        email: normalizedEmail ?? undefined,
+      },
+    }),
+
+    // 2️⃣ Update PROFILE (phone + profile fields)
+    prisma.profile.upsert({
+      where: { userId: clientId },
+      update: {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dob: data.dob,
+        experience: data.experience,
+        injuryNotes: data.injuryNotes,
+        phone: normalizedPhone,
+      },
+      create: {
+        userId: clientId,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        dob: data.dob,
+        experience: data.experience,
+        injuryNotes: data.injuryNotes,
+        phone: normalizedPhone,
+      },
+    }),
+  ]);
 }

@@ -69,6 +69,7 @@ model Profile {
   user   User   @relation(fields: [userId], references: [id])
 
   firstName      String
+  phone          String?
   lastName       String
   height         Float?
   dob            DateTime?

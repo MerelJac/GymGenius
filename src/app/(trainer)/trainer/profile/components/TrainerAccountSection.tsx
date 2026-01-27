@@ -8,15 +8,21 @@ type TrainerAccountSectionProps = {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
+  phone: string | null;
 };
 
 export function TrainerAccountSection({
   firstName: initialFirstName,
   lastName: initialLastName,
-  email,
+  email: initialEmail,
+  phone: initialPhone,
 }: TrainerAccountSectionProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState(initialFirstName ?? "");
+  const [email, setEmail] = useState(initialEmail ?? "");
+
+  const [phone, setPhone] = useState(initialPhone ?? "");
+
   const [lastName, setLastName] = useState(initialLastName ?? "");
   const [saving, setSaving] = useState(false);
 
@@ -24,7 +30,7 @@ export function TrainerAccountSection({
     setSaving(true);
 
     startTransition(async () => {
-      await updateTrainerProfile(firstName, lastName);
+      await updateTrainerProfile(firstName, lastName, email, phone);
       setSaving(false);
       setIsEditing(false);
     });
@@ -35,9 +41,7 @@ export function TrainerAccountSection({
       {/* ACCOUNT INFO CARD */}
       <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            Account Info
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900">Account Info</h2>
 
           <button
             onClick={() => setIsEditing(true)}
@@ -74,9 +78,7 @@ export function TrainerAccountSection({
               <X size={18} />
             </button>
 
-            <h3 className="text-lg font-semibold mb-4">
-              Edit Account Info
-            </h3>
+            <h3 className="text-lg font-semibold mb-4">Edit Account Info</h3>
 
             <div className="space-y-4">
               <div>
@@ -97,6 +99,30 @@ export function TrainerAccountSection({
                 <input
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
+                  className="w-full rounded-lg border px-3 py-2 text-base"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
+                <input
+                  value={email}
+                  type="email"
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border px-3 py-2 text-base"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Phone
+                </label>
+                <input
+                  value={phone}
+                  type="phone"
+                  onChange={(e) => setPhone(e.target.value)}
                   className="w-full rounded-lg border px-3 py-2 text-base"
                 />
               </div>

@@ -6,7 +6,7 @@ import { Prisma } from "@prisma/client";
 export type Client = {
   id: string;
   email: string;
-
+  phone?: string;
   profile: Profile | null;
   bodyMetrics: BodyMetric[];
 

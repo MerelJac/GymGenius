@@ -16,7 +16,7 @@ bun dev
 ```
 
 restart ts server is prisma isnt updating:
-cmd shift P > Restart Typescript Server
+cmd shift P > TypeScript: Restart Typescript Server
 
 Next.js App Router
 
