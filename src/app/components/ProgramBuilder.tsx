@@ -16,6 +16,7 @@ import { BackButton } from "./BackButton";
 import { ClientProgramProgress } from "./ClientProgramProgress";
 import { ClientWithWorkouts } from "@/types/client";
 import { Plus, Users } from "lucide-react";
+import { ExerciseQuickAdd } from "../(trainer)/exercises/components/ExerciseQuickAdd";
 
 export default function ProgramBuilder({
   program,
@@ -50,7 +51,7 @@ export default function ProgramBuilder({
   const [programName, setProgramName] = useState(program.name);
   const [clientId, setClientId] = useState("");
   const [startDate, setStartDate] = useState("");
-
+  const [exerciseList, setExerciseList] = useState<Exercise[]>(exercises);
   async function saveProgramName() {
     setEditingName(false);
     startTransition(() => {
@@ -231,13 +232,24 @@ export default function ProgramBuilder({
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">Workouts</h2>
-          <button
-            onClick={handleAddWorkout}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition"
-          >
-            <Plus size={18} />
-            Add Workout
-          </button>
+          <div className=" flex flex-row gap-2">
+            <ExerciseQuickAdd
+              onCreated={(exercise) => {
+                setExerciseList((prev) => {
+                  // prevent duplicates just in case
+                  if (prev.some((e) => e.id === exercise.id)) return prev;
+                  return [...prev, exercise];
+                });
+              }}
+            />
+            <button
+              onClick={handleAddWorkout}
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition"
+            >
+              <Plus size={18} />
+              Add Workout
+            </button>
+          </div>
         </div>
 
         {optimisticWorkouts.length === 0 ? (
@@ -259,7 +271,7 @@ export default function ProgramBuilder({
               <WorkoutCard
                 key={workout.id}
                 workout={workout}
-                exercises={exercises}
+                exercises={exerciseList}
                 programId={program.id}
                 onDelete={() => handleDeleteWorkout(workout)}
                 onDuplicate={() => handleDuplicateWorkout(workout)}
