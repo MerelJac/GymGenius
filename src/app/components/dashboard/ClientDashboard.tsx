@@ -9,6 +9,7 @@ import { ClientDashboardStats } from "../clients/ClientDashboardStats";
 import { getClientDashboardStats } from "@/lib/clients/getClientDashboardStats";
 import { getClientProgressSummary } from "@/lib/clients/clientProgress";
 import { ProgressChanges } from "../clients/ProgressChanges";
+import { redirect } from "next/navigation";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
@@ -19,6 +20,15 @@ export default async function ClientDashboard() {
   const stats = await getClientDashboardStats(clientId);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+
+  const profile = await prisma.profile.findUnique({
+    where: { userId: clientId },
+    select: { waiverSignedAt: true },
+  });
+
+  if (!profile?.waiverSignedAt) {
+    redirect("/waiver");
+  }
 
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);

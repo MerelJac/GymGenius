@@ -11,7 +11,7 @@ import { ScheduledWorkoutWithProgram } from "@/types/workout";
 import { ClientProfileEditor } from "./ClientProfileEditor";
 import { BackButton } from "../BackButton";
 import { useRouter } from "next/navigation";
-import { Trash } from "lucide-react";
+import { AlertCircle, Trash } from "lucide-react";
 
 export default function ClientProfile({
   client,
@@ -95,7 +95,7 @@ export default function ClientProfile({
 
       {/* Basic info */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 text-sm">
-        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <dl className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           <div>
             <dt className="text-gray-500 font-medium">Joined</dt>
             <dd className="mt-1 text-gray-900">
@@ -109,6 +109,44 @@ export default function ClientProfile({
           <div>
             <dt className="text-gray-500 font-medium">Email</dt>
             <dd className="mt-1 text-gray-900">{client.email}</dd>
+          </div>
+          <div>
+            <dt className="text-gray-500 font-medium">Waiver Signed</dt>
+            <dd className="mt-1 text-gray-900">
+              {client.profile?.waiverSignedAt ? (
+                new Date(client.profile.waiverSignedAt).toLocaleDateString(
+                  undefined,
+                  {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  },
+                )
+              ) : (
+                <>
+                  <AlertCircle
+                    size={16}
+                    className="text-amber-500 cursor-help"
+                  />
+
+                  {/* Tooltip */}
+                  <div
+                    className="
+          absolute left-1/2 top-full mt-2 -translate-x-1/2
+          whitespace-nowrap
+          rounded-md bg-gray-900 px-2 py-1
+          text-xs text-white
+          opacity-0 group-hover:opacity-100
+          pointer-events-none
+          transition
+          z-50
+        "
+                  >
+                    Waiver has not been signed
+                  </div>
+                </>
+              )}
+            </dd>
           </div>
         </dl>
       </div>

@@ -68,12 +68,14 @@ model Profile {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  firstName   String
-  lastName    String
-  height      Float?
-  dob         DateTime?
-  experience  String?
-  injuryNotes String? // trainer-visible only
+  firstName      String
+  lastName       String
+  height         Float?
+  dob            DateTime?
+  experience     String?
+  injuryNotes    String? // trainer-visible only
+  waiverSignedAt DateTime?
+  waiverVersion  String?
 }
 
 model BodyMetric {
