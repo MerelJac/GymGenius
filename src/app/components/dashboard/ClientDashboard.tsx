@@ -7,13 +7,15 @@ import { ScheduledWorkoutDashboard } from "@/types/workout";
 import { AdditionalWorkoutQuickAdd } from "../workout/AdditionalWorkoutQuickAdd";
 import { ClientDashboardStats } from "../clients/ClientDashboardStats";
 import { getClientDashboardStats } from "@/lib/clients/getClientDashboardStats";
+import { getClientProgressSummary } from "@/lib/clients/clientProgress";
+import { ProgressChanges } from "../clients/ProgressChanges";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
   const clientId = session?.user?.id;
-
+  const progress = await getClientProgressSummary(clientId);
   const stats = await getClientDashboardStats(clientId);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -91,7 +93,11 @@ export default async function ClientDashboard() {
       {/* Placeholder cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
-          Progress overview coming soon
+          <ProgressChanges
+            strength={progress.strength}
+            weight={progress.weight}
+            bodyFat={progress.bodyFat}
+          />
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">

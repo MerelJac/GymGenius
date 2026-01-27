@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client"
+
 export type ExerciseType =
   | "STRENGTH"
   | "TIMED"
@@ -35,3 +37,12 @@ export type ExerciseDetail = {
     note: string | null;
   }[];
 };
+
+export type ExerciseLogWithSets =
+  Prisma.ExerciseLogGetPayload<{
+    include: {
+      exercise: true;
+      sets: true;
+    };
+  }>;
+

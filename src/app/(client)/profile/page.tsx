@@ -177,52 +177,47 @@ export default async function ClientProfilePage() {
       </section>
 
       {/* Workout History */}
-<section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
-  <h2 className="text-lg font-semibold text-gray-900">
-    Recent Activity
-  </h2>
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
 
-  {historyItems.length === 0 ? (
-    <p className="text-sm text-gray-500">
-      No activity logged yet
-    </p>
-  ) : (
-    <ul className="text-sm space-y-2">
-      {historyItems.map((item) => (
-        <li
-          key={`${item.kind}-${item.id}`}
-          className="flex justify-between items-center"
-        >
-          <div className="flex items-center gap-2">
-            {item.kind === "scheduled" ? (
-              <Link
-                href={item.href}
-                className="font-medium text-gray-900 hover:underline hover:text-blue-600"
+        {historyItems.length === 0 ? (
+          <p className="text-sm text-gray-500">No activity logged yet</p>
+        ) : (
+          <ul className="text-sm space-y-2">
+            {historyItems.map((item) => (
+              <li
+                key={`${item.kind}-${item.id}`}
+                className="flex justify-between items-center"
               >
-                {item.title}
-              </Link>
-            ) : (
-              <span className="font-medium text-gray-900">
-                {item.title}
-              </span>
-            )}
+                <div className="flex items-center gap-2">
+                  {item.kind === "scheduled" ? (
+                    <Link
+                      href={item.href}
+                      className="font-medium text-gray-900 hover:underline hover:text-blue-600"
+                    >
+                      {item.title}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-gray-900">
+                      {item.title}
+                    </span>
+                  )}
 
-            {item.kind === "additional" && (
-              <span className="text-xs rounded-full bg-gray-100 px-2 py-0.5 text-gray-600">
-                Additional
-              </span>
-            )}
-          </div>
+                  {item.kind === "additional" && (
+                    <span className="text-xs rounded-full bg-gray-100 px-2 py-0.5 text-gray-600">
+                      Additional
+                    </span>
+                  )}
+                </div>
 
-          <span className="text-gray-500">
-            {item.date.toLocaleDateString()}
-          </span>
-        </li>
-      ))}
-    </ul>
-  )}
-</section>
-
+                <span className="text-gray-500">
+                  {item.date.toLocaleDateString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {/* Logout */}
       <div className="pt-2 text-center">
