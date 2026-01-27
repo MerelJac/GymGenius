@@ -45,23 +45,24 @@ export function ExerciseLogger({
   }
 
   useEffect(() => {
-  if (!onRegisterAutoSave) return;
+    if (!onRegisterAutoSave) return;
 
-  onRegisterAutoSave(async () => {
-    if (!workoutLogId || hasSaved) return;
+    onRegisterAutoSave(async () => {
+      if (!workoutLogId || hasSaved) return;
 
-    await logExercise(
-      workoutLogId,
-      exercise.id,
-      prescribed,
-      performed,
-      note,
-    );
+      await logExercise(workoutLogId, exercise.id, prescribed, performed, note);
 
-    setHasSaved(true);
-  });
-}, [workoutLogId, hasSaved, performed, note, exercise.id, onRegisterAutoSave, prescribed]);
-
+      setHasSaved(true);
+    });
+  }, [
+    workoutLogId,
+    hasSaved,
+    performed,
+    note,
+    exercise.id,
+    onRegisterAutoSave,
+    prescribed,
+  ]);
 
   useEffect(() => {
     async function loadOneRepMax() {
@@ -220,6 +221,135 @@ export function ExerciseLogger({
                   </div>
                 );
               })}
+            </div>
+          )}
+          {/* CORE & MOBILITY */}
+          {(performed.kind === "core" || performed.kind === "mobility") && (
+            <div className="space-y-3">
+              {/* Summary pill (matches viewer) */}
+              <div
+                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
+                  performed.kind === "core"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "bg-emerald-50 text-emerald-700"
+                }`}
+              >
+                {performed.kind === "core" ? "Core" : "Mobility"}
+                {performed.duration ? (
+                  <span className="opacity-70">• {performed.duration}s</span>
+                ) : null}
+              </div>
+
+              {/* Sets */}
+              <div className="space-y-2">
+                {performed.sets.map((set, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-medium text-gray-500 w-10">
+                        Set {index + 1}
+                      </span>
+
+                      {/* Reps (optional) */}
+                      <div className="flex items-center gap-1">
+                        <input
+                            type="number"
+                            value={set.reps ?? ""}
+                            onChange={(e) => {
+                              setHasSaved(false);
+                              setPerformed((prev) => {
+                                if (
+                                  prev.kind !== "core" &&
+                                  prev.kind !== "mobility"
+                                )
+                                  return prev;
+  
+                                const sets = [...prev.sets];
+                                sets[index] = {
+                                  ...sets[index],
+                                  reps: e.target.value
+                                    ? Number(e.target.value)
+                                    : 0,
+                                };
+  
+                                return { ...prev, sets };
+                              });
+                            }}
+                            placeholder="—"
+                            className="w-14 rounded-md border border-gray-300 px-2 py-1 text-sm
+                             focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                        <span className="text-xs text-gray-500">reps</span>
+                      </div>
+
+                      {/* Weight (optional, de-emphasized) */}
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="number"
+                          value={set.weight ?? ""}
+                          onChange={(e) => {
+                            setHasSaved(false);
+                            setPerformed((prev) => {
+                              if (
+                                prev.kind !== "core" &&
+                                prev.kind !== "mobility"
+                              )
+                                return prev;
+
+                              const sets = [...prev.sets];
+                              sets[index] = {
+                                ...sets[index],
+                                weight: e.target.value
+                                  ? Number(e.target.value)
+                                  : null,
+                              };
+
+                              return { ...prev, sets };
+                            });
+                          }}
+                          placeholder="bw / lb"
+                          className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm
+                           focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        />
+                        <span className="text-xs text-gray-400">lb</span>
+                      </div>
+                    </div>
+
+                    {/* Cue (matches viewer tone) */}
+                    <span className="text-xs text-gray-400 italic">
+                      controlled
+                    </span>
+                  </div>
+                ))}
+
+                {/* Duration input (mirrors viewer placement) */}
+                {performed.duration != null && (
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <span>Hold for</span>
+                    <input
+                      type="number"
+                      value={performed.duration}
+                      onChange={(e) => {
+                        setHasSaved(false);
+                        setPerformed((prev) => {
+                          if (prev.kind !== "core" && prev.kind !== "mobility")
+                            return prev;
+
+                          return {
+                            ...prev,
+                            duration: Number(e.target.value),
+                          };
+                        });
+                      }}
+                      className="w-20 rounded-md border border-gray-300 px-2 py-1 text-sm
+                       focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                    />
+                    <span className="text-gray-500">seconds</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

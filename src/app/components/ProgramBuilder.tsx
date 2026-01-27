@@ -130,6 +130,8 @@ export default function ProgramBuilder({
     await duplicateWorkout(program.id, workout.id);
   }
 
+  console.log('Clinets availbel', clients)
+
   return (
     <div className="space-y-8 pb-12">
       {/* Header & Program Name */}

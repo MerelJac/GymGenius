@@ -21,7 +21,6 @@ import { Exercise } from "@/types/exercise";
 import { formatPrescribed } from "../utils/prescriptions/prescriptionFormatter";
 import { WorkoutDay } from "@/types/enums";
 import { Prescribed } from "@/types/prescribed";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   ChevronDown,
@@ -31,6 +30,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import ExerciseModal from "./exercise/ExerciseModal";
 
 export default function WorkoutCard({
   workout,
@@ -59,6 +59,8 @@ export default function WorkoutCard({
   const [editing, setEditing] = useState(false);
   const [day, setDay] = useState<WorkoutDay>(workout.day);
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
+  const [openExerciseId, setOpenExerciseId] = useState<string | null>(null);
+
   const [sectionTitles, setSectionTitles] = useState<Record<string, string>>(
     {},
   );
@@ -462,48 +464,48 @@ export default function WorkoutCard({
     router.refresh();
   }
 
- function moveExerciseWithinSection(
-  sectionId: string,
-  exerciseId: string,
-  direction: "up" | "down",
-) {
-  const section = optimisticSections.find((s) => s.id === sectionId);
-  if (!section) return;
+  function moveExerciseWithinSection(
+    sectionId: string,
+    exerciseId: string,
+    direction: "up" | "down",
+  ) {
+    const section = optimisticSections.find((s) => s.id === sectionId);
+    if (!section) return;
 
-  const index = section.exercises.findIndex((e) => e.id === exerciseId);
-  if (index === -1) return;
+    const index = section.exercises.findIndex((e) => e.id === exerciseId);
+    if (index === -1) return;
 
-  const targetIndex = direction === "up" ? index - 1 : index + 1;
-  if (targetIndex < 0 || targetIndex >= section.exercises.length) return;
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= section.exercises.length) return;
 
-  const reorderedExercises = [...section.exercises];
-  [reorderedExercises[index], reorderedExercises[targetIndex]] = [
-    reorderedExercises[targetIndex],
-    reorderedExercises[index],
-  ];
+    const reorderedExercises = [...section.exercises];
+    [reorderedExercises[index], reorderedExercises[targetIndex]] = [
+      reorderedExercises[targetIndex],
+      reorderedExercises[index],
+    ];
 
-  // 1️⃣ Optimistic UI update
-  startTransition(() => {
-    updateOptimisticSections({
-      type: "replace-section",
-      tempId: section.id,
-      section: {
-        ...section,
-        exercises: reorderedExercises.map((e, i) => ({
-          ...e,
-          order: i,
-        })),
-      },
+    // 1️⃣ Optimistic UI update
+    startTransition(() => {
+      updateOptimisticSections({
+        type: "replace-section",
+        tempId: section.id,
+        section: {
+          ...section,
+          exercises: reorderedExercises.map((e, i) => ({
+            ...e,
+            order: i,
+          })),
+        },
+      });
     });
-  });
 
-  // 2️⃣ Persist to server
-  reorderExercisesInSection(
-    programId,
-    sectionId,
-    reorderedExercises.map((e) => e.id)
-  );
-}
+    // 2️⃣ Persist to server
+    reorderExercisesInSection(
+      programId,
+      sectionId,
+      reorderedExercises.map((e) => e.id),
+    );
+  }
 
   return (
     <div className="bg-white border border-blue-200 rounded-xl shadow-sm overflow-hidden">
@@ -712,13 +714,13 @@ export default function WorkoutCard({
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-2">
-                          <Link
-                            href={`/exercises/${we.exercise?.id}/modal`}
-                            scroll={false}
-                            className="font-medium text-blue-700 hover:text-blue-900 truncate"
+                          <button
+                            type="button"
+                            onClick={() => setOpenExerciseId(we.exercise!.id)}
+                            className="font-medium text-blue-700 hover:text-blue-900 truncate text-left"
                           >
                             {we.exercise?.name || "Missing exercise"}
-                          </Link>
+                          </button>
                           <span className="text-gray-600 text-sm">
                             — {formatPrescribed(we.prescribed as Prescribed)}
                           </span>
@@ -748,7 +750,12 @@ export default function WorkoutCard({
 
       {/* Add Exercise Form */}
       <div className="px-5 py-5 border-t bg-gray-50/40">
-        <p>Add exercise to section:</p>
+        <div>
+          <h4 className="text-sm font-semibold text-gray-900">Add exercise</h4>
+          <p className="text-xs text-gray-500">
+            Choose a section and configure the exercise
+          </p>
+        </div>
         <select
           value={sectionId}
           onChange={(e) => setSectionId(e.target.value)}
@@ -858,6 +865,12 @@ export default function WorkoutCard({
           </button>
         </div>
       </div>
+      {openExerciseId && (
+        <ExerciseModal
+          exerciseId={openExerciseId}
+          onClose={() => setOpenExerciseId(null)}
+        />
+      )}
     </div>
   );
 }

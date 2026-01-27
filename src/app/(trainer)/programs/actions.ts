@@ -11,48 +11,63 @@ export async function deleteProgram(programId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) throw new Error("Unauthorized");
 
-  // 1️⃣ Delete workout exercises
-  await prisma.workoutExercise.deleteMany({
-    where: {
-      section: {
-        workout: {
-          programId,
+  await prisma.$transaction(async (tx) => {
+    // 1️⃣ Exercise logs (lowest level)
+    await tx.exerciseLog.deleteMany({
+      where: {
+        workoutLog: {
+          scheduled: {
+            workout: { programId },
+          },
         },
       },
-    },
-  });
+    });
 
-  // 2️⃣ Delete workout sections
-  await prisma.workoutSection.deleteMany({
-    where: {
-      workout: {
-        programId,
+    // 2️⃣ Workout logs
+    await tx.workoutLog.deleteMany({
+      where: {
+        scheduled: {
+          workout: { programId },
+        },
       },
-    },
-  });
+    });
 
-  // 3️⃣ Delete scheduled workouts (clients)
-  await prisma.scheduledWorkout.deleteMany({
-    where: {
-      workout: {
-        programId,
+    // 3️⃣ Scheduled workouts
+    await tx.scheduledWorkout.deleteMany({
+      where: {
+        workout: { programId },
       },
-    },
-  });
+    });
 
-  // 4️⃣ Delete workout templates
-  await prisma.workoutTemplate.deleteMany({
-    where: { programId },
-  });
+    // 4️⃣ Workout exercises (templates)
+    await tx.workoutExercise.deleteMany({
+      where: {
+        section: {
+          workout: { programId },
+        },
+      },
+    });
 
-  // 5️⃣ Finally delete program
-  await prisma.program.delete({
-    where: { id: programId },
+    // 5️⃣ Workout sections
+    await tx.workoutSection.deleteMany({
+      where: {
+        workout: { programId },
+      },
+    });
+
+    // 6️⃣ Workout templates
+    await tx.workoutTemplate.deleteMany({
+      where: { programId },
+    });
+
+    // 7️⃣ Program
+    await tx.program.delete({
+      where: { id: programId },
+    });
   });
 
   revalidatePath("/programs");
 }
-
 
 export async function duplicateProgram(programId: string) {
   const session = await getServerSession(authOptions);

@@ -2,6 +2,7 @@ import { PrismaClient, ExerciseType } from "@prisma/client"
 import { PrismaPg } from '@prisma/adapter-pg';
 import bcrypt from "bcryptjs"
 import { seedProgramExercises } from "./seed/exercises";
+import { seedProgramEccentric } from "./seed/program-eccentric-upper-lower";
 
 // RUN: npx prisma db seed
 const adapter = new PrismaPg({
@@ -177,9 +178,13 @@ async function main() {
 // });
 
 //   console.log("✅ Seeded default exercises");
- await seedProgramExercises();
- console.log("✅ Seeded program exercises");
+//  await seedProgramExercises();
+//  console.log("✅ Seeded program exercises");
+
+ await seedProgramEccentric();
+
 }
+
 
 main()
   .catch((e) => {
