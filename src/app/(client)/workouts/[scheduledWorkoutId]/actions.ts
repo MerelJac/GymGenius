@@ -4,6 +4,7 @@ import { Performed, Prescribed } from "@/types/prescribed";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { calculateOneRepMax } from "@/app/utils/oneRepMax/calculateOneRepMax";
 
 export async function startWorkout(scheduledId: string) {
   const session = await getServerSession(authOptions);
@@ -51,7 +52,6 @@ export async function startWorkout(scheduledId: string) {
   });
 }
 
-
 export async function stopWorkout(workoutLogId: string) {
   await prisma.$transaction(async (tx) => {
     // 1️⃣ Complete the workout log
@@ -73,7 +73,6 @@ export async function stopWorkout(workoutLogId: string) {
   });
 }
 
-
 export async function logExercise(
   workoutLogId: string,
   exerciseId: string,
@@ -81,7 +80,7 @@ export async function logExercise(
   performed: Performed,
   note?: string,
 ) {
-  await prisma.exerciseLog.create({
+  const exerciseLog = await prisma.exerciseLog.create({
     data: {
       workoutLogId,
       exerciseId,
@@ -90,4 +89,40 @@ export async function logExercise(
       substitutionReason: note || null,
     },
   });
+
+  // ── 1RM tracking ─────────────────────────────
+  if (performed.kind === "strength" || performed.kind === "hybrid") {
+    const candidateOneRMs = performed.sets
+      .filter(
+        (set) =>
+          typeof set.weight === "number" &&
+          set.weight > 0 &&
+          typeof set.reps === "number" &&
+          set.reps > 0,
+      )
+      .map((set) => calculateOneRepMax(set.weight!, set.reps));
+
+    if (candidateOneRMs.length > 0) {
+      const oneRepMax = Math.max(...candidateOneRMs);
+
+      console.log("Tracking 1RM", oneRepMax);
+
+      const workoutLog = await prisma.workoutLog.findUnique({
+        where: { id: workoutLogId },
+        select: { clientId: true },
+      });
+
+      if (workoutLog?.clientId) {
+        await prisma.exerciseOneRepMax.create({
+          data: {
+            clientId: workoutLog.clientId,
+            exerciseId,
+            oneRepMax,
+          },
+        });
+      }
+    }
+  }
+
+  return exerciseLog;
 }

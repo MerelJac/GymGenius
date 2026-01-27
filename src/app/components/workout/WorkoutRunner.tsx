@@ -10,7 +10,7 @@ import { ExerciseLogger } from "./ExerciseLogger";
 import { ExerciseLog, ScheduledWorkoutWithLogs } from "@/types/workout";
 import { ExerciseLogViewer } from "./ExerciseLogViewer";
 import { useRouter } from "next/navigation";
-import { assertPrescribed } from "@/app/utils/assertPrescribed";
+import { assertPrescribed } from "@/app/utils/prescriptions/assertPrescribed";
 
 export default function WorkoutRunner({
   scheduledWorkout,
@@ -21,6 +21,7 @@ export default function WorkoutRunner({
   const activeLog = scheduledWorkout.workoutLogs[0] ?? null;
   const isActive = activeLog?.status === "IN_PROGRESS" && !activeLog.endedAt;
   const router = useRouter();
+  const clientId = scheduledWorkout.clientId;
 
   const isCompleted = activeLog?.status === "COMPLETED";
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(
@@ -112,6 +113,7 @@ export default function WorkoutRunner({
                     exercise={we.exercise}
                     prescribed={assertPrescribed(we.prescribed)}
                     workoutLogId={workoutLogId}
+                    clientId={clientId}
                     disabled={!isActive}
                     notes={we.notes}
                   />

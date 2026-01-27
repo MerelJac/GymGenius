@@ -51,14 +51,15 @@ model User {
   profile  Profile?
   programs Program[] @relation("TrainerPrograms")
 
-  sentMessages       Message[]           @relation("MessageSender")
-  receivedMessages   Message[]           @relation("MessageRecipient")
-  exercises          Exercise[]
-  scheduledWorkouts  ScheduledWorkout[]
-  workoutLogs        WorkoutLog[]
-  invitesSent        Invite[]
-  bodyMetrics        BodyMetric[]
-  additionalWorkouts AdditionalWorkout[]
+  sentMessages        Message[]           @relation("MessageSender")
+  receivedMessages    Message[]           @relation("MessageRecipient")
+  exercises           Exercise[]
+  scheduledWorkouts   ScheduledWorkout[]
+  workoutLogs         WorkoutLog[]
+  invitesSent         Invite[]
+  bodyMetrics         BodyMetric[]
+  additionalWorkouts  AdditionalWorkout[]
+  exerciseOneRepMaxes ExerciseOneRepMax[]
 }
 
 model Profile {
@@ -99,10 +100,11 @@ model Exercise {
   trainerId String?
   trainer   User?   @relation(fields: [trainerId], references: [id])
 
-  workoutExercises  WorkoutExercise[]
-  exerciseLogs      ExerciseLog[]          @relation("ExerciseToLogs")
-  substitutionsFrom ExerciseSubstitution[] @relation("PrimaryExercise")
-  substitutionsTo   ExerciseSubstitution[] @relation("SubstituteExercise")
+  workoutExercises    WorkoutExercise[]
+  exerciseLogs        ExerciseLog[]          @relation("ExerciseToLogs")
+  substitutionsFrom   ExerciseSubstitution[] @relation("PrimaryExercise")
+  substitutionsTo     ExerciseSubstitution[] @relation("SubstituteExercise")
+  exerciseOneRepMaxes ExerciseOneRepMax[]
 
   @@unique([name, trainerId], name: "exercise_name_trainer_unique")
 }
@@ -287,4 +289,17 @@ model AdditionalWorkout {
   createdAt   DateTime @default(now())
 
   @@index([clientId, performedAt])
+}
+
+model ExerciseOneRepMax {
+  id         String   @id @default(uuid())
+  clientId   String
+  exerciseId String
+  oneRepMax  Float
+  recordedAt DateTime @default(now())
+
+  client   User     @relation(fields: [clientId], references: [id])
+  exercise Exercise @relation(fields: [exerciseId], references: [id])
+
+  @@index([clientId, exerciseId, recordedAt])
 }

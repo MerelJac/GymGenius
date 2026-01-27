@@ -18,7 +18,7 @@ import {
   WorkoutWithSections,
 } from "@/types/workout"; // ← update this type!
 import { Exercise } from "@/types/exercise";
-import { formatPrescribed } from "../utils/prescriptionFormatter";
+import { formatPrescribed } from "../utils/prescriptions/prescriptionFormatter";
 import { WorkoutDay } from "@/types/enums";
 import { Prescribed } from "@/types/prescribed";
 import Link from "next/link";
