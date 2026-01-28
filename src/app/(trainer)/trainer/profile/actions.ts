@@ -14,7 +14,9 @@ export async function updateTrainerProfile(
   phone: string | null,
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   const userId = session.user.id;
 
@@ -43,11 +45,14 @@ export async function updateTrainerProfile(
   ]);
 
   revalidatePath("/trainer/profile");
+  return { ok: true };
 }
 
 export async function createTrainer(email: string) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   // ✅ normalize email
   const normalizedEmail = normalizeEmail(email);
@@ -72,5 +77,5 @@ export async function createTrainer(email: string) {
   });
 
   revalidatePath("/trainer/profile");
-  return { id: trainer.id };
+  return { ok: true, id: trainer.id };
 }

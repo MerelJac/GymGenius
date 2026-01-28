@@ -48,6 +48,7 @@ export default function WorkoutCard({
   const router = useRouter();
   const [exerciseId, setExerciseId] = useState(exercises[0]?.id || "");
   const [sectionId, setSectionId] = useState("");
+  const [error, setError] = useState<string | null | undefined>(null);
 
   const [sets, setSets] = useState(3);
   const [reps, setReps] = useState(10);
@@ -220,15 +221,28 @@ export default function WorkoutCard({
 
   function saveName() {
     setEditing(false);
-    startTransition(() => {
-      updateWorkoutName(programId, workout.id, name);
+    setError(null);
+    startTransition(async () => {
+      const result = await updateWorkoutName(programId, workout.id, name);
+
+      if (!result.ok) {
+        setEditing(false);
+        setError(result.error);
+        return;
+      }
     });
   }
 
   function saveDay(newDay: WorkoutDay) {
     setDay(newDay);
-    startTransition(() => {
-      updateWorkoutDay(programId, workout.id, newDay);
+    setError(null);
+    startTransition(async () => {
+      const result = await updateWorkoutDay(programId, workout.id, newDay);
+      if (!result.ok) {
+        setEditing(false);
+        setError(result.error);
+        return;
+      }
     });
   }
 
@@ -290,7 +304,8 @@ export default function WorkoutCard({
 
     // Real server call
     try {
-      await addWorkoutExercise(
+      setError(null);
+      const result = await addWorkoutExercise(
         programId,
         workout.id,
         sectionId, // ← now required
@@ -298,6 +313,10 @@ export default function WorkoutCard({
         prescribed,
         notes.trim() || undefined,
       );
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       setNotes(""); // clear only on success
     } catch (err) {
       console.error("Failed to add exercise", err);
@@ -313,7 +332,12 @@ export default function WorkoutCard({
       });
     });
     try {
-      await deleteWorkoutExercise(programId, workoutExerciseId);
+      setError(null);
+      const result = await deleteWorkoutExercise(programId, workoutExerciseId);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
     } catch (err) {
       console.error("Delete failed", err);
       // TODO: revert optimistic state
@@ -340,14 +364,23 @@ export default function WorkoutCard({
     setEditingSectionId(null);
 
     try {
-      await updateWorkoutSectionTitle(programId, sectionId, trimmed);
+      setError(null);
+      const result = await updateWorkoutSectionTitle(
+        programId,
+        sectionId,
+        trimmed,
+      );
+      if (result && result.error) {
+        setError(result.error);
+        return;
+      }
     } catch (err) {
       console.error("Failed to update section title", err);
       // TODO: rollback (advanced) or show toast/error
     }
   }
 
-  async function handleAddSection() {
+   async function handleAddSection() {
     const tempId = crypto.randomUUID();
 
     const optimisticSection: WorkoutSectionWithExercises = {
@@ -370,6 +403,17 @@ export default function WorkoutCard({
         workout.id,
         "New Section",
       );
+
+      if ("error" in realSection) {
+        setError(realSection.error);
+        startTransition(() => {
+          updateOptimisticSections({
+            type: "delete-section",
+            sectionId: tempId,
+          });
+        });
+        return;
+      }
 
       startTransition(() => {
         updateOptimisticSections({
@@ -394,7 +438,6 @@ export default function WorkoutCard({
       });
     }
   }
-
   function moveSectionUp(sectionId: string) {
     const index = optimisticSections.findIndex((s) => s.id === sectionId);
     if (index <= 0) return;
@@ -668,14 +711,74 @@ export default function WorkoutCard({
                   section.exercises.map((we) => (
                     <div
                       key={we.id}
-                      className="px-4 py-3 flex items-center gap-4 hover:bg-gray-50/70 transition-colors"
+                      className="
+    px-4 py-3
+    flex flex-col gap-3
+    md:flex-row md:items-center md:gap-4
+    hover:bg-gray-50/70 transition-colors
+  "
                     >
-                      <div className="flex items-center gap-1 text-gray-400">
+                      {/* TOP ROW (mobile): reorder + section select */}
+                      <div className="flex items-center justify-between gap-3 md:hidden">
+                        <div className="flex items-center gap-2 text-gray-400">
+                          <button
+                            onClick={() =>
+                              moveExerciseWithinSection(section.id, we.id, "up")
+                            }
+                            className="p-2 rounded-lg hover:text-gray-700 hover:bg-gray-200/60"
+                            aria-label="Move up"
+                          >
+                            <ChevronUp size={18} />
+                          </button>
+                          <button
+                            onClick={() =>
+                              moveExerciseWithinSection(
+                                section.id,
+                                we.id,
+                                "down",
+                              )
+                            }
+                            className="p-2 rounded-lg hover:text-gray-700 hover:bg-gray-200/60"
+                            aria-label="Move down"
+                          >
+                            <ChevronDown size={18} />
+                          </button>
+                        </div>
+
+                        <select
+                          value={section.id}
+                          onChange={async (e) => {
+                            const target = e.target.value;
+                            startTransition(() =>
+                              updateOptimisticSections({
+                                type: "move-exercise",
+                                exerciseId: we.id,
+                                fromSectionId: section.id,
+                                toSectionId: target,
+                              }),
+                            );
+                            await moveWorkoutExercise(programId, we.id, target);
+                          }}
+                          className="
+        text-sm border border-gray-200 rounded-lg px-3 py-2
+        focus:border-blue-500 focus:ring-1 focus:ring-blue-500
+      "
+                        >
+                          {optimisticSections.map((s) => (
+                            <option key={s.id} value={s.id}>
+                              {s.title}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* DESKTOP reorder buttons */}
+                      <div className="hidden md:flex items-center gap-1 text-gray-400">
                         <button
                           onClick={() =>
                             moveExerciseWithinSection(section.id, we.id, "up")
                           }
-                          className="p-1 hover:text-gray-700 rounded hover:bg-gray-200/60"
+                          className="p-1.5 hover:text-gray-700 rounded hover:bg-gray-200/60"
                         >
                           <ChevronUp size={16} />
                         </button>
@@ -683,12 +786,13 @@ export default function WorkoutCard({
                           onClick={() =>
                             moveExerciseWithinSection(section.id, we.id, "down")
                           }
-                          className="p-1 hover:text-gray-700 rounded hover:bg-gray-200/60"
+                          className="p-1.5 hover:text-gray-700 rounded hover:bg-gray-200/60"
                         >
                           <ChevronDown size={16} />
                         </button>
                       </div>
 
+                      {/* DESKTOP section select */}
                       <select
                         value={section.id}
                         onChange={async (e) => {
@@ -703,7 +807,11 @@ export default function WorkoutCard({
                           );
                           await moveWorkoutExercise(programId, we.id, target);
                         }}
-                        className="min-w-[110px] text-sm border border-gray-200 rounded px-2 py-1 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                        className="
+      hidden md:block min-w-[120px]
+      text-sm border border-gray-200 rounded px-2 py-1
+      focus:border-blue-500 focus:ring-1 focus:ring-blue-500
+    "
                       >
                         {optimisticSections.map((s) => (
                           <option key={s.id} value={s.id}>
@@ -712,32 +820,41 @@ export default function WorkoutCard({
                         ))}
                       </select>
 
+                      {/* MAIN CONTENT */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-baseline gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setOpenExerciseId(we.exercise!.id)}
-                            className="font-medium text-blue-700 hover:text-blue-900 truncate text-left"
-                          >
-                            {we.exercise?.name || "Missing exercise"}
-                          </button>
-                          <span className="text-gray-600 text-sm">
-                            — {formatPrescribed(we.prescribed as Prescribed)}
-                          </span>
+                        <button
+                          type="button"
+                          onClick={() => setOpenExerciseId(we.exercise!.id)}
+                          className="
+        font-medium text-blue-700 hover:text-blue-900
+        truncate text-left block
+      "
+                        >
+                          {we.exercise?.name || "Missing exercise"}
+                        </button>
+
+                        <div className="text-sm text-gray-600 mt-0.5">
+                          {formatPrescribed(we.prescribed as Prescribed)}
                         </div>
+
                         {we.notes && (
-                          <p className="text-xs text-gray-500 mt-0.5 italic">
+                          <p className="text-xs text-gray-500 mt-1 italic">
                             {we.notes}
                           </p>
                         )}
                       </div>
 
+                      {/* DELETE */}
                       <button
                         onClick={() => handleDeleteExercise(we.id)}
-                        className="p-1.5 text-red-600 hover:text-red-800 rounded hover:bg-red-50 transition"
+                        className="
+      self-start md:self-center
+      p-2 text-red-600 hover:text-red-800
+      rounded-lg hover:bg-red-50 transition
+    "
                         title="Remove exercise"
                       >
-                        <Trash2 size={16} />
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   ))
@@ -871,6 +988,7 @@ export default function WorkoutCard({
           onClose={() => setOpenExerciseId(null)}
         />
       )}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

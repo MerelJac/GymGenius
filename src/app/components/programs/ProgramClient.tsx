@@ -96,7 +96,7 @@ return (
           {programs.map((program) => (
             <div
               key={program.id}
-              className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/70 transition-colors group"
+              className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/70 transition-colors group flex-col md:flex-row"
             >
               <Link
                 href={`/programs/${program.id}`}

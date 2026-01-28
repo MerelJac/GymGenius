@@ -8,7 +8,7 @@ export default function PublicLandingPage() {
       {/* Hero */}
       <section className="bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 py-24 text-center">
-          <h1 className="text-4xl md:text-5xl font-semibold mb-6">
+          <h1 className="text-4xl md:text-5xl font-semibold mb-6  text-black">
             Smarter training. Better results.
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
@@ -34,7 +34,7 @@ export default function PublicLandingPage() {
       </section>
 
       {/* Features */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section className="max-w-7xl mx-auto px-6 py-20 bg-white">
         <div className="grid md:grid-cols-3 gap-10">
           <Feature
             title="Workout Programming"

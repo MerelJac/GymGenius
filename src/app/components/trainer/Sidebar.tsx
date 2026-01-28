@@ -65,9 +65,9 @@ export default function SidebarLayout({
           onClick={() => setOpen(true)}
           className="p-2 rounded-md hover:bg-gray-100"
         >
-          <Menu className="w-5 h-5" />
+          <Menu className="w-5 h-5 black" />
         </button>
-        <div className="ml-3 font-semibold">GymGenius</div>
+        <div className="ml-3 font-semibold text-black">GymGenius</div>
       </header>
 
       {/* Mobile overlay */}

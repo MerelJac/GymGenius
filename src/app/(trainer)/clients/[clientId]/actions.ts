@@ -13,7 +13,9 @@ export async function addBodyMetric(
   bodyFat: number | null,
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   await prisma.bodyMetric.create({
     data: {
@@ -24,12 +26,13 @@ export async function addBodyMetric(
   });
 
   revalidatePath(`/clients/${clientId}`);
+  return { ok: true };
 }
 
 export async function deleteClient(clientId: string) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+    return { ok: false, error: "Unauthorized" };
   }
 
   // Ensure this client belongs to the trainer
@@ -43,7 +46,7 @@ export async function deleteClient(clientId: string) {
   });
 
   if (!client) {
-    throw new Error("Client not found or unauthorized");
+    return { ok: false, error: "Client not found or unauthorized" };
   }
 
   // Delete dependent data first
@@ -59,6 +62,7 @@ export async function deleteClient(clientId: string) {
   ]);
 
   revalidatePath("/clients");
+  return { ok: true };
 }
 export async function updateClientProfile(
   clientId: string,
@@ -75,12 +79,14 @@ export async function updateClientProfile(
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    throw new Error("Unauthorized");
+    return { ok: false, error: "Unauthorized" };
   }
 
+
   if (!clientId) {
-    throw new Error("Missing crucial Data");
+    return { ok: false, error: "Missing client ID" };
   }
+
 
   let normalizedPhone;
   if (data.phone) {
@@ -122,4 +128,5 @@ export async function updateClientProfile(
       },
     }),
   ]);
+    return { ok: true };
 }

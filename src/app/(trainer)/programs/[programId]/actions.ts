@@ -15,7 +15,9 @@ function runRevalidate(programId: string) {
 
 export async function createWorkout(programId: string) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   const order = await prisma.workoutTemplate.count({
     where: { programId },
@@ -36,6 +38,7 @@ export async function createWorkout(programId: string) {
   });
 
   runRevalidate(programId);
+  return { ok: true };
 }
 
 export async function deleteWorkoutExercise(
@@ -43,13 +46,15 @@ export async function deleteWorkoutExercise(
   workoutExerciseId: string,
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
   await prisma.workoutExercise.delete({
     where: { id: workoutExerciseId },
   });
 
   runRevalidate(programId);
+  return { ok: true };
 }
 export async function addWorkoutExercise(
   programId: string,
@@ -60,7 +65,9 @@ export async function addWorkoutExercise(
   notes?: string,
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   const order = await prisma.workoutExercise.count({
     where: { sectionId },
@@ -77,6 +84,7 @@ export async function addWorkoutExercise(
   });
 
   runRevalidate(programId);
+  return { ok: true };
 }
 export async function updateWorkoutName(
   programId: string,
@@ -84,7 +92,9 @@ export async function updateWorkoutName(
   name: string,
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   await prisma.workoutTemplate.update({
     where: { id: workoutId },
@@ -92,11 +102,14 @@ export async function updateWorkoutName(
   });
 
   runRevalidate(programId);
+  return { ok: true };
 }
 
 export async function deleteWorkout(programId: string, workoutId: string) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
   await prisma.workoutExercise.deleteMany({
     where: { section: { workoutId } },
   });
@@ -106,6 +119,7 @@ export async function deleteWorkout(programId: string, workoutId: string) {
   });
 
   revalidatePath(`/trainer/programs/${programId}`);
+  return { ok: true };
 }
 export async function duplicateWorkout(programId: string, workoutId: string) {
   const workout = await prisma.workoutTemplate.findUnique({
@@ -122,7 +136,9 @@ export async function duplicateWorkout(programId: string, workoutId: string) {
     },
   });
 
-  if (!workout) throw new Error("Workout not found");
+  if (!workout) {
+    return { ok: false, error: "Workout not found" };
+  }
 
   const newWorkout = await prisma.workoutTemplate.create({
     data: {
@@ -152,7 +168,8 @@ export async function duplicateWorkout(programId: string, workoutId: string) {
   });
 
   revalidatePath(`/programs/${programId}`);
-  return newWorkout.id;
+
+  return { ok: true, workoutId: newWorkout.id };
 }
 
 export async function assignProgramToClient(
@@ -165,7 +182,9 @@ export async function assignProgramToClient(
     include: { workouts: true },
   });
 
-  if (!program) throw new Error("Program not found");
+  if (!program) {
+    return { ok: false, error: "Program not found" };
+  }
 
   for (const workout of program.workouts) {
     const scheduledDate = getNextDateForDay(startDate, workout.day);
@@ -178,6 +197,7 @@ export async function assignProgramToClient(
       },
     });
   }
+  return { ok: true };
 }
 
 export async function updateWorkoutDay(
@@ -186,7 +206,9 @@ export async function updateWorkoutDay(
   day: WorkoutDay,
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   await prisma.workoutTemplate.update({
     where: { id: workoutId },
@@ -194,6 +216,7 @@ export async function updateWorkoutDay(
   });
 
   revalidatePath(`/programs/${programId}`);
+  return { ok: true };
 }
 
 export async function createWorkoutSection(
@@ -202,7 +225,9 @@ export async function createWorkoutSection(
   title: string,
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { error: "Unauthorized" };
+  }
 
   const section = await prisma.$transaction(async (tx) => {
     const maxOrder = await tx.workoutSection.aggregate({
@@ -231,7 +256,9 @@ export async function updateWorkoutSectionTitle(
   title: string,
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   await prisma.workoutSection.update({
     where: { id: sectionId },
@@ -259,6 +286,7 @@ export async function moveWorkoutExercise(
   });
 
   revalidatePath(`/trainer/programs/${programId}`);
+  return { ok: true };
 }
 export async function reorderWorkoutSections(
   workoutId: string,
@@ -285,6 +313,7 @@ export async function reorderWorkoutSections(
       ),
     );
   });
+  return { ok: true };
 }
 
 export async function reorderExercisesInSection(
@@ -308,7 +337,7 @@ export async function reorderExercisesInSection(
 
   // 2️⃣ Safety check
   if (exercises.length !== orderedExerciseIds.length) {
-    throw new Error("Invalid exercise reorder request");
+    return { ok: false, error: "Invalid exercise reorder request" };
   }
 
   // 3️⃣ Persist order atomically
@@ -322,6 +351,7 @@ export async function reorderExercisesInSection(
   );
 
   revalidatePath(`/trainer/programs/${programId}`);
+  return { ok: true };
 }
 
 export async function deleteWorkoutSection(
@@ -339,7 +369,7 @@ export async function deleteWorkoutSection(
     include: { exercises: true },
   });
 
-  if (!section) return;
+  if (!section) return { ok: false };
 
   // OPTION A: delete exercises + section
   await prisma.$transaction([
@@ -369,4 +399,5 @@ export async function deleteWorkoutSection(
       }),
     ),
   );
+  return { ok: true };
 }

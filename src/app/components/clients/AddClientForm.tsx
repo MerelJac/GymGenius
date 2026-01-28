@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 export default function AddClientForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null | undefined>(null);
   const [saving, setSaving] = useState(false);
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,6 +19,13 @@ export default function AddClientForm() {
     startTransition(async () => {
       try {
         const result = await createClient(email);
+
+        if (!result.ok) {
+          setSaving(false);
+          setError(result.error);
+          return;
+        }
+
         setEmail("");
         router.push(`/clients/${result.id}`);
       } catch (err) {

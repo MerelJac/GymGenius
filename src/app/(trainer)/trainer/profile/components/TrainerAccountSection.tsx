@@ -8,7 +8,7 @@ type TrainerAccountSectionProps = {
   firstName?: string | null;
   lastName?: string | null;
   email: string;
-  phone: string | null |  undefined;
+  phone: string | null | undefined;
 };
 
 export function TrainerAccountSection({
@@ -20,6 +20,7 @@ export function TrainerAccountSection({
   const [isEditing, setIsEditing] = useState(false);
   const [firstName, setFirstName] = useState(initialFirstName ?? "");
   const [email, setEmail] = useState(initialEmail ?? "");
+  const [error, setError] = useState<string | null | undefined>(null);
 
   const [phone, setPhone] = useState(initialPhone ?? "");
 
@@ -30,7 +31,17 @@ export function TrainerAccountSection({
     setSaving(true);
 
     startTransition(async () => {
-      await updateTrainerProfile(firstName, lastName, email, phone);
+      setError(null);
+      const result = await updateTrainerProfile(
+        firstName,
+        lastName,
+        email,
+        phone,
+      );
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       setSaving(false);
       setIsEditing(false);
     });
@@ -147,6 +158,7 @@ export function TrainerAccountSection({
           </div>
         </div>
       )}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </>
   );
 }

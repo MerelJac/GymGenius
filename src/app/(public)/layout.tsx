@@ -12,7 +12,7 @@ export default function PublicLayout({
       <header className="border-b bg-white">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo / Brand */}
-          <Link href="/" className="text-lg font-semibold">
+          <Link href="/" className="text-lg font-semibold text-black">
             GymGenius
           </Link>
 

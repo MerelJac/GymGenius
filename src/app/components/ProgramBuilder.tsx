@@ -29,6 +29,8 @@ export default function ProgramBuilder({
   clients: User[];
   clientsAssignedProgram: ClientWithWorkouts[];
 }) {
+  const [error, setError] = useState<string | null | undefined>(null);
+
   type WorkoutAction =
     | { type: "add"; workout: WorkoutWithSections }
     | { type: "remove"; id: string };
@@ -90,7 +92,12 @@ export default function ProgramBuilder({
       });
     });
 
-    await createWorkout(program.id);
+    setError(null);
+    const result = await createWorkout(program.id);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
   }
 
   async function handleDeleteWorkout(workout: WorkoutWithSections) {
@@ -100,7 +107,12 @@ export default function ProgramBuilder({
         id: workout.id,
       });
     });
-    await deleteWorkout(program.id, workout.id);
+    setError(null);
+    const result = await deleteWorkout(program.id, workout.id);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
   }
 
   async function handleDuplicateWorkout(workout: WorkoutWithSections) {
@@ -126,11 +138,13 @@ export default function ProgramBuilder({
         workout: optimisticCopy,
       });
     });
-
-    await duplicateWorkout(program.id, workout.id);
+    setError(null);
+    const result = await duplicateWorkout(program.id, workout.id);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
   }
-
-  console.log('Clinets availbel', clients)
 
   return (
     <div className="space-y-8 pb-12">
@@ -232,7 +246,7 @@ export default function ProgramBuilder({
 
       {/* Workouts Section */}
       <div className="space-y-5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-col md:flex-row">
           <h2 className="text-xl font-semibold text-gray-900">Workouts</h2>
           <div className=" flex flex-row gap-2">
             <ExerciseQuickAdd
@@ -282,6 +296,7 @@ export default function ProgramBuilder({
           </div>
         )}
       </div>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

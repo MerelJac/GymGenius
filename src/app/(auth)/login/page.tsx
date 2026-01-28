@@ -93,7 +93,7 @@ export default function LoginPage() {
             Sign in
           </button>
 
-          <Link href="/signup" className="text-sm text-center block underline">
+          <Link href="/signup" className="text-sm text-center block underline text-black">
             New here? Get Started
           </Link>
 

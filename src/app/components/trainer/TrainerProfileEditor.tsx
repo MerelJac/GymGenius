@@ -18,14 +18,25 @@ export function TrainerProfileEditor({
 }) {
   const [firstName, setFirstName] = useState(initialFirstName ?? "");
   const [lastName, setLastName] = useState(initialLastName ?? "");
-    const [email, setEmail] = useState(initialEmail ?? "");
-      const [phone, setPhone] = useState(initialPhone ?? "");
+  const [email, setEmail] = useState(initialEmail ?? "");
+  const [phone, setPhone] = useState(initialPhone ?? "");
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null | undefined>(null);
 
   function save() {
     setSaving(true);
+    setError(null);
     startTransition(async () => {
-      await updateTrainerProfile(firstName, lastName, email, phone);
+      const result = await updateTrainerProfile(
+        firstName,
+        lastName,
+        email,
+        phone,
+      );
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
       setSaving(false);
     });
   }
@@ -48,7 +59,7 @@ export function TrainerProfileEditor({
           onChange={(e) => setLastName(e.target.value)}
         />
 
-                <input
+        <input
           className="rounded-lg border px-3 py-2 text-base"
           placeholder="Email"
           type="email"
@@ -56,7 +67,7 @@ export function TrainerProfileEditor({
           onChange={(e) => setEmail(e.target.value)}
         />
 
-                <input
+        <input
           className="rounded-lg border px-3 py-2 text-base"
           placeholder="Phone"
           type="phone"
@@ -74,6 +85,7 @@ export function TrainerProfileEditor({
           {saving ? "Saving…" : "Save"}
         </button>
       </div>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }
