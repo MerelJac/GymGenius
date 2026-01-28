@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RescheduleWorkoutModal } from "./workout/RescheduleWorkoutModal";
+import { formatDateFromInput, normalizeDate } from "../utils/format/formatDateFromInput";
 
 // Minimal shape based on your existing schema
 export type CalendarScheduledWorkout = {
@@ -39,14 +40,8 @@ function sameDay(a: Date, b: Date) {
 
 export default function WorkoutCalendarWeek({
   scheduledWorkouts,
-  referenceDate = new Date(),
-  onPrevWeek,
-  onNextWeek,
 }: {
   scheduledWorkouts: CalendarScheduledWorkout[];
-  referenceDate?: Date;
-  onPrevWeek?: () => void;
-  onNextWeek?: () => void;
 }) {
   const [rescheduleId, setRescheduleId] = useState<string | null>(null);
   const [currentDate, setCurrentDate] = useState(() => {
@@ -64,7 +59,7 @@ export default function WorkoutCalendarWeek({
   const normalized = useMemo(() => {
     return scheduledWorkouts.map((w) => ({
       ...w,
-      scheduledDate: new Date(w.scheduledDate),
+      scheduledDate: normalizeDate(w.scheduledDate),
     }));
   }, [scheduledWorkouts]);
 

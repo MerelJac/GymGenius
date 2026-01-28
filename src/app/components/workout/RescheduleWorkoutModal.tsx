@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { rescheduleWorkout } from "@/app/(trainer)/clients/[clientId]/actions";
+import { normalizeDate, toInputDate } from "@/app/utils/format/formatDateFromInput";
 
 export function RescheduleWorkoutModal({
   scheduledWorkoutId,
@@ -13,15 +14,14 @@ export function RescheduleWorkoutModal({
   currentDate: Date;
   onClose: () => void;
 }) {
-  const [date, setDate] = useState(
-    currentDate.toISOString().slice(0, 10),
-  );
+  const [date, setDate] = useState(() => toInputDate(currentDate));
+
   const [saving, setSaving] = useState(false);
   const router = useRouter();
 
   async function handleSave() {
     setSaving(true);
-    await rescheduleWorkout(scheduledWorkoutId, new Date(date));
+    await rescheduleWorkout(scheduledWorkoutId, normalizeDate(date));
     router.refresh();
     setSaving(false);
     onClose();
