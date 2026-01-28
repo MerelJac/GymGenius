@@ -10,7 +10,10 @@ import {
 import WorkoutCard from "./WorkoutCard";
 import { ProgramWithWorkouts, WorkoutWithSections } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
-import { updateProgramName } from "../(trainer)/programs/actions";
+import {
+  updateProgramName,
+  updateProgramNote,
+} from "../(trainer)/programs/actions";
 import { User, WorkoutDay } from "@prisma/client";
 import { BackButton } from "./BackButton";
 import { ClientProgramProgress } from "./ClientProgramProgress";
@@ -50,7 +53,10 @@ export default function ProgramBuilder({
   });
 
   const [editingName, setEditingName] = useState(false);
+  const [editingNote, setEditingNote] = useState(false);
+
   const [programName, setProgramName] = useState(program.name);
+  const [programNote, setProgramNote] = useState(program.notes ?? "");
   const [clientId, setClientId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [exerciseList, setExerciseList] = useState<Exercise[]>(exercises);
@@ -60,6 +66,18 @@ export default function ProgramBuilder({
       updateProgramName(program.id, programName);
     });
   }
+
+
+  async function saveProgramNote() {
+  setEditingNote(false);
+
+  const result = await updateProgramNote(program.id, programNote);
+
+  if (!result.ok) {
+    setError(result.error);
+    return;
+  }
+}
 
   async function handleAssign() {
     if (!clientId || !startDate) return;
@@ -152,7 +170,7 @@ export default function ProgramBuilder({
       <BackButton route="/programs" />
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b bg-gray-50/70">
-          <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div className="flex items-start justify-between gap-6 flex-wrap flex-col">
             <div className="flex-1 min-w-[300px]">
               {editingName ? (
                 <input
@@ -173,6 +191,29 @@ export default function ProgramBuilder({
                     ✎
                   </span>
                 </h1>
+              )}
+            </div>
+            <div className="flex-1 min-w-[300px]">
+              {editingNote ? (
+                <input
+                  value={programNote}
+                  onChange={(e) => setProgramNote(e.target.value)}
+                  onBlur={saveProgramNote}
+                  onKeyDown={(e) => e.key === "Enter" && saveProgramNote()}
+                  className="w-full px-4 py-2.5 text-xs border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-base"
+                  autoFocus
+                />
+              ) : (
+                <p
+                  className="text-xs md:text-3xl text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
+                  onClick={() => setEditingNote(true)}
+                >
+                  {programNote || "Add program notes"}
+                  <span className="opacity-0 group-hover:opacity-70 text-gray-400">
+                    {" "}
+                    ✎
+                  </span>
+                </p>
               )}
             </div>
           </div>

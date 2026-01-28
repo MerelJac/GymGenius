@@ -11,7 +11,7 @@ console.log("SESSION USER:", session?.user ?? 'NA')
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  const { name } = await req.json()
+  const { name, notes } = await req.json()
 
   if (!name) {
     return NextResponse.json({ error: "Name is required" }, { status: 400 })
@@ -20,6 +20,7 @@ console.log("SESSION USER:", session?.user ?? 'NA')
   const program = await prisma.program.create({
     data: {
       name,
+      notes,
       trainer: {
         connect: { id: session.user.id },
       },

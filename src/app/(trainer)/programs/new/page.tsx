@@ -6,6 +6,7 @@ import { BackButton } from "@/app/components/BackButton";
 
 export default function NewProgramPage() {
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const router = useRouter();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,7 +19,7 @@ export default function NewProgramPage() {
     try {
       const res = await fetch("/api/trainer/programs", {
         method: "POST",
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, notes: description }),
       });
 
       if (!res.ok) {
@@ -56,7 +57,7 @@ export default function NewProgramPage() {
                 htmlFor="program-name"
                 className="block text-sm font-medium text-gray-700"
               >
-                Program Name
+                Name
               </label>
               <input
                 id="program-name"
@@ -68,6 +69,34 @@ export default function NewProgramPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. 5/3/1 Beginner, Push-Pull-Legs, Upper/Lower..."
+                className={`
+                  w-full px-4 py-3 rounded-lg border border-gray-300 
+                  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
+                  focus:outline-none transition-all
+                  placeholder:text-gray-400
+                  disabled:opacity-60 disabled:cursor-not-allowed text-base
+                `}
+                disabled={isSubmitting}
+                autoFocus
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="program-description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Description{" "}
+                <small>(optional)</small>
+              </label>
+              <input
+                id="program-description"
+                type="text"
+                name="description"
+                maxLength={80}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Focus on full body strength, mobility, etc..."
                 className={`
                   w-full px-4 py-3 rounded-lg border border-gray-300 
                   focus:border-blue-500 focus:ring-2 focus:ring-blue-200 

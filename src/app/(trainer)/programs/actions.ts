@@ -132,10 +132,11 @@ export async function duplicateProgram(programId: string) {
   return newProgram.id;
 }
 
-
 export async function updateProgramName(programId: string, name: string) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
   await prisma.program.update({
     where: { id: programId },
@@ -143,4 +144,21 @@ export async function updateProgramName(programId: string, name: string) {
   });
 
   revalidatePath("/programs");
+  return { ok: true };
+}
+
+export async function updateProgramNote(programId: string, notes: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
+
+  await prisma.program.update({
+    where: { id: programId },
+    data: { notes: notes.trim() || null },
+  });
+
+  revalidatePath(`/trainer/programs/${programId}`);
+
+  return { ok: true };
 }

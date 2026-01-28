@@ -158,6 +158,7 @@ export type WorkoutSectionWithExercises = {
 export type ProgramWithWorkouts = {
   id: string;
   name: string;
+  notes?: string | null;
   trainerId: string;
   workouts: WorkoutWithSections[];
 };

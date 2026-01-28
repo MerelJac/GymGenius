@@ -1,12 +1,12 @@
 export type Program = {
-  id: string
-  name: string
-  description?: string | null
+  id: string;
+  name: string;
+  notes?: string | null;
 
-  trainerId: string
+  trainerId: string;
 
-  isTemplate?: boolean // future-proofing (duplication)
-  version?: number     // for later versioning
+  isTemplate?: boolean; // future-proofing (duplication)
+  version?: number; // for later versioning
 
-  createdAt?: Date
-}
+  createdAt?: Date;
+};
