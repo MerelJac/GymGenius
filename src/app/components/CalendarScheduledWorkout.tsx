@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RescheduleWorkoutModal } from "./workout/RescheduleWorkoutModal";
-import { formatDateFromInput, normalizeDate } from "../utils/format/formatDateFromInput";
+import {
+  formatDateFromInput,
+  normalizeDate,
+} from "../utils/format/formatDateFromInput";
 
 // Minimal shape based on your existing schema
 export type CalendarScheduledWorkout = {
@@ -88,7 +91,7 @@ export default function WorkoutCalendarWeek({
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-7 divide-x divide-gray-200">
+      <div className="grid grid-cols-1 md:grid-cols-7 md:divide-x divide-gray-200">
         {days.map((day) => {
           const workoutsForDay = normalized.filter((w) =>
             sameDay(w.scheduledDate as Date, day),

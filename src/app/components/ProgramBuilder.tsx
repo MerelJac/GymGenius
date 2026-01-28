@@ -34,7 +34,6 @@ export default function ProgramBuilder({
 }) {
   const [error, setError] = useState<string | null | undefined>(null);
 
-  
   type WorkoutAction =
     | { type: "add"; workout: WorkoutWithSections }
     | { type: "remove"; id: string };
@@ -68,17 +67,16 @@ export default function ProgramBuilder({
     });
   }
 
-
   async function saveProgramNote() {
-  setEditingNote(false);
+    setEditingNote(false);
 
-  const result = await updateProgramNote(program.id, programNote);
+    const result = await updateProgramNote(program.id, programNote);
 
-  if (!result.ok) {
-    setError(result.error);
-    return;
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
   }
-}
 
   async function handleAssign() {
     if (!clientId || !startDate) return;
@@ -277,6 +275,12 @@ export default function ProgramBuilder({
             <h3 className="text-sm font-semibold text-gray-700 mb-4">
               Assigned Clients
             </h3>
+            <p className="text-xs text-gray-500 mb-4 max-w-2xl">
+              <span className="font-medium text-gray-600">Note:</span> Changes
+              to existing workouts (exercises, sets, reps, notes) will
+              automatically update for assigned clients. Adding new workouts to
+              a program requires a manual sync from the client’s page.
+            </p>
             <div className="space-y-4">
               {clientsAssignedProgram.map((client) => (
                 <ClientProgramProgress key={client.id} client={client} />
