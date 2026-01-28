@@ -7,10 +7,11 @@ import { revalidatePath } from "next/cache";
 
 export async function createClient(email: string) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
 
-
-    // ✅ normalize email
+  // ✅ normalize email
   const normalizedEmail = email.trim().toLowerCase();
 
   // ✅ check for existing user
@@ -20,10 +21,12 @@ export async function createClient(email: string) {
   });
 
   if (existing) {
-    throw new Error("A client with this email already exists.");
+    return {
+      ok: false,
+      error: "A client with this email already exists.",
+    };
   }
 
-  
   const client = await prisma.user.create({
     data: {
       email: normalizedEmail,
@@ -34,5 +37,8 @@ export async function createClient(email: string) {
   });
 
   revalidatePath("/trainer/clients");
-  return { id: client.id };
+  return {
+    ok: true,
+    id: client.id,
+  };
 }

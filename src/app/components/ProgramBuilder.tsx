@@ -10,7 +10,10 @@ import {
 import WorkoutCard from "./WorkoutCard";
 import { ProgramWithWorkouts, WorkoutWithSections } from "@/types/workout";
 import { Exercise } from "@/types/exercise";
-import { updateProgramName } from "../(trainer)/programs/actions";
+import {
+  updateProgramName,
+  updateProgramNote,
+} from "../(trainer)/programs/actions";
 import { User, WorkoutDay } from "@prisma/client";
 import { BackButton } from "./BackButton";
 import { ClientProgramProgress } from "./ClientProgramProgress";
@@ -29,6 +32,8 @@ export default function ProgramBuilder({
   clients: User[];
   clientsAssignedProgram: ClientWithWorkouts[];
 }) {
+  const [error, setError] = useState<string | null | undefined>(null);
+
   type WorkoutAction =
     | { type: "add"; workout: WorkoutWithSections }
     | { type: "remove"; id: string };
@@ -48,7 +53,10 @@ export default function ProgramBuilder({
   });
 
   const [editingName, setEditingName] = useState(false);
+  const [editingNote, setEditingNote] = useState(false);
+
   const [programName, setProgramName] = useState(program.name);
+  const [programNote, setProgramNote] = useState(program.notes ?? "");
   const [clientId, setClientId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [exerciseList, setExerciseList] = useState<Exercise[]>(exercises);
@@ -57,6 +65,17 @@ export default function ProgramBuilder({
     startTransition(() => {
       updateProgramName(program.id, programName);
     });
+  }
+
+  async function saveProgramNote() {
+    setEditingNote(false);
+
+    const result = await updateProgramNote(program.id, programNote);
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
   }
 
   async function handleAssign() {
@@ -90,7 +109,12 @@ export default function ProgramBuilder({
       });
     });
 
-    await createWorkout(program.id);
+    setError(null);
+    const result = await createWorkout(program.id);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
   }
 
   async function handleDeleteWorkout(workout: WorkoutWithSections) {
@@ -100,7 +124,12 @@ export default function ProgramBuilder({
         id: workout.id,
       });
     });
-    await deleteWorkout(program.id, workout.id);
+    setError(null);
+    const result = await deleteWorkout(program.id, workout.id);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
   }
 
   async function handleDuplicateWorkout(workout: WorkoutWithSections) {
@@ -126,11 +155,13 @@ export default function ProgramBuilder({
         workout: optimisticCopy,
       });
     });
-
-    await duplicateWorkout(program.id, workout.id);
+    setError(null);
+    const result = await duplicateWorkout(program.id, workout.id);
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
   }
-
-  console.log('Clinets availbel', clients)
 
   return (
     <div className="space-y-8 pb-12">
@@ -138,7 +169,7 @@ export default function ProgramBuilder({
       <BackButton route="/programs" />
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
         <div className="px-6 py-5 border-b bg-gray-50/70">
-          <div className="flex items-start justify-between gap-6 flex-wrap">
+          <div className="flex items-start justify-between gap-6 flex-wrap flex-col">
             <div className="flex-1 min-w-[300px]">
               {editingName ? (
                 <input
@@ -159,6 +190,29 @@ export default function ProgramBuilder({
                     ✎
                   </span>
                 </h1>
+              )}
+            </div>
+            <div className="flex-1 min-w-[300px]">
+              {editingNote ? (
+                <input
+                  value={programNote}
+                  onChange={(e) => setProgramNote(e.target.value)}
+                  onBlur={saveProgramNote}
+                  onKeyDown={(e) => e.key === "Enter" && saveProgramNote()}
+                  className="w-full px-4 py-2.5 text-xs border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-base"
+                  autoFocus
+                />
+              ) : (
+                <p
+                  className="text-xs text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
+                  onClick={() => setEditingNote(true)}
+                >
+                  {programNote || "Add program notes"}
+                  <span className="opacity-0 group-hover:opacity-70 text-gray-400">
+                    {" "}
+                    ✎
+                  </span>
+                </p>
               )}
             </div>
           </div>
@@ -221,6 +275,12 @@ export default function ProgramBuilder({
             <h3 className="text-sm font-semibold text-gray-700 mb-4">
               Assigned Clients
             </h3>
+            <p className="text-xs text-gray-500 mb-4 max-w-2xl">
+              <span className="font-medium text-gray-600">Note:</span> Changes
+              to existing workouts (exercises, sets, reps, notes) will
+              automatically update for assigned clients. Adding new workouts to
+              a program requires a manual sync from the client’s page.
+            </p>
             <div className="space-y-4">
               {clientsAssignedProgram.map((client) => (
                 <ClientProgramProgress key={client.id} client={client} />
@@ -232,7 +292,7 @@ export default function ProgramBuilder({
 
       {/* Workouts Section */}
       <div className="space-y-5">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-col md:flex-row">
           <h2 className="text-xl font-semibold text-gray-900">Workouts</h2>
           <div className=" flex flex-row gap-2">
             <ExerciseQuickAdd
@@ -282,6 +342,7 @@ export default function ProgramBuilder({
           </div>
         )}
       </div>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

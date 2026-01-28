@@ -158,6 +158,7 @@ export type WorkoutSectionWithExercises = {
 export type ProgramWithWorkouts = {
   id: string;
   name: string;
+  notes?: string | null;
   trainerId: string;
   workouts: WorkoutWithSections[];
 };
@@ -193,3 +194,16 @@ export type SectionExercise = {
   prescribed: Prescribed | null;
   notes: string | null;
 };
+
+
+export type ScheduledWorkoutWithWorkout =
+  Prisma.ScheduledWorkoutGetPayload<{
+    include: {
+      workout: {
+        select: {
+          id: true;
+          name: true;
+        };
+      };
+    };
+  }>;

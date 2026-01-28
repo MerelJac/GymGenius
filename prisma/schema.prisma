@@ -136,6 +136,7 @@ model Program {
   version   Int      @default(1)
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
+  notes     String?
 
   workouts WorkoutTemplate[]
 }

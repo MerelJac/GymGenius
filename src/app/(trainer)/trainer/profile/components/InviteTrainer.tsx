@@ -7,7 +7,7 @@ import { createTrainer } from "../actions";
 export default function InviteTrainer() {
   const router = useRouter();
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null | undefined>(null);
   const [saving, setSaving] = useState(false);
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -18,9 +18,13 @@ export default function InviteTrainer() {
 
     startTransition(async () => {
       try {
-        await createTrainer(email);
+        const result = await createTrainer(email);
+        if (!result.ok) {
+          setError(result.error);
+          return;
+        }
         setEmail("");
-        setSaving(false)
+        setSaving(false);
         router.refresh();
       } catch (err) {
         setSaving(false);
