@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import ClientProfile from "@/app/components/clients/ClientProfile";
 import { notFound } from "next/navigation";
+import { ScheduledWorkoutWithWorkout } from "@/types/workout";
 
 export default async function ClientPage({
   params,
@@ -35,5 +36,17 @@ export default async function ClientPage({
 
   if (!client) notFound();
 
-  return <ClientProfile client={client} />;
+  const scheduledWorkouts: ScheduledWorkoutWithWorkout[] =
+    await prisma.scheduledWorkout.findMany({
+      where: { clientId },
+      include: {
+        workout: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+
+  return (
+    <ClientProfile client={client} scheduledWorkouts={scheduledWorkouts} />
+  );
 }

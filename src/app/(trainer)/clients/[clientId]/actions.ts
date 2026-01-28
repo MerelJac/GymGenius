@@ -130,3 +130,21 @@ export async function updateClientProfile(
   ]);
     return { ok: true };
 }
+export async function rescheduleWorkout(
+  scheduledWorkoutId: string,
+  newDate: Date,
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  await prisma.scheduledWorkout.update({
+    where: { id: scheduledWorkoutId },
+    data: {
+      scheduledDate: newDate,
+    },
+  });
+
+  return { ok: true };
+}

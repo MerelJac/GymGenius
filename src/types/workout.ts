@@ -194,3 +194,16 @@ export type SectionExercise = {
   prescribed: Prescribed | null;
   notes: string | null;
 };
+
+
+export type ScheduledWorkoutWithWorkout =
+  Prisma.ScheduledWorkoutGetPayload<{
+    include: {
+      workout: {
+        select: {
+          id: true;
+          name: true;
+        };
+      };
+    };
+  }>;

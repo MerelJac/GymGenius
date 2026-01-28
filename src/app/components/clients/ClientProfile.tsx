@@ -6,16 +6,23 @@ import {
   deleteClient,
 } from "@/app/(trainer)/clients/[clientId]/actions";
 import { TrainerClientProfile } from "@/types/client";
-import { ScheduledWorkoutWithProgram } from "@/types/workout";
+import {
+  ScheduledWorkoutWithProgram,
+  ScheduledWorkoutWithWorkout,
+} from "@/types/workout";
 import { ClientProfileEditor } from "./ClientProfileEditor";
 import { BackButton } from "../BackButton";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Trash } from "lucide-react";
+import WorkoutCalendarWeek from "../CalendarScheduledWorkout";
+import { SyncProgramButton } from "../programs/SyncProgramButton";
 
 export default function ClientProfile({
   client,
+  scheduledWorkouts,
 }: {
   client: TrainerClientProfile;
+  scheduledWorkouts: ScheduledWorkoutWithWorkout[];
 }) {
   type ProgramGroup = {
     program: {
@@ -268,6 +275,12 @@ export default function ClientProfile({
                   key={program.id}
                   className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4"
                 >
+                  <WorkoutCalendarWeek scheduledWorkouts={scheduledWorkouts} />
+
+                  <SyncProgramButton
+                    clientId={client.id}
+                    programId={program.id}
+                  />
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <h3 className="font-semibold text-lg text-gray-900">
                       {program.name}
@@ -387,9 +400,7 @@ export default function ClientProfile({
           {deleting ? "Deleting…" : "Delete Client"}
         </button>
       </div>
-      {error && (
-        <p className="text-red-500 text-sm">{error}</p>
-      )}
+      {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>
   );
 }

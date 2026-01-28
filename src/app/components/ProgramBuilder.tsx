@@ -34,6 +34,7 @@ export default function ProgramBuilder({
 }) {
   const [error, setError] = useState<string | null | undefined>(null);
 
+  
   type WorkoutAction =
     | { type: "add"; workout: WorkoutWithSections }
     | { type: "remove"; id: string };
@@ -205,7 +206,7 @@ export default function ProgramBuilder({
                 />
               ) : (
                 <p
-                  className="text-xs md:text-3xl text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
+                  className="text-xs text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
                   onClick={() => setEditingNote(true)}
                 >
                   {programNote || "Add program notes"}
