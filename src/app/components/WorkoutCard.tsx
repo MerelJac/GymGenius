@@ -29,6 +29,7 @@ import {
   Pencil,
   Plus,
   Trash2,
+  Video,
 } from "lucide-react";
 import ExerciseModal from "./exercise/ExerciseModal";
 
@@ -74,6 +75,10 @@ export default function WorkoutCard({
     selectedExercise?.type === "BODYWEIGHT";
 
   const showTimedFields = selectedExercise?.type === "TIMED";
+
+  const showCoreMobilityFields = 
+    selectedExercise?.type === "CORE" ||
+    selectedExercise?.type === "MOBILITY";
 
   function normalizeSections(
     sections: WorkoutWithSections["workoutSections"],
@@ -864,11 +869,14 @@ export default function WorkoutCard({
                               type="button"
                               onClick={() => setOpenExerciseId(we.exercise!.id)}
                               className="
-        font-medium text-blue-700 hover:text-blue-900
-        truncate text-left block
-      "
+                                      font-medium text-blue-700 hover:text-blue-900
+                                      truncate text-left block
+                                    "
                             >
-                              {we.exercise?.name || "Missing exercise"}
+                              <div className="flex flex-col md:flex-row gap-2 items-center">
+                                {we.exercise?.name || "Missing exercise"}
+                                {we.exercise?.videoUrl && <Video size={12} />}
+                              </div>
                             </button>
 
                             <div className="text-sm text-gray-600 mt-0.5">
@@ -983,6 +991,63 @@ export default function WorkoutCard({
                       />
                     </div>
                   )}
+                </>
+              )}
+
+              {showCoreMobilityFields && (
+                <>
+                  <div className="w-20">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Sets
+                    </label>
+                    <input
+                      type="number"
+                      value={sets}
+                      onChange={(e) => setSets(Number(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                    />
+                  </div>
+                  <div className="w-20">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Reps
+                    </label>
+                    <input
+                      type="number"
+                      value={reps}
+                      onChange={(e) => setReps(Number(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                    />
+                  </div>
+                  {selectedExercise?.type !== "BODYWEIGHT" && (
+                    <div className="w-24">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Weight
+                      </label>
+                      <input
+                        type="number"
+                        value={weight ?? ""}
+                        onChange={(e) =>
+                          setWeight(
+                            e.target.value ? Number(e.target.value) : null,
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      />
+                    </div>
+                  )}
+                  <div className="w-28">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Duration (s)
+                    </label>
+                    <input
+                      type="number"
+                      value={time ?? ""}
+                      onChange={(e) =>
+                        setTime(e.target.value ? Number(e.target.value) : null)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                    />
+                  </div>
                 </>
               )}
 
