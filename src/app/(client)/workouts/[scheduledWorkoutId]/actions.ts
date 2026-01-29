@@ -10,7 +10,6 @@ import {  redirect } from "next/navigation";
 
 export async function startWorkout(scheduledId: string) {
   const session = await getServerSession(authOptions);
-  console.log(session, 'session')
  if (!session?.user?.id) return  redirect("/login");
 
   return await prisma.$transaction(async (tx) => {
@@ -152,11 +151,8 @@ export async function addExerciseToWorkout(
 }
 
 export async function removeClientExercise(exerciseLogId: string) {
-    console.log('starting deleting exericise', exerciseLogId)
   const session = await getServerSession(authOptions);
-    console.log(session, 'session')
   if (!session?.user?.id) return  redirect("/login");
-  console.log('deleting exericise', exerciseLogId)
   const log = await prisma.exerciseLog.findUnique({
     where: { id: exerciseLogId },
     include: {
