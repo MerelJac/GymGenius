@@ -3,17 +3,19 @@
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-export async function signupAction(formData: FormData): Promise<void> {
+type SignupResult = { success: true } | { success: false; error: string };
+
+export async function signupAction(formData: FormData): Promise<SignupResult> {
   const email = String(formData.get("email")).trim().toLowerCase();
   const password = String(formData.get("password"));
   const passwordConfirm = String(formData.get("password-confirm"));
 
   if (!email || !password || !passwordConfirm) {
-    throw new Error("Missing required fields");
+    return { success: false, error: "Missing required fields" };
   }
 
   if (password !== passwordConfirm) {
-    throw new Error("Passwords do not match");
+    return { success: false, error: "Passwords do not match" };
   }
 
   const user = await prisma.user.findUnique({
@@ -21,19 +23,22 @@ export async function signupAction(formData: FormData): Promise<void> {
   });
 
   if (!user) {
-    throw new Error("This email is not authorized to register.");
+    return {
+      success: false,
+      error: "This email is not authorized to register.",
+    };
   }
 
   if (user.password) {
-    throw new Error("Account already exists. Please log in.");
+    return { success: false, error: "Account already exists. Please log in." };
   }
 
   const hashed = await bcrypt.hash(password, 10);
 
   await prisma.user.update({
     where: { id: user.id },
-    data: {
-      password: hashed,
-    },
+    data: { password: hashed },
   });
+
+  return { success: true };
 }
