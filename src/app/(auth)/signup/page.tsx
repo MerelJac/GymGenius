@@ -31,9 +31,23 @@ export default function SignupPage() {
           </h1>
 
           {error && (
-            <div className="rounded bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
-              {error}
-            </div>
+            <section className="flex flex-col gap-2 mb-4">
+              <div className="rounded bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+                {error}
+              </div>
+              <small className="text-black text-sm">
+                Thanks for your interest! At the moment, registration is limited
+                to invited users only. We appreciate your patience and will be
+                opening access soon.{" "}
+                <a
+                  href="mailto:coachmerel.training@gmail.com?subject=Dialed%20Fitness%20Inquiry"
+                  className="underline text-blue-600 hover:text-blue-700"
+                >
+                  Contact us
+                </a>{" "}
+                for more information.
+              </small>
+            </section>
           )}
 
           <div className="space-y-1.5">
@@ -64,13 +78,13 @@ export default function SignupPage() {
                        transition text-base"
             />
           </div>
-           <div className="space-y-1.5">
+          <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700">
               Confirm Password
             </label>
             <input
               name="password-confirm"
-                            type="password"
+              type="password"
               required
               placeholder="Password"
               className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
@@ -78,7 +92,7 @@ export default function SignupPage() {
                        transition text-base"
             />
           </div>
-          
+
           <button
             type="submit"
             className="w-full py-2.5 rounded-lg bg-blue-600 text-white font-medium

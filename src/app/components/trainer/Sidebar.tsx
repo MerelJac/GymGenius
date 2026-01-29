@@ -67,7 +67,7 @@ export default function SidebarLayout({
         >
           <Menu className="w-5 h-5 black" />
         </button>
-        <div className="ml-3 font-semibold text-black">GymGenius</div>
+        <div className="ml-3 font-semibold text-black">Dialed Fitness</div>
       </header>
 
       {/* Mobile overlay */}
@@ -94,7 +94,7 @@ export default function SidebarLayout({
         <div className="px-6 py-5 border-b flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold tracking-tight text-gray-900">
-              GymGenius
+              Dialed Fitness
             </h1>
             <p className="text-xs text-gray-500 mt-0.5">Trainer Dashboard</p>
           </div>

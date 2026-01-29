@@ -35,8 +35,8 @@ export function buildPerformedFromPrescribed(
         sets: Array.from({ length: prescribed.sets ?? 0 }, () => ({
           reps: prescribed.reps ?? 0,
           weight: prescribed.weight ?? null,
+          duration: prescribed.duration ?? 0,
         })),
-        duration: prescribed.duration ?? 0,
       };
 
     case "mobility":
@@ -45,8 +45,8 @@ export function buildPerformedFromPrescribed(
         sets: Array.from({ length: prescribed.sets ?? 0 }, () => ({
           reps: prescribed.reps ?? 0,
           weight: prescribed.weight ?? null,
+          duration: prescribed.duration ?? 0,
         })),
-        duration: prescribed.duration ?? 0,
       };
 
     default:
@@ -68,10 +68,23 @@ export function renderPrescribed(prescribed: Prescribed) {
     case "timed":
       return `${prescribed.duration} seconds`;
     case "core":
-    case "mobility":
-      return prescribed.duration
-        ? `${prescribed.duration} seconds`
-        : `${prescribed.sets} sets`;
+    case "mobility": {
+      const parts: string[] = [];
+
+      if (prescribed.sets && prescribed.reps) {
+        parts.push(`${prescribed.sets} × ${prescribed.reps}`);
+      }
+
+      if (prescribed.duration) {
+        parts.push(`${prescribed.duration}s`);
+      }
+
+      if (prescribed.weight) {
+        parts.push(`${prescribed.weight}lbs`);
+      }
+
+      return parts.join(" · ");
+    }
 
     default:
       return "";

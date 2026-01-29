@@ -12,7 +12,7 @@ export default function PublicLandingPage() {
             Smarter training. Better results.
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
-            Gym Genius helps trainers and clients plan workouts, track progress,
+            Dialed Fitness helps trainers and clients plan workouts, track progress,
             and stay accountable — all in one simple platform.
           </p>
 
@@ -58,7 +58,7 @@ export default function PublicLandingPage() {
             Start training smarter today
           </h2>
           <p className="text-gray-300 mb-6">
-            Join Gym Genius and take control of your training experience.
+            Join Dialed Fitness and take control of your training experience.
           </p>
           <Link
             href="/signup"

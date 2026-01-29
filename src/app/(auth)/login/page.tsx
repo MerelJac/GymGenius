@@ -40,7 +40,7 @@ export default function LoginPage() {
           <div className="text-center space-y-1">
             <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
             <p className="text-sm text-gray-500">
-              Sign in to your GymGenius account
+              Sign in to your Dialed Fitness account
             </p>
           </div>
 
@@ -99,7 +99,7 @@ export default function LoginPage() {
 
           {/* Footer */}
           <p className="text-xs text-center text-gray-500">
-            © {new Date().getFullYear()} GymGenius
+            © {new Date().getFullYear()} Dialed Fitness
           </p>
         </form>
       </div>

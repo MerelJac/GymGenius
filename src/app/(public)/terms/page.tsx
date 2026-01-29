@@ -8,15 +8,15 @@ export default function TermsConditions() {
         <strong>Effective Date:</strong> January 27, 2026{" "}
       </p>
       <p>
-        Welcome to <strong>Gym Genius</strong> (“Company,” “we,” “our,” or
-        “us”). By creating an account, accessing, or using the Gym Genius
+        Welcome to <strong>Dialed Fitness</strong> (“Company,” “we,” “our,” or
+        “us”). By creating an account, accessing, or using the Dialed Fitness
         application, website, or related services (collectively, the
         “Services”), you agree to be bound by these Terms of Service (“Terms”).
         If you do not agree, do not use the Services.
       </p>
       <strong>1. Use of Services</strong>
       <p>
-        Gym Genius provides tools for fitness programming, workout tracking,
+        Dialed Fitness provides tools for fitness programming, workout tracking,
         communication, and related training features. You agree to use the
         Services only for lawful purposes and in accordance with these Terms.
       </p>
@@ -38,7 +38,7 @@ export default function TermsConditions() {
         </li>
       </ul>
       <p>
-        Gym Genius is not responsible for any injury, illness, or damages
+        Dialed Fitness is not responsible for any injury, illness, or damages
         resulting from participation in physical activities suggested through
         the Services.
       </p>
@@ -48,7 +48,7 @@ export default function TermsConditions() {
         data (“User Content”).
       </p>
       <p>
-        By submitting User Content, you grant Gym Genius a non-exclusive,
+        By submitting User Content, you grant Dialed Fitness a non-exclusive,
         royalty-free license to use, store, and process such content solely to
         operate and improve the Services.
       </p>
@@ -79,7 +79,7 @@ export default function TermsConditions() {
       </p>
       <strong>7. Limitation of Liability</strong>
       <p>
-        To the maximum extent permitted by law, Gym Genius shall not be liable
+        To the maximum extent permitted by law, Dialed Fitness shall not be liable
         for any indirect, incidental, consequential, or special damages arising
         from your use of the Services.
       </p>
@@ -101,7 +101,7 @@ export default function TermsConditions() {
         <strong>Effective Date:</strong> January 27, 2026
       </p>
       <p>
-        Gym Genius (“we,” “our,” or “us”) values your privacy. This Privacy
+        Dialed Fitness (“we,” “our,” or “us”) values your privacy. This Privacy
         Policy explains how we collect, use, and protect your information.
       </p>
       <strong>1. Information We Collect</strong>

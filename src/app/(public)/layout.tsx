@@ -13,7 +13,7 @@ export default function PublicLayout({
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo / Brand */}
           <Link href="/" className="text-lg font-semibold text-black">
-            GymGenius
+            Dialed Fitness
           </Link>
 
           {/* Nav */}
@@ -39,7 +39,7 @@ export default function PublicLayout({
       {/* Optional footer */}
       <footer className="border-t">
         <div className="max-w-7xl mx-auto px-6 py-6 text-sm text-gray-500 flex justify-between">
-          <span>© {new Date().getFullYear()} Gym Genius</span>
+          <span>© {new Date().getFullYear()} Dialed Fitness</span>
           <div className="flex gap-4">
             <Link href="/terms" className="hover:text-gray-700">
               Terms & Privacy Policy
