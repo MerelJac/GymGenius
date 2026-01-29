@@ -153,7 +153,7 @@ export async function addExerciseToWorkout(
 
 export async function removeClientExercise(exerciseLogId: string) {
     console.log('starting deleting exericise', exerciseLogId)
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
     console.log(session, 'session')
   if (!session?.user?.id) return  redirect("/login");
   console.log('deleting exericise', exerciseLogId)
