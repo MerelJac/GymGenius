@@ -9,15 +9,19 @@ export default function SignupPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
-  async function signup(formData: FormData) {
-    setError(null);
-    try {
-      await signupAction(formData);
-      router.push("/login");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Signup failed");
-    }
+async function signup(formData: FormData) {
+  setError(null);
+
+  const result = await signupAction(formData);
+
+  if (!result.success) {
+    setError(result.error);
+    return;
   }
+
+  router.push("/login");
+}
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
