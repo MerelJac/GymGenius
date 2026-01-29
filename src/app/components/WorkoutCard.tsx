@@ -286,6 +286,8 @@ export default function WorkoutCard({
       prescribed = { kind: "strength", sets, reps, weight };
     }
 
+
+    
     // Optimistic shape should roughly match what your backend returns
     const optimisticExercise = {
       id: crypto.randomUUID(), // temporary id

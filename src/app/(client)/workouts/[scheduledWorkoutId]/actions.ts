@@ -5,10 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { calculateOneRepMax } from "@/app/utils/oneRepMax/calculateOneRepMax";
+import { buildPerformedFromPrescribed } from "@/app/utils/workoutFunctions";
+import {  redirect } from "next/navigation";
 
 export async function startWorkout(scheduledId: string) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
+  console.log(session, 'session')
+ if (!session?.user?.id) return  redirect("/login");
 
   return await prisma.$transaction(async (tx) => {
     // 1️⃣ Check for existing ACTIVE log
@@ -125,4 +128,55 @@ export async function logExercise(
   }
 
   return exerciseLog;
+}
+
+// app/(client)/workouts/[scheduledWorkoutId]/addExercise.ts
+export async function addExerciseToWorkout(
+  workoutLogId: string,
+  exerciseId: string,
+  prescribed: Prescribed,
+  sectionId?: string,
+) {
+  const performed = buildPerformedFromPrescribed(prescribed);
+
+  await prisma.exerciseLog.create({
+    data: {
+      workoutLogId,
+      exerciseId,
+      sectionId,
+      prescribed,
+      performed,
+      substitutionReason: "Client added exercise",
+    },
+  });
+}
+
+export async function removeClientExercise(exerciseLogId: string) {
+    console.log('starting deleting exericise', exerciseLogId)
+  const session = await getServerSession();
+    console.log(session, 'session')
+  if (!session?.user?.id) return  redirect("/login");
+  console.log('deleting exericise', exerciseLogId)
+  const log = await prisma.exerciseLog.findUnique({
+    where: { id: exerciseLogId },
+    include: {
+      workoutLog: true,
+    },
+  });
+
+  if (!log) throw new Error("Exercise log not found");
+
+  // 🔐 Ownership check
+  if (log.workoutLog.clientId !== session.user.id) {
+    throw new Error("Forbidden");
+  }
+
+  // 🔐 Only allow removal if it was client-added
+  if (log.substitutedFrom) {
+    throw new Error("Cannot remove substituted exercises");
+  }
+
+  await prisma.exerciseLog.delete({
+    where: { id: exerciseLogId },
+  });
 }

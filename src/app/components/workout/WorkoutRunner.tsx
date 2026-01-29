@@ -11,13 +11,13 @@ import { ExerciseLog, ScheduledWorkoutWithLogs } from "@/types/workout";
 import { ExerciseLogViewer } from "./ExerciseLogViewer";
 import { useRouter } from "next/navigation";
 import { assertPrescribed } from "@/app/utils/prescriptions/assertPrescribed";
+import { AddExerciseToWorkout } from "./AddExerciseToWorkout";
 
 export default function WorkoutRunner({
   scheduledWorkout,
 }: {
   scheduledWorkout: ScheduledWorkoutWithLogs;
 }) {
-  console.log("schedueld workouts", scheduledWorkout);
   const activeLog = scheduledWorkout.workoutLogs[0] ?? null;
   const isActive = activeLog?.status === "IN_PROGRESS" && !activeLog.endedAt;
   const router = useRouter();
@@ -123,7 +123,30 @@ export default function WorkoutRunner({
                   />
                 );
               })}
+              {/* CLIENT-ADDED EXERCISES */}
+              {activeLog?.exercises
+                .filter((el) => el.sectionId === section.id)
+                .map((el) => (
+                  <ExerciseLogger
+                    key={el.id}
+                    exercise={el.exercise}
+                    prescribed={assertPrescribed(el.prescribed)}
+                    workoutLogId={workoutLogId}
+                    clientId={clientId}
+                    disabled={!isActive}
+                    notes={el.substitutionReason ?? "Client-added exercise"}
+                    isClientAdded // 👈 ADD THIS FLAG
+                    exerciseLogId={el.id} // 👈 PASS LOG ID
+                    onRegisterAutoSave={(fn) => autoSaveFns.current.push(fn)}
+                  />
+                ))}
             </ul>
+            {workoutLogId && (
+              <AddExerciseToWorkout
+                workoutLogId={workoutLogId}
+                sectionId={section.id}
+              />
+            )}
           </div>
         ))}
       </div>

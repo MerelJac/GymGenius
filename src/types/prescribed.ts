@@ -80,8 +80,8 @@ export type CorePerformed = {
   sets: {
     reps: number;
     weight: number | null;
+    duration: number;
   }[];
-  duration: number;
 };
 
 export type MobilityPerformed = {
@@ -89,8 +89,8 @@ export type MobilityPerformed = {
   sets: {
     reps: number;
     weight: number | null;
+    duration: number;
   }[];
-  duration: number;
 };
 
 export type Performed =

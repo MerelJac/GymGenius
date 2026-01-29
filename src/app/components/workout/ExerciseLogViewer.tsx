@@ -75,56 +75,56 @@ export function ExerciseLogViewer({ logs }: { logs: ExerciseLog[] }) {
             {(log.performed?.kind === "core" ||
               log.performed?.kind === "mobility") && (
               <div className="space-y-3">
-                {/* Summary pill */}
-                <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
-                  {log.performed.kind === "core" ? "Core" : "Mobility"}
-                  {log.performed.duration ? (
-                    <span className="text-indigo-500">
-                      • {log.performed.duration}s
-                    </span>
-                  ) : null}
-                </div>
+                {(() => {
+                  const sets = log.performed.sets;
+                  const firstDuration = sets[0]?.duration;
+                  const sameDuration =
+                    firstDuration != null &&
+                    sets.every((s) => s.duration === firstDuration);
 
-                {/* Sets */}
-                <div className="space-y-2">
-                  {log.performed.sets.map((set, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-medium text-gray-500">
-                          Set {index + 1}
-                        </span>
+                  return (
+                    <>
+                      {/* Sets */}
+                      <div className="space-y-2">
+                        {sets.map((set, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 flex-wrap gap-2"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs font-medium text-gray-500">
+                                Set {index + 1}
+                              </span>
 
-                        {set.reps != null && (
-                          <span className="text-sm text-gray-900">
-                            {set.reps} reps
-                          </span>
-                        )}
+                              {set.reps != null && (
+                                <span className="text-sm text-gray-900">
+                                  {set.reps} reps
+                                </span>
+                              )}
 
-                        {set.weight != null && (
-                          <span className="text-xs text-gray-500">
-                            @ {set.weight} lb
-                          </span>
-                        )}
+                              {set.duration != null && (
+                                <span className="text-xs text-gray-500">
+                                  • {set.duration}s
+                                </span>
+                              )}
+
+                              {set.weight != null && (
+                                <span className="text-xs text-gray-500">
+                                  @ {set.weight} lb
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Optional cue */}
+                            <span className="text-xs text-gray-400 italic">
+                              controlled
+                            </span>
+                          </div>
+                        ))}
                       </div>
-
-                      {/* Optional cue */}
-                      <span className="text-xs text-gray-400 italic">
-                        controlled
-                      </span>
-                    </div>
-                  ))}
-                  {log.performed.duration && (
-                    <div className="text-sm text-gray-700">
-                      Hold for{" "}
-                      <span className="font-medium">
-                        {log.performed.duration}s
-                      </span>
-                    </div>
-                  )}
-                </div>
+                    </>
+                  );
+                })()}
               </div>
             )}
 

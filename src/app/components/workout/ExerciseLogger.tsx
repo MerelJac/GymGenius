@@ -1,4 +1,7 @@
-import { logExercise } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
+import {
+  logExercise,
+  removeClientExercise,
+} from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
 import ExerciseModal from "@/app/components/exercise/ExerciseModal";
 import { getPercentageForReps } from "@/app/utils/oneRepMax/getPercentageForReps";
 import {
@@ -7,6 +10,8 @@ import {
 } from "@/app/utils/workoutFunctions";
 import { Exercise } from "@/types/exercise";
 import { Performed, Prescribed } from "@/types/prescribed";
+import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export function ExerciseLogger({
@@ -16,6 +21,8 @@ export function ExerciseLogger({
   clientId,
   disabled,
   notes,
+  isClientAdded = false,
+  exerciseLogId,
   onRegisterAutoSave,
 }: {
   exercise: Exercise;
@@ -25,8 +32,11 @@ export function ExerciseLogger({
 
   disabled: boolean;
   notes?: string | null;
+  isClientAdded?: boolean;
+  exerciseLogId?: string;
   onRegisterAutoSave?: (fn: () => Promise<void>) => void;
 }) {
+  const router = useRouter();
   const [performed, setPerformed] = useState<Performed>(
     buildPerformedFromPrescribed(prescribed),
   );
@@ -79,16 +89,29 @@ export function ExerciseLogger({
   return (
     <li className="rounded-xl border border-gray-200 bg-white p-4 space-y-4 shadow-sm">
       {/* Header */}
-      <div
-        className="flex items-center justify-between cursor-pointer group"
-        onClick={() => setOpenExerciseId(exercise.id)}
-      >
-        <h4 className="font-semibold text-gray-900 group-hover:underline">
+      <div className="flex items-center justify-between cursor-pointer group">
+        <h4
+          className="font-semibold text-gray-900 group-hover:underline"
+          onClick={() => setOpenExerciseId(exercise.id)}
+        >
           {exercise.name}
         </h4>
-        <span className="text-xs text-gray-400 group-hover:text-gray-600">
-          View
-        </span>
+        {isClientAdded && !disabled && (
+          <button
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (!exerciseLogId || !workoutLogId) return;
+
+              if (!confirm("Remove this exercise from your workout?")) return;
+
+              await removeClientExercise(exerciseLogId);
+              router.refresh()
+            }}
+            className="text-xs text-red-600 hover:underline"
+          >
+            <Trash2 size={14} />
+          </button>
+        )}
       </div>
 
       {/* Prescribed */}
@@ -226,35 +249,29 @@ export function ExerciseLogger({
           {/* CORE & MOBILITY */}
           {(performed.kind === "core" || performed.kind === "mobility") && (
             <div className="space-y-3">
-              {/* Summary pill (matches viewer) */}
-              <div
-                className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ${
-                  performed.kind === "core"
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "bg-emerald-50 text-emerald-700"
-                }`}
-              >
-                {performed.kind === "core" ? "Core" : "Mobility"}
-                {performed.duration ? (
-                  <span className="opacity-70">• {performed.duration}s</span>
-                ) : null}
-              </div>
+
 
               {/* Sets */}
               <div className="space-y-2">
-                {performed.sets.map((set, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-medium text-gray-500 w-10">
-                        Set {index + 1}
-                      </span>
+                {(() => {
+                  const firstDuration = performed.sets[0]?.duration;
+                  const sameDuration =
+                    firstDuration != null &&
+                    performed.sets.every((s) => s.duration === firstDuration);
 
-                      {/* Reps (optional) */}
-                      <div className="flex items-center gap-1">
-                        <input
+                  return performed.sets.map((set, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 flex-wrap gap-2"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-medium text-gray-500 w-10">
+                          Set {index + 1}
+                        </span>
+
+                        {/* Reps (optional) */}
+                        <div className="flex items-center gap-1">
+                          <input
                             type="number"
                             value={set.reps ?? ""}
                             onChange={(e) => {
@@ -265,7 +282,7 @@ export function ExerciseLogger({
                                   prev.kind !== "mobility"
                                 )
                                   return prev;
-  
+
                                 const sets = [...prev.sets];
                                 sets[index] = {
                                   ...sets[index],
@@ -273,22 +290,66 @@ export function ExerciseLogger({
                                     ? Number(e.target.value)
                                     : 0,
                                 };
-  
+
                                 return { ...prev, sets };
                               });
                             }}
                             placeholder="—"
                             className="w-14 rounded-md border border-gray-300 px-2 py-1 text-sm
-                             focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                           />
-                        <span className="text-xs text-gray-500">reps</span>
+                          <span className="text-xs text-gray-500">reps</span>
+
+                          {sameDuration && firstDuration != null && (
+                            <span className="text-xs text-gray-400">
+                              • {firstDuration}s
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Weight (optional, de-emphasized) */}
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            value={set.weight ?? ""}
+                            onChange={(e) => {
+                              setHasSaved(false);
+                              setPerformed((prev) => {
+                                if (
+                                  prev.kind !== "core" &&
+                                  prev.kind !== "mobility"
+                                )
+                                  return prev;
+
+                                const sets = [...prev.sets];
+                                sets[index] = {
+                                  ...sets[index],
+                                  weight: e.target.value
+                                    ? Number(e.target.value)
+                                    : null,
+                                };
+
+                                return { ...prev, sets };
+                              });
+                            }}
+                            placeholder="bw / lb"
+                            className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm
+                focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                          <span className="text-xs text-gray-400">lb</span>
+                        </div>
                       </div>
 
-                      {/* Weight (optional, de-emphasized) */}
+                      {/* Cue */}
+                      <span className="text-xs text-gray-400 italic">
+                        controlled
+                      </span>
+
+                      {/* Duration per set */}
                       <div className="flex items-center gap-1">
                         <input
                           type="number"
-                          value={set.weight ?? ""}
+                          value={set.duration ?? ""}
                           onChange={(e) => {
                             setHasSaved(false);
                             setPerformed((prev) => {
@@ -301,54 +362,23 @@ export function ExerciseLogger({
                               const sets = [...prev.sets];
                               sets[index] = {
                                 ...sets[index],
-                                weight: e.target.value
+                                duration: e.target.value
                                   ? Number(e.target.value)
-                                  : null,
+                                  : 0,
                               };
 
                               return { ...prev, sets };
                             });
                           }}
-                          placeholder="bw / lb"
+                          placeholder="sec"
                           className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm
-                           focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                         />
-                        <span className="text-xs text-gray-400">lb</span>
+                        <span className="text-xs text-gray-500">sec</span>
                       </div>
                     </div>
-
-                    {/* Cue (matches viewer tone) */}
-                    <span className="text-xs text-gray-400 italic">
-                      controlled
-                    </span>
-                  </div>
-                ))}
-
-                {/* Duration input (mirrors viewer placement) */}
-                {performed.duration != null && (
-                  <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <span>Hold for</span>
-                    <input
-                      type="number"
-                      value={performed.duration}
-                      onChange={(e) => {
-                        setHasSaved(false);
-                        setPerformed((prev) => {
-                          if (prev.kind !== "core" && prev.kind !== "mobility")
-                            return prev;
-
-                          return {
-                            ...prev,
-                            duration: Number(e.target.value),
-                          };
-                        });
-                      }}
-                      className="w-20 rounded-md border border-gray-300 px-2 py-1 text-sm
-                       focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                    />
-                    <span className="text-gray-500">seconds</span>
-                  </div>
-                )}
+                  ));
+                })()}
               </div>
             </div>
           )}
