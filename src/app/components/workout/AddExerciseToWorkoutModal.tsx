@@ -6,7 +6,7 @@ import { Modal } from "@/app/components/ui/Modal";
 import { Exercise } from "@/types/exercise";
 import { Prescribed } from "@/types/prescribed";
 import { addExerciseToWorkout } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
-import { ExerciseSearch } from "./AddExerciseModal";
+import { ExerciseSearch } from "./ExerciseSearch";
 import { PrescribedEditor } from "./PrescribedEditor";
 
 export function AddExerciseToWorkoutModal({

@@ -32,6 +32,7 @@ import {
   Video,
 } from "lucide-react";
 import ExerciseModal from "./exercise/ExerciseModal";
+import { ExerciseSearch } from "./workout/ExerciseSearch";
 
 export default function WorkoutCard({
   workout,
@@ -48,6 +49,8 @@ export default function WorkoutCard({
 }) {
   const router = useRouter();
   const [exerciseId, setExerciseId] = useState(exercises[0]?.id || "");
+  const [showSearch, setShowSearch] = useState(false);
+
   const [sectionId, setSectionId] = useState("");
   const [error, setError] = useState<string | null | undefined>(null);
   const [collapsed, setCollapsed] = useState(false);
@@ -76,9 +79,8 @@ export default function WorkoutCard({
 
   const showTimedFields = selectedExercise?.type === "TIMED";
 
-  const showCoreMobilityFields = 
-    selectedExercise?.type === "CORE" ||
-    selectedExercise?.type === "MOBILITY";
+  const showCoreMobilityFields =
+    selectedExercise?.type === "CORE" || selectedExercise?.type === "MOBILITY";
 
   function normalizeSections(
     sections: WorkoutWithSections["workoutSections"],
@@ -286,8 +288,6 @@ export default function WorkoutCard({
       prescribed = { kind: "strength", sets, reps, weight };
     }
 
-
-    
     // Optimistic shape should roughly match what your backend returns
     const optimisticExercise = {
       id: crypto.randomUUID(), // temporary id
@@ -939,17 +939,25 @@ export default function WorkoutCard({
                 <label className="block text-xs font-medium text-gray-700 mb-1">
                   Exercise
                 </label>
-                <select
-                  value={exerciseId}
-                  onChange={(e) => setExerciseId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                <button
+                  type="button"
+                  onClick={() => setShowSearch(true)}
+                  className="w-full text-left px-3 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 >
-                  {exercises.map((ex) => (
-                    <option key={ex.id} value={ex.id}>
-                      {ex.name}
-                    </option>
-                  ))}
-                </select>
+                  {exercises.find((e) => e.id === exerciseId)?.name ??
+                    "Select exercise"}
+                </button>
+
+                {showSearch && (
+                  <div className="absolute z-50 mt-2 bg-white border rounded-md shadow-lg">
+                    <ExerciseSearch
+                      onSelect={(exercise) => {
+                        setExerciseId(exercise.id);
+                        setShowSearch(false);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               {showStrengthFields && (

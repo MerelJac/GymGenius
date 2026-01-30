@@ -51,7 +51,7 @@ export function ExerciseSearch({
           className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
         />
         <input
-          className="w-full rounded-md border px-9 py-2 text-sm"
+          className="w-fit rounded-md border px-9 py-2 text-sm"
           placeholder="Search exercises..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
