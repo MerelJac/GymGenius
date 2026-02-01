@@ -2,6 +2,7 @@
 
 import { useState, startTransition } from "react";
 import { updateClientProfile } from "@/app/(trainer)/clients/[clientId]/actions";
+import { ResendInviteButton } from "../ResendEmailButton";
 
 export function ClientProfileEditor({
   clientId,
@@ -203,6 +204,14 @@ export function ClientProfileEditor({
             <span className="font-medium text-gray-900">
               {email || "Not set"}
             </span>
+          </div>
+
+          <div>
+            <span className="block text-gray-500">
+              Resend Invitiation Email
+            </span>
+
+            <ResendInviteButton email={email} />
           </div>
           {/* phone */}
           <div>

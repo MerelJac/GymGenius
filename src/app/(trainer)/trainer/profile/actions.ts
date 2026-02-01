@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { normalizeEmail } from "@/app/utils/format/normalizeEmail";
+import { sendWelcomeEmail } from "@/lib/email-templates/welcomeEmail";
 
 export async function updateTrainerProfile(
   firstName: string,
@@ -75,6 +76,14 @@ export async function createTrainer(email: string) {
       password: "TEMP", // replace later with invite / reset flow
     },
   });
+
+
+    try {
+      await sendWelcomeEmail(trainer.email);
+      console.error("Sent welcome email", trainer.email);
+    } catch (err) {
+      console.error("❌ Error sending welcome email:", err);
+    }
 
   revalidatePath("/trainer/profile");
   return { ok: true, id: trainer.id };

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { sendWelcomeEmail } from "@/lib/email-templates/welcomeEmail";
 
 export async function createClient(email: string) {
   const session = await getServerSession(authOptions);
@@ -35,6 +36,13 @@ export async function createClient(email: string) {
       password: "TEMP", // replace later with invite / reset flow
     },
   });
+
+  try {
+    await sendWelcomeEmail(client.email);
+    console.error("Sent welcome email", client.email);
+  } catch (err) {
+    console.error("❌ Error sending welcome email:", err);
+  }
 
   revalidatePath("/trainer/clients");
   return {
