@@ -949,7 +949,7 @@ export default function WorkoutCard({
                 </button>
 
                 {showSearch && (
-                  <div className="absolute z-50 mt-2 bg-white border rounded-md shadow-lg">
+                  <div className="absolute z-50 mt-2 bg-white border rounded-md shadow-lg p-4">
                     <ExerciseSearch
                       onSelect={(exercise) => {
                         setExerciseId(exercise.id);

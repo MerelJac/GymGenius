@@ -52,8 +52,8 @@ model User {
   profile  Profile?
   programs Program[] @relation("TrainerPrograms")
 
-  sentMessages        Message[]           @relation("MessageSender")
-  receivedMessages    Message[]           @relation("MessageRecipient")
+  sentMessages        Message[]            @relation("MessageSender")
+  receivedMessages    Message[]            @relation("MessageRecipient")
   exercises           Exercise[]
   scheduledWorkouts   ScheduledWorkout[]
   workoutLogs         WorkoutLog[]
@@ -61,6 +61,7 @@ model User {
   bodyMetrics         BodyMetric[]
   additionalWorkouts  AdditionalWorkout[]
   exerciseOneRepMaxes ExerciseOneRepMax[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Profile {
@@ -307,4 +308,17 @@ model ExerciseOneRepMax {
   exercise Exercise @relation(fields: [exerciseId], references: [id])
 
   @@index([clientId, exerciseId, recordedAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

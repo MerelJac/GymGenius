@@ -93,9 +93,20 @@ export default function LoginPage() {
             Sign in
           </button>
 
-          <Link href="/signup" className="text-sm text-center block underline text-black">
-            New here? Get Started
-          </Link>
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <Link
+              href="/signup"
+              className="text-sm text-center block hover:underline text-black"
+            >
+              New here? Get Started
+            </Link>
+            <Link
+              href="/forgot-password"
+              className="text-sm text-center block hover:underline text-black"
+            >
+              Forgot password?
+            </Link>
+          </div>
 
           {/* Footer */}
           <p className="text-xs text-center text-gray-500">
