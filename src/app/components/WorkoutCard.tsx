@@ -1,5 +1,5 @@
 "use client";
-import { useOptimistic, startTransition, useState, useEffect } from "react";
+import { useOptimistic, startTransition, useState, useEffect , useRef} from "react";
 import {
   addWorkoutExercise,
   updateWorkoutName,
@@ -81,6 +81,28 @@ export default function WorkoutCard({
 
   const showCoreMobilityFields =
     selectedExercise?.type === "CORE" || selectedExercise?.type === "MOBILITY";
+
+    const containerRef = useRef<HTMLDivElement | null>(null);
+
+useEffect(() => {
+  function handleClickOutside(e: MouseEvent) {
+    if (
+      containerRef.current &&
+      !containerRef.current.contains(e.target as Node)
+    ) {
+      setShowSearch(false);
+    }
+  }
+
+  if (showSearch) {
+    document.addEventListener("mousedown", handleClickOutside);
+  }
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [showSearch]);
+
 
   function normalizeSections(
     sections: WorkoutWithSections["workoutSections"],
@@ -597,14 +619,6 @@ export default function WorkoutCard({
             </h2>
           )}
         </div>
-        <div className="flex justify-between items-center">
-          <button
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
-            onClick={handleAddSection}
-          >
-            <Plus size={16} /> Add section
-          </button>
-        </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           <select
@@ -701,7 +715,7 @@ export default function WorkoutCard({
                       </h3>
                     )}
                     {/* section controls */}
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity">
                       <button
                         onClick={() => moveSectionUp(section.id)}
                         className="p-1 text-gray-500 hover:text-gray-900 rounded hover:bg-gray-200 transition"
@@ -922,7 +936,16 @@ export default function WorkoutCard({
               <p className="text-xs text-gray-500">
                 Choose a section and configure the exercise
               </p>
+
             </div>
+                          <div className="flex justify-between items-center">
+                <button
+                  className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+                  onClick={handleAddSection}
+                >
+                  <Plus size={16} /> New section
+                </button>
+              </div>
             <select
               value={sectionId}
               onChange={(e) => setSectionId(e.target.value)}
@@ -934,7 +957,7 @@ export default function WorkoutCard({
                 </option>
               ))}
             </select>
-            <div className="flex flex-wrap gap-3 items-end">
+            <div ref={containerRef} className="flex flex-wrap gap-3 items-end">
               <div className="min-w-[220px] flex-1">
                 <label className="block text-xs font-medium text-gray-700 mb-1">
                   Exercise
