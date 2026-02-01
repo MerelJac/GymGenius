@@ -24,7 +24,7 @@ export function Modal({
       />
 
       {/* Modal */}
-      <div className="absolute inset-x-0 top-10 mx-auto max-w-lg bg-white rounded-lg shadow-lg p-6">
+      <div className="absolute inset-x-0 top-10 mx-auto max-w-lg bg-white rounded-lg shadow-lg p-6 max-h-[90vh] overflow-y-scroll">
         <div className="flex justify-between items-center mb-4">
           {title && <h2 className="font-semibold text-lg">{title}</h2>}
           <button onClick={onClose}>
