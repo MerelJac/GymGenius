@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
     <section className="min-h-screen flex items-center justify-center bg-gray-50">
       <form
         onSubmit={onSubmit}
-        className="bg-white shadow p-6 rounded w-80 space-y-3"
+        className="bg-white shadow p-6 rounded-xl w-80 space-y-3"
       >
         <h1 className="text-xl font-semibold text-center">
           Forgot your password?
