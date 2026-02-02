@@ -22,14 +22,15 @@ export default function WorkoutRunner({
   const isActive = activeLog?.status === "IN_PROGRESS" && !activeLog.endedAt;
   const router = useRouter();
   const clientId = scheduledWorkout.clientId;
-
   const isCompleted = activeLog?.status === "COMPLETED";
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(
     activeLog?.id ?? null,
   );
+  const [finishingText, setFinishingText] = useState("Finish Workout");
+  const [isFinishing, setIsFinishing] = useState(false);
+
   const autoSaveFns = useRef<(() => Promise<void>)[]>([]);
 
-  console.log("Scheduled workouts", scheduledWorkout.workout.workoutSections);
   const logs: ExerciseLog[] = scheduledWorkout.workout.workoutSections.flatMap(
     (section) =>
       section.exercises.map((we) => {
@@ -83,8 +84,12 @@ export default function WorkoutRunner({
       ) : (
         <button
           className="px-4 py-2 border rounded text-red-600"
+          disabled={isFinishing}
           onClick={async () => {
-            if (!workoutLogId) return;
+            if (!workoutLogId || isFinishing) return;
+
+            setIsFinishing(true);
+            setFinishingText("Finishing...");
 
             // 🔐 Auto-save all unsaved exercises
             await Promise.all(autoSaveFns.current.map((fn) => fn()));
@@ -93,7 +98,7 @@ export default function WorkoutRunner({
             router.refresh();
           }}
         >
-          Finish workout
+          {finishingText}
         </button>
       )}
 

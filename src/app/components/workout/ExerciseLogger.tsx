@@ -12,7 +12,7 @@ import { Exercise } from "@/types/exercise";
 import { Performed, Prescribed } from "@/types/prescribed";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function ExerciseLogger({
   exercise,
@@ -53,26 +53,39 @@ export function ExerciseLogger({
     setHasSaved(false);
     setPerformed((prev) => updater(prev));
   }
+const performedRef = useRef(performed);
+const noteRef = useRef(note);
+const hasSavedRef = useRef(hasSaved);
+const hasRegisteredRef = useRef(false);
 
-  useEffect(() => {
-    if (!onRegisterAutoSave) return;
+useEffect(() => {
+  performedRef.current = performed;
+  noteRef.current = note;
+  hasSavedRef.current = hasSaved;
+}, [performed, note, hasSaved]);
 
-    onRegisterAutoSave(async () => {
-      if (!workoutLogId || hasSaved) return;
+useEffect(() => {
+  if (!onRegisterAutoSave) return;
+  if (hasRegisteredRef.current) return;
 
-      await logExercise(workoutLogId, exercise.id, prescribed, performed, note);
+  const fn = async () => {
+    if (!workoutLogId || hasSavedRef.current) return;
 
-      setHasSaved(true);
-    });
-  }, [
-    workoutLogId,
-    hasSaved,
-    performed,
-    note,
-    exercise.id,
-    onRegisterAutoSave,
-    prescribed,
-  ]);
+    await logExercise(
+      workoutLogId,
+      exercise.id,
+      prescribed,
+      performedRef.current,
+      noteRef.current,
+    );
+
+    setHasSaved(true);
+    hasSavedRef.current = true;
+  };
+
+  onRegisterAutoSave(fn);
+  hasRegisteredRef.current = true;
+}, [onRegisterAutoSave, workoutLogId, exercise.id, prescribed]);
 
   useEffect(() => {
     async function loadOneRepMax() {
@@ -105,7 +118,7 @@ export function ExerciseLogger({
               if (!confirm("Remove this exercise from your workout?")) return;
 
               await removeClientExercise(exerciseLogId);
-              router.refresh()
+              router.refresh();
             }}
             className="text-xs text-red-600 hover:underline"
           >
@@ -249,8 +262,6 @@ export function ExerciseLogger({
           {/* CORE & MOBILITY */}
           {(performed.kind === "core" || performed.kind === "mobility") && (
             <div className="space-y-3">
-
-
               {/* Sets */}
               <div className="space-y-2">
                 {(() => {
@@ -455,6 +466,7 @@ export function ExerciseLogger({
 
                 setIsSaving(false);
                 setHasSaved(true);
+                hasSavedRef.current = true;
               }}
             >
               {hasSaved ? "Saved ✓" : "Save"}
