@@ -47,6 +47,11 @@ export function ClientProgramProgress({
       return acc;
     }, {}),
   );
+  const hasRemovableWorkouts = client.scheduledWorkouts.some(
+    (w) =>
+      w.status === WorkoutStatus.SCHEDULED ||
+      w.status === WorkoutStatus.IN_PROGRESS,
+  );
 
   if (programs.length === 0) return null;
 
@@ -105,16 +110,18 @@ export function ClientProgramProgress({
                     {statusLabel} · {completed}/{workouts.length}
                   </span>
 
-                  <button
-                    onClick={() => handleRemoveClientFromProgram(program.id)}
-                    disabled={isPending}
-                    className="
-        text-xs font-medium text-red-600 hover:text-red-700
-        disabled:opacity-50 disabled:cursor-not-allowed
-      "
-                  >
-                    Remove
-                  </button>
+                  {hasRemovableWorkouts && (
+                    <button
+                      onClick={() => handleRemoveClientFromProgram(program.id)}
+                      disabled={isPending}
+                      className="
+      text-xs font-medium text-red-600 hover:text-red-700
+      disabled:opacity-50 disabled:cursor-not-allowed
+    "
+                    >
+                      Remove
+                    </button>
+                  )}
                 </div>
               </div>
 
