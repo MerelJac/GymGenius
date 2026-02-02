@@ -58,6 +58,8 @@ export default function ExerciseForm({
             <option value="TIMED">Timed</option>
             <option value="HYBRID">Hybrid</option>
             <option value="BODYWEIGHT">Bodyweight</option>
+            <option value="CORE">Core</option>
+            <option value="MOBILITY">Mobility</option>
           </select>
         </div>
 

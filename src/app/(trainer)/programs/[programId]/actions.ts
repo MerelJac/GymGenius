@@ -197,6 +197,72 @@ export async function duplicateWorkout(programId: string, workoutId: string) {
 
   return { ok: true, workoutId: newWorkout.id };
 }
+export async function removeProgramFromClient(
+  programId: string,
+  clientId: string,
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return { ok: false, error: "Unauthorized" };
+  }
+
+  // 1️⃣ Get workout template IDs for this program
+  const workouts = await prisma.workoutTemplate.findMany({
+    where: { programId },
+    select: { id: true },
+  });
+
+  if (workouts.length === 0) {
+    return { ok: true, removed: 0 };
+  }
+
+  const workoutIds = workouts.map((w) => w.id);
+
+  // 2️⃣ Find scheduled workouts that are safe to remove
+  const scheduledToRemove = await prisma.scheduledWorkout.findMany({
+    where: {
+      clientId,
+      workoutId: { in: workoutIds },
+      status: {
+        in: ["SCHEDULED", "IN_PROGRESS"],
+      },
+    },
+    select: { id: true },
+  });
+
+  if (scheduledToRemove.length === 0) {
+    return { ok: true, removed: 0 };
+  }
+
+  const scheduledIds = scheduledToRemove.map((s) => s.id);
+
+  // 3️⃣ Transaction: delete logs first, then scheduled workouts
+  const result = await prisma.$transaction(async (tx) => {
+    // Delete workout logs
+    await tx.workoutLog.deleteMany({
+      where: {
+        scheduledId: { in: scheduledIds },
+      },
+    });
+
+    // Delete scheduled workouts
+    const deleted = await tx.scheduledWorkout.deleteMany({
+      where: {
+        id: { in: scheduledIds },
+      },
+    });
+
+    return deleted.count;
+  });
+
+  revalidatePath(`/trainer/programs/${programId}`);
+
+  return {
+    ok: true,
+    removed: result,
+  };
+}
+
 
 export async function assignProgramToClient(
   programId: string,
