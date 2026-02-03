@@ -9,10 +9,10 @@ export async function sendWelcomeEmail(to: string) {
 
   return sendEmail({
     to,
-    subject: "Welcome to Dialed Fitness CLub!",
+    subject: "Welcome to Dialed Fitness Club!",
     html: `
       <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
-        <h2>Welcome to Dialed Fitness CLub 🔥</h2>
+        <h2>Welcome to Dialed Fitness Club 🔥</h2>
         <p>You have been invited to register!</p>
         <p>We’re excited to have you on board. Reminder: Register with the same email address from this email!</p>
         <p>
@@ -25,7 +25,7 @@ export async function sendWelcomeEmail(to: string) {
         <p style="font-size: 0.9rem; color: #888;">— Dialed Fitness Club</p>
       </div>
     `,
-    text: `Welcome to Dialed Fitness CLub! You're officially part of the movement 🔥
+    text: `Welcome to Dialed Fitness Club! You're officially part of the movement 🔥
 Get started here: ${appUrl}/signup`,
   });
 }
