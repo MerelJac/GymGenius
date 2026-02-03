@@ -9,8 +9,10 @@ const WAIVER_VERSION = "v1.0";
 
 export async function signWaiver() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) throw new Error("Unauthorized");
-
+  if (!session) {
+    redirect("/login");
+  }
+  console.log("user signing waiver");
   const profile = await prisma.profile.findUnique({
     where: { userId: session.user.id },
     select: {
@@ -24,6 +26,7 @@ export async function signWaiver() {
     redirect("/dashboard");
   }
 
+  console.log("user signing waiver");
   await prisma.profile.update({
     where: { userId: session.user.id },
     data: {

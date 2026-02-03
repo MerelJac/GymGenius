@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signupAction } from "./actions";
+import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -14,12 +15,19 @@ async function signup(formData: FormData) {
 
   const result = await signupAction(formData);
 
-  if (!result.success) {
+  if (result.success) {
+    await signIn("credentials", {
+      email: formData.get("email"),
+      password: formData.get("password"),
+      redirect: true,
+      callbackUrl: "/dashboard",
+    });
+  } else {
     setError(result.error);
-    return;
+      return;
   }
 
-  router.push("/login");
+  router.push("/");
 }
 
 
@@ -53,6 +61,39 @@ async function signup(formData: FormData) {
               </small>
             </section>
           )}
+
+            {/* firstName */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              First Name
+            </label>
+            <input
+              name="firstName"
+              type="firstName"
+              placeholder="First"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       transition text-base"
+              required
+            />
+          </div>
+
+          {/* LastName */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-gray-700">
+              Last Name
+            </label>
+            <input
+              name="lastName"
+              type="lastName"
+              placeholder="Last"
+              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+                       transition text-base"
+              required
+            />
+          </div>
+
 
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-gray-700">
