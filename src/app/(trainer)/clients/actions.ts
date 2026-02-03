@@ -12,6 +12,8 @@ export async function createClient(email: string) {
     return { ok: false, error: "Unauthorized" };
   }
 
+  const INVITE_PASS = process.env.INVITE_PASS!;
+
   // ✅ normalize email
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -33,7 +35,7 @@ export async function createClient(email: string) {
       email: normalizedEmail,
       role: "CLIENT",
       trainerId: session.user.id,
-      password: "TEMP", // replace later with invite / reset flow
+      password: INVITE_PASS,
     },
   });
 

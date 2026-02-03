@@ -9,6 +9,7 @@ export async function signupAction(formData: FormData): Promise<SignupResult> {
   const email = String(formData.get("email")).trim().toLowerCase();
   const password = String(formData.get("password"));
   const passwordConfirm = String(formData.get("password-confirm"));
+  const INVITE_PASS = process.env.INVITE_PASS!;
 
   if (!email || !password || !passwordConfirm) {
     return { success: false, error: "Missing required fields" };
@@ -29,16 +30,21 @@ export async function signupAction(formData: FormData): Promise<SignupResult> {
     };
   }
 
-  if (user.password) {
-    return { success: false, error: "Account already exists. Please log in." };
+  if (user.password === INVITE_PASS) {
+    // if placeholder password, fill in with new password
+    const hashed = await bcrypt.hash(password, 10);
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashed },
+      });
+
+      return { success: true };
   }
+  else {
+ return { success: false, error: "Account already exists. Please log in." };
+  }   
 
-  const hashed = await bcrypt.hash(password, 10);
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { password: hashed },
-  });
-
-  return { success: true };
+ 
 }
