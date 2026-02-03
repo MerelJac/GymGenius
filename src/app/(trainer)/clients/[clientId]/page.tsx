@@ -6,9 +6,9 @@ import { ScheduledWorkoutWithWorkout } from "@/types/workout";
 export default async function ClientPage({
   params,
 }: {
-  params: { clientId: string };
+  params: Promise<{ clientId: string }>;
 }) {
-  const { clientId } = params;
+  const { clientId } = await params;
   const client = await prisma.user.findUnique({
     where: { id: clientId },
     include: {
