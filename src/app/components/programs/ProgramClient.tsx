@@ -8,12 +8,14 @@ import {
   duplicateProgram,
 } from "@/app/(trainer)/programs/actions";
 import { Copy, Plus, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ProgramsPageClient({
   initialPrograms,
 }: {
   initialPrograms: Program[];
 }) {
+  const router = useRouter();
   type ProgramAction =
     | { type: "remove"; id: string }
     | { type: "add"; program: Program };
@@ -58,6 +60,7 @@ export default function ProgramsPageClient({
     });
 
     await duplicateProgram(program.id);
+    router.refresh();
   }
 return (
     <div className="space-y-6">
