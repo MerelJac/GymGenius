@@ -15,13 +15,13 @@ export function ClientDashboardStats({
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {/* On-Plan Streak */}
-      <div className="bg-white rounded-xl border p-5">
+      {/* <div className="bg-white rounded-xl border p-5">
         <div className="flex items-center gap-2 text-orange-600">
           <Flame size={18} />
           <span className="font-medium">On-Plan Streak</span>
         </div>
         <div className="text-3xl font-bold mt-2">{streak} days</div>
-      </div>
+      </div> */}
 
       {/* Weekly Progress */}
       <div className="bg-white rounded-xl border p-5">
