@@ -46,6 +46,7 @@ export default function ProgramsPageClient({
     });
 
     await deleteProgram(program.id);
+    router.refresh();
   }
 
   async function handleDuplicate(program: Program) {
@@ -62,7 +63,7 @@ export default function ProgramsPageClient({
     await duplicateProgram(program.id);
     router.refresh();
   }
-return (
+  return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -101,10 +102,7 @@ return (
               key={program.id}
               className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/70 transition-colors group flex-col md:flex-row"
             >
-              <Link
-                href={`/programs/${program.id}`}
-                className="flex-1 min-w-0"
-              >
+              <Link href={`/programs/${program.id}`} className="flex-1 min-w-0">
                 <div className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors truncate">
                   {program.name}
                 </div>
