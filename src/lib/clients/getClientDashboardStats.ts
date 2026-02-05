@@ -23,7 +23,7 @@ export async function getClientDashboardStats(clientId: string) {
     firstWorkoutDate.setHours(0, 0, 0, 0);
 
     const hasAnyCompleted = workouts.some(
-      (w) => w.status === WorkoutStatus.COMPLETED
+      (w) => w.status === WorkoutStatus.COMPLETED,
     );
 
     if (hasAnyCompleted) {
@@ -37,13 +37,12 @@ export async function getClientDashboardStats(clientId: string) {
 
         const dayWorkouts = workouts.filter(
           (w) =>
-            new Date(w.scheduledDate).toDateString() ===
-            date.toDateString()
+            new Date(w.scheduledDate).toDateString() === date.toDateString(),
         );
 
         const hasScheduled = dayWorkouts.length > 0;
         const completed = dayWorkouts.some(
-          (w) => w.status === WorkoutStatus.COMPLETED
+          (w) => w.status === WorkoutStatus.COMPLETED,
         );
 
         // On-plan logic
@@ -60,12 +59,16 @@ export async function getClientDashboardStats(clientId: string) {
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - startOfWeek.getDay());
 
-  const weekWorkouts = workouts.filter(
-    (w) => w.scheduledDate >= startOfWeek
-  );
+  const weekWorkouts = workouts.filter((w) => {
+    const d = new Date(w.scheduledDate);
+    d.setHours(0, 0, 0, 0);
 
+    return d >= startOfWeek && d <= today;
+  });
+
+  console.log("week workouts", weekWorkouts.slice(0,2));
   const completedThisWeek = weekWorkouts.filter(
-    (w) => w.status === WorkoutStatus.COMPLETED
+    (w) => w.status === WorkoutStatus.COMPLETED,
   ).length;
 
   // ---------- NEXT WORKOUT ----------
