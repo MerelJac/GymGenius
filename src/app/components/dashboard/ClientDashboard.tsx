@@ -79,8 +79,7 @@ export default async function ClientDashboard() {
   const pastWorkouts = await prisma.scheduledWorkout.findMany({
     where: {
       clientId,
-      scheduledDate: { lt: today },
-      status: "COMPLETED", // optional but recommended
+      scheduledDate: { lt: today }
     },
     include: {
       workout: {
@@ -109,10 +108,14 @@ export default async function ClientDashboard() {
   const futureWorkouts = upcomingWorkouts.filter(
     (w) => w.scheduledDate >= tomorrow,
   );
+  const completedWorkouts = pastWorkouts.filter(
+    (w) => w.status === "COMPLETED",
+  );
 
   const overdueWorkouts = pastWorkouts.filter(
-    (w) => w.scheduledDate <= today,
+    (w) => w.status !== "COMPLETED",
   );
+
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -141,7 +144,7 @@ export default async function ClientDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UpcomingWorkouts workouts={futureWorkouts} />
         <OverdueWorkouts workouts={overdueWorkouts} />
-        <PastWorkouts workouts={pastWorkouts} />
+        <PastWorkouts workouts={completedWorkouts} />
       </div>
 
       {/* Placeholder cards */}
