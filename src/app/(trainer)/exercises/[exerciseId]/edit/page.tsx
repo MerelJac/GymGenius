@@ -8,10 +8,11 @@ import { BackButton } from "@/app/components/BackButton";
 export default async function EditExercisePage({
   params,
 }: {
-  params: { exerciseId: string };
+  params: Promise<{ exerciseId: string }>;
 }) {
+  const { exerciseId } = await params;
   const exercise = await prisma.exercise.findUnique({
-    where: { id: params.exerciseId },
+    where: { id: exerciseId },
     include: {
       substitutionsFrom: {
         include: {
@@ -25,20 +26,17 @@ export default async function EditExercisePage({
     return <div>Exercise not found</div>;
   }
 
-  const allExercises = await prisma.exercise.findMany({
-    orderBy: { name: "asc" },
-  });
-
   async function updateExercise(formData: FormData) {
     "use server";
 
     const type = parseExerciseType(formData.get("type"));
 
     await prisma.exercise.update({
-      where: { id: params.exerciseId },
+      where: { id: exerciseId },
       data: {
         name: String(formData.get("name")),
         type,
+        muscleGroup: String(formData.get("muscleGroup") || ""),
         equipment: String(formData.get("equipment") || ""),
         notes: String(formData.get("notes") || ""),
       },
@@ -56,7 +54,7 @@ export default async function EditExercisePage({
         exercise={exercise}
         action={updateExercise}
       />
-      <SubstitutionsEditor exercise={exercise} allExercises={allExercises} />
+      <SubstitutionsEditor exercise={exercise}/>
     </div>
   );
 }

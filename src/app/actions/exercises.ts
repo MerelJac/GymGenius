@@ -11,6 +11,7 @@ export async function createExerciseAction(formData: FormData) {
       name: String(formData.get("name")),
       type,
       equipment: String(formData.get("equipment") || ""),
+      muscleGroup: String(formData.get("muscleGroup") || ""),
       videoUrl: String(formData.get("videoUrl") || ""),
       notes: String(formData.get("notes") || ""),
     },

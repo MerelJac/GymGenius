@@ -50,6 +50,7 @@ export default function ExerciseModal({
     ? getEmbedUrl(exercise.videoUrl)
     : null;
 
+    console.log('embed url:', embedUrl)
   return (
     <>
       {/* Backdrop */}

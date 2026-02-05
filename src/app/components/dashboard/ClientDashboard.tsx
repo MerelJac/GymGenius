@@ -76,13 +76,43 @@ export default async function ClientDashboard() {
     take: 5, // today + next few
   });
 
+  const pastWorkouts = await prisma.scheduledWorkout.findMany({
+    where: {
+      clientId,
+      scheduledDate: { lt: today },
+      status: "COMPLETED", // optional but recommended
+    },
+    include: {
+      workout: {
+        include: {
+          workoutSections: {
+            orderBy: { order: "asc" },
+            include: {
+              exercises: {
+                orderBy: { order: "asc" },
+                include: {
+                  exercise: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    orderBy: { scheduledDate: "desc" },
+    take: 5,
+  });
+
   const todaysWorkout = upcomingWorkouts.find(
     (w) => w.scheduledDate < tomorrow,
   );
   const futureWorkouts = upcomingWorkouts.filter(
     (w) => w.scheduledDate >= tomorrow,
   );
-  const pastWorkouts = upcomingWorkouts.filter((w) => w.scheduledDate <= today);
+
+  const overdueWorkouts = pastWorkouts.filter(
+    (w) => w.scheduledDate <= today,
+  );
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -110,6 +140,7 @@ export default async function ClientDashboard() {
       </section>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UpcomingWorkouts workouts={futureWorkouts} />
+        <OverdueWorkouts workouts={overdueWorkouts} />
         <PastWorkouts workouts={pastWorkouts} />
       </div>
 
@@ -215,7 +246,41 @@ function UpcomingWorkouts({
   );
 }
 
+function OverdueWorkouts({
+  workouts,
+}: {
+  workouts: ScheduledWorkoutDashboard[];
+}) {
+  console.log("overdue workouts", workouts.slice(0, 2));
+
+  if (workouts.length === 0) return null;
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
+      <h2 className="font-semibold text-gray-900">Missed</h2>
+
+      <ul className="text-sm space-y-2">
+        {workouts.map((w) => (
+          <li key={w.id} className="flex justify-between items-center">
+            <Link
+              href={`/workouts/${w.id}`}
+              className="text-gray-900 hover:underline"
+            >
+              {w.workout.name}
+            </Link>
+            <span className="text-gray-500">
+              {w.scheduledDate.toLocaleDateString()}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
+  console.log("past workouts", workouts.slice(0, 2));
+
   if (workouts.length === 0) return null;
 
   return (
