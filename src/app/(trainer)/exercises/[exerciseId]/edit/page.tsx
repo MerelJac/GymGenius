@@ -37,6 +37,7 @@ export default async function EditExercisePage({
         name: String(formData.get("name")),
         type,
         muscleGroup: String(formData.get("muscleGroup") || ""),
+        videoUrl: String(formData.get("videoUrl") || ""),
         equipment: String(formData.get("equipment") || ""),
         notes: String(formData.get("notes") || ""),
       },
