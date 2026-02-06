@@ -3,6 +3,7 @@
 import { useState, startTransition } from "react";
 import { updateClientProfile } from "@/app/(trainer)/clients/[clientId]/actions";
 import { ResendInviteButton } from "../ResendEmailButton";
+import {  formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
 
 export function ClientProfileEditor({
   clientId,
@@ -227,7 +228,7 @@ export function ClientProfileEditor({
             <div>
               <span className="block text-gray-500">Date of Birth</span>
               <span className="font-medium text-gray-900">
-                {dob ? new Date(dob).toLocaleDateString() : "Not set"}
+                {dob ? formatDateFromInputReturnString(dob) : "Not set"}
               </span>
             </div>
 

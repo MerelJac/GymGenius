@@ -19,7 +19,7 @@ export function formatPrescribed(p: Prescribed): string {
 
       const durationPart =
         typeof p.duration === "number" && p.duration > 0
-          ? ` ${p.duration}s`
+          ? `${p.duration}s`
           : "";
 
       const weightPart =
