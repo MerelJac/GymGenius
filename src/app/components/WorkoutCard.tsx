@@ -1,5 +1,11 @@
 "use client";
-import { useOptimistic, startTransition, useState, useEffect , useRef} from "react";
+import {
+  useOptimistic,
+  startTransition,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import {
   addWorkoutExercise,
   updateWorkoutName,
@@ -82,27 +88,26 @@ export default function WorkoutCard({
   const showCoreMobilityFields =
     selectedExercise?.type === "CORE" || selectedExercise?.type === "MOBILITY";
 
-    const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-useEffect(() => {
-  function handleClickOutside(e: MouseEvent) {
-    if (
-      containerRef.current &&
-      !containerRef.current.contains(e.target as Node)
-    ) {
-      setShowSearch(false);
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        setShowSearch(false);
+      }
     }
-  }
 
-  if (showSearch) {
-    document.addEventListener("mousedown", handleClickOutside);
-  }
+    if (showSearch) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
 
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, [showSearch]);
-
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showSearch]);
 
   function normalizeSections(
     sections: WorkoutWithSections["workoutSections"],
@@ -305,6 +310,10 @@ useEffect(() => {
       prescribed = { kind: "bodyweight", sets, reps };
     } else if (exercise.type === "HYBRID") {
       prescribed = { kind: "hybrid", sets, reps, weight };
+    } else if (exercise.type === "CORE") {
+      prescribed = { kind: "core", sets, reps, weight, duration: time };
+    } else if (exercise.type === "MOBILITY") {
+      prescribed = { kind: "mobility", sets, reps, weight, duration: time };
     } else {
       // STRENGTH + fallback
       prescribed = { kind: "strength", sets, reps, weight };
@@ -936,16 +945,15 @@ useEffect(() => {
               <p className="text-xs text-gray-500">
                 Choose a section and configure the exercise
               </p>
-
             </div>
-                          <div className="flex justify-between items-center">
-                <button
-                  className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
-                  onClick={handleAddSection}
-                >
-                  <Plus size={16} /> New section
-                </button>
-              </div>
+            <div className="flex justify-between items-center">
+              <button
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+                onClick={handleAddSection}
+              >
+                <Plus size={16} /> New section
+              </button>
+            </div>
             <select
               value={sectionId}
               onChange={(e) => setSectionId(e.target.value)}
