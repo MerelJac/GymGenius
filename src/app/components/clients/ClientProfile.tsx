@@ -369,11 +369,7 @@ export default function ClientProfile({
                 </div>
 
                 <div className="text-gray-500 text-sm">
-                  {new Date(w.performedAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {formatDateFromInputReturnString(w.performedAt)}
                 </div>
               </li>
             ))}
