@@ -18,11 +18,35 @@ export function formatDateFromInput(value: string | Date): Date {
   );
 }
 
-export function formatDateFromInputReturnString(value: string | Date): string {
-  const d =
-    value instanceof Date
-      ? value
-      : new Date(value);
+export function formatDateFromInputReturnString(
+  value: string | Date
+): string {
+  let d: Date;
+
+  if (value instanceof Date) {
+    // ALWAYS use UTC components
+    d = new Date(
+      value.getUTCFullYear(),
+      value.getUTCMonth(),
+      value.getUTCDate(),
+      12
+    );
+  } else {
+    // Handle strings explicitly
+    if (value.includes("T")) {
+      const parsed = new Date(value);
+      d = new Date(
+        parsed.getUTCFullYear(),
+        parsed.getUTCMonth(),
+        parsed.getUTCDate(),
+        12
+      );
+    } else {
+      // YYYY-MM-DD
+      const [y, m, day] = value.split("-").map(Number);
+      d = new Date(y, m - 1, day, 12);
+    }
+  }
 
   return d.toLocaleDateString(undefined, {
     year: "numeric",
