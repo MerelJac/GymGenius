@@ -4,6 +4,8 @@ import ExerciseForm from "../../../../components/exercise/ExerciseForm";
 import { parseExerciseType } from "@/lib/exerciseValidation";
 import SubstitutionsEditor from "@/app/components/exercise/SubstitutionsEditor";
 import { BackButton } from "@/app/components/BackButton";
+import { deleteExercise } from "./actions";
+import { DeleteExerciseButton } from "@/app/components/ui/DeleteButton";
 
 export default async function EditExercisePage({
   params,
@@ -55,7 +57,12 @@ export default async function EditExercisePage({
         exercise={exercise}
         action={updateExercise}
       />
-      <SubstitutionsEditor exercise={exercise}/>
+
+      <SubstitutionsEditor exercise={exercise} />
+      <form action={deleteExercise}>
+        <input type="hidden" name="exerciseId" value={exercise.id} />
+        <DeleteExerciseButton />
+      </form>
     </div>
   );
 }
