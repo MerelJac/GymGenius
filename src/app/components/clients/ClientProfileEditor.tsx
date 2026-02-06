@@ -207,12 +207,13 @@ export function ClientProfileEditor({
             </span>
           </div>
 
-          <div>
+          <div className="flex flex-row gap-2">
+                        <ResendInviteButton email={email} />
             <span className="block text-gray-500">
               Resend Invitiation Email
             </span>
 
-            <ResendInviteButton email={email} />
+
           </div>
           {/* phone */}
           <div>
