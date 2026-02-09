@@ -59,7 +59,8 @@ export async function updateWorkoutStatus() {
       trainer.email,
       trainer.profile.firstName,
       workout.scheduledDate.toDateString(),
-      workout.workout.name
+      workout.workout.name,
+      client.profile.firstName,
     );
   }
 

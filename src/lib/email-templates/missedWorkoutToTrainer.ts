@@ -8,6 +8,7 @@ export async function missedWorkoutToTrainer(
   who: string,
   date: string,
   workout: string,
+  clientName?: string
 ) {
   const appUrl = process.env.APP_URL || "${process.env.APP_URL}";
 
@@ -18,8 +19,7 @@ export async function missedWorkoutToTrainer(
       <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
         <h2>Missed Workout Notification</h2>
         <p>Hello ${who},</p>
-        <p>This is a notification that your workout on ${date} for ${workout} was missed.</p>
-        <p>Please make sure to schedule a new workout or contact your trainer if you have any questions.</p>
+        <p>This is a notification that ${clientName ? `${clientName}'s` : "a"} workout on ${date} for ${workout} was missed.</p>
         <p>
             <a href="${appUrl}/trainer/dashboard" style="display:inline-block; background:#ff6a00; color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none;">
               View Dashboard
