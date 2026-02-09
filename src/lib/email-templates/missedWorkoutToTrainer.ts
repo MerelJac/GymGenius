@@ -21,7 +21,7 @@ export async function missedWorkoutToTrainer(
         <p>Hello ${who},</p>
         <p>This is a notification that ${clientName ? `${clientName}'s` : "a"} workout on ${date} for ${workout} was missed.</p>
         <p>
-            <a href="${appUrl}/trainer/dashboard" style="display:inline-block; background:#ff6a00; color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none;">
+            <a href="${appUrl}/trainer" style="display:inline-block; background:#ff6a00; color:#fff; padding:10px 18px; border-radius:6px; text-decoration:none;">
               View Dashboard
             </a>
         </p>
@@ -30,6 +30,6 @@ export async function missedWorkoutToTrainer(
       </div>
     `,
     text: `Missed Workout Notification 
-View your profile here: ${appUrl}/trainer/dashboard`,
+View your profile here: ${appUrl}/trainer`,
   });
 }
