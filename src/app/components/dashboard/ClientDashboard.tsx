@@ -27,7 +27,10 @@ export default async function ClientDashboard() {
     include: {
       user: {
         include: {
-          trainer: true, // assumes User → trainer relation
+          trainer: {
+            include: {
+              profile: true
+          }}
         },
       },
     },
@@ -42,6 +45,15 @@ export default async function ClientDashboard() {
   if (!trainer) {
     throw new Error("Trainer not found for client");
   }
+
+  const trainerForContact = {
+  email: trainer.email,
+  phone: trainer.profile?.phone ?? null,
+  name:
+    trainer.profile?.firstName || trainer.profile?.lastName
+      ? `${trainer.profile?.firstName ?? ""} ${trainer.profile?.lastName ?? ""}`.trim()
+      : null,
+};
 
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
@@ -157,7 +169,7 @@ export default async function ClientDashboard() {
           />
         </div>
 
-        <ContactTrainer trainer={trainer} />
+        <ContactTrainer trainer={trainerForContact} />
       </div>
     </div>
   );

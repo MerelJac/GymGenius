@@ -6,7 +6,9 @@ type ContactTrainerProps = {
   };
 };
 
+
 export function ContactTrainer({ trainer }: ContactTrainerProps) {
+  // console.log("ContactTrainerProps", trainer);
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900">
