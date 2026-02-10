@@ -57,10 +57,6 @@ export async function getClientProgressSummary(clientId: string) {
       } => v !== null,
     ).slice(0, 5); // Limit to 5 most recent
 
-  return {
-    strength,
-  };
-}
 
   // ----------------------------
   // BODY CHECK-INS
