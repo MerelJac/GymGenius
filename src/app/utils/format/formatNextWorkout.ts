@@ -1,14 +1,23 @@
-import { normalizeDate } from "./formatDateFromInput";
-
 export function formatNextWorkout(date: Date) {
-  const today = normalizeDate(new Date());
-  const workoutDay = normalizeDate(date);
+  const now = new Date();
 
-  if (workoutDay.getTime() === today.getTime()) {
+  const todayLocal = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  );
+
+  const workoutLocal = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  );
+
+  if (workoutLocal.getTime() === todayLocal.getTime()) {
     return "Today";
   }
 
-  return workoutDay.toLocaleDateString(undefined, {
+  return workoutLocal.toLocaleDateString(undefined, {
     weekday: "long",
   });
 }
