@@ -1,3 +1,5 @@
+import { formatPhoneDisplay } from "@/app/utils/format/formatPhoneNumber";
+
 type ContactTrainerProps = {
   trainer: {
     email: string;
@@ -33,7 +35,7 @@ export function ContactTrainer({ trainer }: ContactTrainerProps) {
             href={`sms:${trainer.phone}`}
             className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
           >
-            {trainer.phone}
+            {formatPhoneDisplay(trainer.phone)}
           </a>
         </div>
       )}

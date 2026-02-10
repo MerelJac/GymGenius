@@ -5,6 +5,8 @@ import { useState } from "react";
 import { Pencil, X } from "lucide-react";
 import { ClientProfileEditor } from "./ClientProfileEditor";
 import { ClientProfilePageUser } from "@/types/client";
+import { formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
+import { formatPhoneDisplay } from "@/app/utils/format/formatPhoneNumber";
 
 export default function ClientProfileSection({
   user,
@@ -54,7 +56,7 @@ export default function ClientProfileSection({
                 href={`tel:${user.profile.phone}`}
                 className="font-medium text-blue-600 hover:underline"
               >
-                {user.profile.phone}
+                {formatPhoneDisplay(user.profile.phone)}
               </a>
             ) : (
               <span className="text-gray-400 italic">Not provided</span>
@@ -66,7 +68,7 @@ export default function ClientProfileSection({
             <span className="block text-gray-500">Date of Birth</span>
             <span className="font-medium text-gray-900">
               {user.profile?.dob
-                ? new Date(user.profile.dob).toLocaleDateString()
+                ? formatDateFromInputReturnString(user.profile.dob)
                 : "N/A"}
             </span>
           </div>
