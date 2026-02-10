@@ -1,17 +1,9 @@
 import { prisma } from "@/lib/prisma";
-import { subWeeks } from "date-fns";
 
 export async function getClientProgressSummary(clientId: string) {
-  const sixWeeksAgo = subWeeks(new Date(), 6);
-
-  // Pull 1RM history within 6 weeks (plus 1 earlier for baseline safety)
+  // Pull all recorded 1RM values
   const logs = await prisma.exerciseOneRepMax.findMany({
-    where: {
-      clientId,
-      recordedAt: {
-        gte: sixWeeksAgo,
-      },
-    },
+    where: { clientId },
     include: {
       exercise: true,
     },
@@ -23,10 +15,7 @@ export async function getClientProgressSummary(clientId: string) {
   // Group by exercise
   const byExercise = new Map<
     string,
-    {
-      exerciseName: string;
-      oneRepMaxes: number[];
-    }
+    { exerciseName: string; oneRepMaxes: number[] }
   >();
 
   for (const log of logs) {
@@ -42,32 +31,19 @@ export async function getClientProgressSummary(clientId: string) {
     byExercise.get(key)!.oneRepMaxes.push(log.oneRepMax);
   }
 
-  // Compute largest delta per exercise
+  // Build progress deltas
   const strength = Array.from(byExercise.values())
     .map(({ exerciseName, oneRepMaxes }) => {
       if (oneRepMaxes.length < 2) return null;
 
-      let maxDelta = 0;
-      let previous = 0;
-      let current = 0;
-
-      for (let i = 1; i < oneRepMaxes.length; i++) {
-        const delta = oneRepMaxes[i] - oneRepMaxes[i - 1];
-
-        if (delta > maxDelta) {
-          maxDelta = delta;
-          previous = oneRepMaxes[i - 1];
-          current = oneRepMaxes[i];
-        }
-      }
-
-      if (maxDelta <= 0) return null;
+      const previous = oneRepMaxes[oneRepMaxes.length - 2];
+      const current = oneRepMaxes[oneRepMaxes.length - 1];
 
       return {
         exerciseName,
         previous1RM: Math.round(previous),
         current1RM: Math.round(current),
-        delta: Math.round(maxDelta),
+        delta: Math.round(current - previous),
       };
     })
     .filter(
@@ -79,11 +55,12 @@ export async function getClientProgressSummary(clientId: string) {
         current1RM: number;
         delta: number;
       } => v !== null,
-    )
-    // Sort by biggest gain
-    .sort((a, b) => b.delta - a.delta)
-    // Limit to top 8
-    .slice(0, 8);
+    ).slice(0, 5); // Limit to 5 most recent
+
+  return {
+    strength,
+  };
+}
 
   // ----------------------------
   // BODY CHECK-INS

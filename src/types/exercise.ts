@@ -30,6 +30,7 @@ export type ExerciseDetail = {
   type: string;
   equipment: string | null;
   notes: string | null;
+  muscleGroup: string | null;
   videoUrl: string | null;
   substitutions: {
     id: string;

@@ -77,6 +77,7 @@ export default function ExerciseModal({
           <div className="text-sm text-gray-500 mb-4">
             {exercise.type}
             {exercise.equipment && ` • ${exercise.equipment}`}
+            {exercise.muscleGroup && ` • ${exercise.muscleGroup}`}
           </div>
 
           {/* 🎥 Video */}
