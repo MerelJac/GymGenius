@@ -23,6 +23,10 @@ export type Exercise = {
 
   createdAt?: string
 }
+export type OneRMPoint = {
+  date: string;
+  value: number;
+};
 
 export type ExerciseDetail = {
   id: string;

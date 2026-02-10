@@ -479,6 +479,7 @@ useEffect(() => {
       {openExerciseId && (
         <ExerciseModal
           exerciseId={openExerciseId}
+          clientId={clientId}
           onClose={() => setOpenExerciseId(null)}
         />
       )}

@@ -1,10 +1,12 @@
 export type StrengthProgress = {
   exerciseName: string;
+  exerciseId: string;
   previous1RM: number;
   current1RM: number;
 };
 
 export type ProgressChangesProps = {
+  clientId: string; 
   strength: StrengthProgress[];
   weight?: {
     previous: number;

@@ -1,19 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExerciseDetail } from "@/types/exercise";
+import { ExerciseDetail, OneRMPoint } from "@/types/exercise";
 import { getEmbedUrl } from "@/lib/video";
+import { OneRMLineChart } from "../clients/OneRmLineChart";
 
 export default function ExerciseModal({
   exerciseId,
+  clientId,
   onClose,
 }: {
   exerciseId: string;
+  clientId?: string;
   onClose: () => void;
 }) {
   const [exercise, setExercise] = useState<ExerciseDetail | null>(null);
   const [loading, setLoading] = useState(true);
+  const [oneRMHistory, setOneRMHistory] = useState<OneRMPoint[]>([]);
+  // Get client's 1RM history for this exercise to show progress over time
+  useEffect(() => {
+    if (!clientId) return;
 
+    fetch(`/api/clients/${clientId}/exercises/${exerciseId}/one-rm`)
+      .then((res) => res.json())
+      .then(setOneRMHistory);
+  }, [clientId, exerciseId]);
+
+  // Get exercise details
   useEffect(() => {
     let active = true;
 
@@ -36,9 +49,7 @@ export default function ExerciseModal({
       <>
         <div className="fixed inset-0 z-40 bg-black/40" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl p-6">
-            Loading…
-          </div>
+          <div className="bg-white rounded-xl p-6">Loading…</div>
         </div>
       </>
     );
@@ -46,18 +57,13 @@ export default function ExerciseModal({
 
   if (!exercise) return null;
 
-  const embedUrl = exercise.videoUrl
-    ? getEmbedUrl(exercise.videoUrl)
-    : null;
+  const embedUrl = exercise.videoUrl ? getEmbedUrl(exercise.videoUrl) : null;
 
-    console.log('embed url:', embedUrl)
+  console.log("embed url:", embedUrl);
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40 bg-black/40"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
@@ -70,9 +76,7 @@ export default function ExerciseModal({
             ✕
           </button>
 
-          <h2 className="text-xl font-semibold mb-2">
-            {exercise.name}
-          </h2>
+          <h2 className="text-xl font-semibold mb-2">{exercise.name}</h2>
 
           <div className="text-sm text-gray-500 mb-4">
             {exercise.type}
@@ -84,11 +88,7 @@ export default function ExerciseModal({
           {embedUrl && (
             <div className="mb-4">
               {embedUrl.endsWith(".mp4") ? (
-                <video
-                  controls
-                  className="w-full rounded-md"
-                  src={embedUrl}
-                />
+                <video controls className="w-full rounded-md" src={embedUrl} />
               ) : (
                 <div className="relative aspect-video rounded-md overflow-hidden">
                   <iframe
@@ -125,13 +125,20 @@ export default function ExerciseModal({
                 <li key={sub.id} className="border p-2 rounded">
                   <div className="font-medium">{sub.name}</div>
                   {sub.note && (
-                    <div className="text-sm text-gray-600">
-                      {sub.note}
-                    </div>
+                    <div className="text-sm text-gray-600">{sub.note}</div>
                   )}
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div>
+            {clientId && (
+              <div className="my-6">
+                <h3 className="font-medium mb-2">1RM Progress</h3>
+                <OneRMLineChart data={oneRMHistory} />
+              </div>
+            )}
           </div>
         </div>
       </div>

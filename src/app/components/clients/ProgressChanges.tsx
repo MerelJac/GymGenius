@@ -1,10 +1,19 @@
+ "use client";
 import { ProgressChangesProps } from "@/types/progress";
+import { useState } from "react";
+import ExerciseModal from "../exercise/ExerciseModal";
 
 export function ProgressChanges({
+  clientId,
   strength,
   weight,
   bodyFat,
 }: ProgressChangesProps) {
+  const [openExercise, setOpenExercise] = useState<{
+    exerciseId: string;
+    clientId?: string;
+  } | null>(null);
+
   return (
     <>
       <h3 className="text-sm font-semibold text-gray-700">Progress Changes</h3>
@@ -24,8 +33,15 @@ export function ProgressChanges({
 
             return (
               <div
-                key={lift.exerciseName}
-                className="flex justify-between items-center text-sm"
+                key={lift.exerciseId}
+                onClick={() => {
+                  setOpenExercise({
+                    exerciseId: lift.exerciseId,
+                    clientId,
+                  });
+                }}
+                className="flex justify-between items-center text-sm cursor-pointer
+             hover:bg-gray-50 rounded px-2 py-1"
               >
                 <span className="text-gray-800">{lift.exerciseName}</span>
                 <span
@@ -80,6 +96,13 @@ export function ProgressChanges({
           )}
         </div>
       </div>
+      {openExercise && (
+        <ExerciseModal
+          exerciseId={openExercise.exerciseId}
+          clientId={openExercise.clientId}
+          onClose={() => setOpenExercise(null)}
+        />
+      )}
     </>
   );
 }

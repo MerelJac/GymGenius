@@ -29,8 +29,9 @@ export default async function ClientDashboard() {
         include: {
           trainer: {
             include: {
-              profile: true
-          }}
+              profile: true,
+            },
+          },
         },
       },
     },
@@ -47,13 +48,13 @@ export default async function ClientDashboard() {
   }
 
   const trainerForContact = {
-  email: trainer.email,
-  phone: trainer.profile?.phone ?? null,
-  name:
-    trainer.profile?.firstName || trainer.profile?.lastName
-      ? `${trainer.profile?.firstName ?? ""} ${trainer.profile?.lastName ?? ""}`.trim()
-      : null,
-};
+    email: trainer.email,
+    phone: trainer.profile?.phone ?? null,
+    name:
+      trainer.profile?.firstName || trainer.profile?.lastName
+        ? `${trainer.profile?.firstName ?? ""} ${trainer.profile?.lastName ?? ""}`.trim()
+        : null,
+  };
 
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
@@ -91,7 +92,7 @@ export default async function ClientDashboard() {
   const pastWorkouts = await prisma.scheduledWorkout.findMany({
     where: {
       clientId,
-      scheduledDate: { lt: today }
+      scheduledDate: { lt: today },
     },
     include: {
       workout: {
@@ -124,10 +125,7 @@ export default async function ClientDashboard() {
     (w) => w.status === "COMPLETED",
   );
 
-  const overdueWorkouts = pastWorkouts.filter(
-    (w) => w.status !== "COMPLETED",
-  );
-
+  const overdueWorkouts = pastWorkouts.filter((w) => w.status !== "COMPLETED");
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -163,6 +161,7 @@ export default async function ClientDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
           <ProgressChanges
+            clientId={clientId}
             strength={progress.strength}
             weight={progress.weight}
             bodyFat={progress.bodyFat}
