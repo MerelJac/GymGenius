@@ -82,24 +82,29 @@ export default function WorkoutRunner({
           Start workout
         </button>
       ) : (
-        <button
-          className="px-4 py-2 border rounded text-red-600"
-          disabled={isFinishing}
-          onClick={async () => {
-            if (!workoutLogId || isFinishing) return;
+        <div className="flex flex-col gap-2">
+          <button
+            className="px-4 py-2 border rounded text-red-600"
+            disabled={isFinishing}
+            onClick={async () => {
+              if (!workoutLogId || isFinishing) return;
 
-            setIsFinishing(true);
-            setFinishingText("Finishing...");
+              setIsFinishing(true);
+              setFinishingText("Finishing...");
 
-            // 🔐 Auto-save all unsaved exercises
-            await Promise.all(autoSaveFns.current.map((fn) => fn()));
-            await stopWorkout(workoutLogId);
-            setWorkoutLogId(null);
-            router.refresh();
-          }}
-        >
-          {finishingText}
-        </button>
+              // 🔐 Auto-save all unsaved exercises
+              await Promise.all(autoSaveFns.current.map((fn) => fn()));
+              await stopWorkout(workoutLogId);
+              setWorkoutLogId(null);
+              router.refresh();
+            }}
+          >
+            {finishingText}
+          </button>
+          <small>
+            Please save all exercises before clicking &quot;finish workout&quot;.
+          </small>
+        </div>
       )}
 
       {/* EXERCISES */}
