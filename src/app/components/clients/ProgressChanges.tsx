@@ -10,7 +10,7 @@ export function ProgressChanges({
       <h3 className="text-sm font-semibold text-gray-700">Progress Changes</h3>
 
       {/* Strength */}
-      <div className="space-y-3">
+      <div className="space-y-3 pt-2">
         <div className="text-xs font-medium text-gray-500 uppercase">
           Strength
         </div>
@@ -43,7 +43,7 @@ export function ProgressChanges({
       </div>
 
       {/* Body */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 pt-2">
         {/* Weight */}
         <div>
           <div className="text-xs font-medium text-gray-500 uppercase mb-1">

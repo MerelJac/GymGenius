@@ -1,56 +1,73 @@
 import { prisma } from "@/lib/prisma";
+import { subWeeks } from "date-fns";
 
-/**
- * Returns strength + body progress deltas for dashboard display
- */
 export async function getClientProgressSummary(clientId: string) {
-  // ----------------------------
-  // STRENGTH (estimated 1RM)
-  // ----------------------------
+  const sixWeeksAgo = subWeeks(new Date(), 6);
 
-  // Pull recent exercise logs with sets
-  const logs = await prisma.exerciseLog.findMany({
+  // Pull 1RM history within 6 weeks (plus 1 earlier for baseline safety)
+  const logs = await prisma.exerciseOneRepMax.findMany({
     where: {
-      workoutLog: {
-        clientId,
-        status: "COMPLETED",
+      clientId,
+      recordedAt: {
+        gte: sixWeeksAgo,
       },
     },
     include: {
       exercise: true,
     },
+    orderBy: {
+      recordedAt: "asc",
+    },
   });
 
   // Group by exercise
-  const byExercise = new Map<string, number[]>();
+  const byExercise = new Map<
+    string,
+    {
+      exerciseName: string;
+      oneRepMaxes: number[];
+    }
+  >();
 
   for (const log of logs) {
-    const performed = log.performed as {
-      kind?: string;
-      reps?: number;
-      weight?: number | null;
-    } | null;
+    const key = log.exerciseId;
 
-    if (!performed) continue;
-    if (performed.kind !== "strength") continue;
-    if (!performed.weight || !performed.reps) continue;
+    if (!byExercise.has(key)) {
+      byExercise.set(key, {
+        exerciseName: log.exercise.name,
+        oneRepMaxes: [],
+      });
+    }
 
-    const est1RM = performed.weight * (1 + performed.reps / 30);
-
-    const arr = byExercise.get(log.exercise.name) ?? [];
-    arr.push(est1RM);
-    byExercise.set(log.exercise.name, arr);
+    byExercise.get(key)!.oneRepMaxes.push(log.oneRepMax);
   }
-  const strength = Array.from(byExercise.entries())
-    .map(([exerciseName, rms]) => {
-      if (rms.length < 2) return null;
 
-      const sorted = rms.sort((a, b) => a - b);
+  // Compute largest delta per exercise
+  const strength = Array.from(byExercise.values())
+    .map(({ exerciseName, oneRepMaxes }) => {
+      if (oneRepMaxes.length < 2) return null;
+
+      let maxDelta = 0;
+      let previous = 0;
+      let current = 0;
+
+      for (let i = 1; i < oneRepMaxes.length; i++) {
+        const delta = oneRepMaxes[i] - oneRepMaxes[i - 1];
+
+        if (delta > maxDelta) {
+          maxDelta = delta;
+          previous = oneRepMaxes[i - 1];
+          current = oneRepMaxes[i];
+        }
+      }
+
+      if (maxDelta <= 0) return null;
 
       return {
         exerciseName,
-        previous1RM: Math.round(sorted[sorted.length - 2]),
-        current1RM: Math.round(sorted[sorted.length - 1]),
+        previous1RM: Math.round(previous),
+        current1RM: Math.round(current),
+        delta: Math.round(maxDelta),
       };
     })
     .filter(
@@ -60,8 +77,13 @@ export async function getClientProgressSummary(clientId: string) {
         exerciseName: string;
         previous1RM: number;
         current1RM: number;
+        delta: number;
       } => v !== null,
-    );
+    )
+    // Sort by biggest gain
+    .sort((a, b) => b.delta - a.delta)
+    // Limit to top 8
+    .slice(0, 8);
 
   // ----------------------------
   // BODY CHECK-INS
