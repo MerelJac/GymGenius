@@ -101,9 +101,9 @@ export default function WorkoutRunner({
           >
             {finishingText}
           </button>
-          <small>
+          <p>
             Please save all exercises before clicking &quot;finish workout&quot;.
-          </small>
+          </p>
         </div>
       )}
 
