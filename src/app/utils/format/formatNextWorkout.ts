@@ -1,9 +1,8 @@
-export function formatNextWorkout(date: Date) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+import { normalizeDate } from "./formatDateFromInput";
 
-  const workoutDay = new Date(date);
-  workoutDay.setHours(0, 0, 0, 0);
+export function formatNextWorkout(date: Date) {
+  const today = normalizeDate(new Date());
+  const workoutDay = normalizeDate(date);
 
   if (workoutDay.getTime() === today.getTime()) {
     return "Today";

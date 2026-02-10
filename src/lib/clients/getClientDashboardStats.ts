@@ -56,20 +56,27 @@ export async function getClientDashboardStats(clientId: string) {
   }
 
   // ---------- THIS WEEK ----------
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - startOfWeek.getDay());
+const startOfWeek = new Date(today);
+const day = startOfWeek.getDay(); // 0 = Sun, 1 = Mon, ...
+const diffToMonday = day === 0 ? -6 : 1 - day;
 
-  const weekWorkouts = workouts.filter((w) => {
-    const d = new Date(w.scheduledDate);
-    d.setHours(0, 0, 0, 0);
+startOfWeek.setDate(startOfWeek.getDate() + diffToMonday);
+startOfWeek.setHours(0, 0, 0, 0);
 
-    return d >= startOfWeek && d <= today;
-  });
+const endOfWeek = new Date(startOfWeek);
+endOfWeek.setDate(startOfWeek.getDate() + 6);
+endOfWeek.setHours(23, 59, 59, 999);
 
-  console.log("week workouts", weekWorkouts.slice(0,2));
-  const completedThisWeek = weekWorkouts.filter(
-    (w) => w.status === WorkoutStatus.COMPLETED,
-  ).length;
+const weekWorkouts = workouts.filter((w) => {
+  const d = new Date(w.scheduledDate);
+  d.setHours(0, 0, 0, 0);
+
+  return d >= startOfWeek && d <= endOfWeek;
+});
+
+const completedThisWeek = weekWorkouts.filter(
+  (w) => w.status === WorkoutStatus.COMPLETED,
+).length;
 
   // ---------- NEXT WORKOUT ----------
   const nextWorkout = await prisma.scheduledWorkout.findFirst({
