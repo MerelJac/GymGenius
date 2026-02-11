@@ -17,6 +17,7 @@ export default function NewExercisePage() {
         videoUrl: String(formData.get("videoUrl") || ""),
         muscleGroup: String(formData.get("muscleGroup") || ""),
         notes: String(formData.get("notes") || ""),
+        trainerId: String(formData.get("trainerId") || null),
       },
     });
 

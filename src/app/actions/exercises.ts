@@ -14,6 +14,7 @@ export async function createExerciseAction(formData: FormData) {
       muscleGroup: String(formData.get("muscleGroup") || ""),
       videoUrl: String(formData.get("videoUrl") || ""),
       notes: String(formData.get("notes") || ""),
+      trainerId:  String(formData.get("trainerId") || null), // For now, all exercises are global. In the future, we can allow trainers to create their own exercises.
     },
   });
 }

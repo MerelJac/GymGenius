@@ -42,6 +42,7 @@ export default async function EditExercisePage({
         videoUrl: String(formData.get("videoUrl") || ""),
         equipment: String(formData.get("equipment") || ""),
         notes: String(formData.get("notes") || ""),
+        trainerId: String(formData.get("trainerId") || null),
       },
     });
 

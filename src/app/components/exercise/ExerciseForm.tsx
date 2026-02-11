@@ -134,7 +134,8 @@ export default function ExerciseForm({
       </div>
 
       <input type="hidden" name="exerciseId" value={exercise?.id} />
-
+      <input type="hidden" name="trainerId" value={exercise?.trainerId ?? ""} />
+      
       <div className="pt-2">
         <button
           type="submit"
