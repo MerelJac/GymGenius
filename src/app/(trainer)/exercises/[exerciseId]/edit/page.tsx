@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ExerciseForm from "../../../../components/exercise/ExerciseForm";
-import { parseExerciseType } from "@/lib/exerciseValidation";
 import SubstitutionsEditor from "@/app/components/exercise/SubstitutionsEditor";
 import { BackButton } from "@/app/components/BackButton";
 import { deleteExercise } from "./actions";
 import { DeleteExerciseButton } from "@/app/components/ui/DeleteButton";
+import { buildExerciseData } from "@/app/utils/exercise/buildExerciseData";
 
 export default async function EditExercisePage({
   params,
@@ -31,19 +31,11 @@ export default async function EditExercisePage({
   async function updateExercise(formData: FormData) {
     "use server";
 
-    const type = parseExerciseType(formData.get("type"));
+    const data = buildExerciseData(formData);
 
     await prisma.exercise.update({
       where: { id: exerciseId },
-      data: {
-        name: String(formData.get("name")),
-        type,
-        muscleGroup: String(formData.get("muscleGroup") || ""),
-        videoUrl: String(formData.get("videoUrl") || ""),
-        equipment: String(formData.get("equipment") || ""),
-        notes: String(formData.get("notes") || ""),
-        trainerId: String(formData.get("trainerId") || null),
-      },
+      data,
     });
 
     redirect("/exercises");

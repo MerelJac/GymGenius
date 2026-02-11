@@ -1,24 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import ExerciseForm from "../../../components/exercise/ExerciseForm";
-import { parseExerciseType } from "@/lib/exerciseValidation";
+import { buildExerciseData } from "@/app/utils/exercise/buildExerciseData";
 
 export default function NewExercisePage() {
   async function createExercise(formData: FormData) {
     "use server";
 
-    const type = parseExerciseType(formData.get("type"));
-
+    const data = buildExerciseData(formData);
     const exercise = await prisma.exercise.create({
-      data: {
-        name: String(formData.get("name")),
-        type,
-        equipment: String(formData.get("equipment") || ""),
-        videoUrl: String(formData.get("videoUrl") || ""),
-        muscleGroup: String(formData.get("muscleGroup") || ""),
-        notes: String(formData.get("notes") || ""),
-        trainerId: String(formData.get("trainerId") || null),
-      },
+      data
     });
 
     // 👇 immediately go to edit where substitutions exist
