@@ -29,7 +29,7 @@ export default function ClientProfile({
     program: {
       id: string;
       name: string;
-    };
+    } 
     workouts: ScheduledWorkoutWithProgram[];
   };
 
@@ -54,6 +54,8 @@ export default function ClientProfile({
   const programs = Object.values(
     client.scheduledWorkouts.reduce<Record<string, ProgramGroup>>((acc, sw) => {
       const program = sw.workout.program;
+      // 🔒 Guard against null
+      if (!program) return acc;
 
       if (!acc[program.id]) {
         acc[program.id] = {
@@ -271,6 +273,7 @@ export default function ClientProfile({
               const total = workouts.length;
               const progress = total ? (completed / total) * 100 : 0;
 
+              
               return (
                 <div
                   key={program.id}

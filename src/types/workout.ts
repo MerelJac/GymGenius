@@ -91,7 +91,7 @@ export type ScheduledWorkout = {
     program: {
       id: string;
       name: string;
-    };
+    } | null;
   };
 };
 
@@ -105,7 +105,7 @@ export type ScheduledWorkoutWithProgram = {
     program: {
       id: string;
       name: string;
-    };
+    } | null;
   };
 };
 

@@ -36,6 +36,9 @@ export function ClientProgramProgress({
     >((acc, sw) => {
       const program = sw.workout.program;
 
+      // 🔒 Guard against null
+      if (!program) return acc;
+
       if (!acc[program.id]) {
         acc[program.id] = {
           program,
