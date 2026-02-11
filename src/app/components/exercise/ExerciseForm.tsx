@@ -11,8 +11,10 @@ export default function ExerciseForm({
   exercise,
   action,
   title,
-  submitLabel = "Save Exercise",
+  submitLabel = "Save Exercise"
 }: Props) {
+
+
   return (
     <form
       action={action}
@@ -134,7 +136,6 @@ export default function ExerciseForm({
       </div>
 
       <input type="hidden" name="exerciseId" value={exercise?.id} />
-      <input type="hidden" name="trainerId" value={exercise?.trainerId ?? ""} />
       
       <div className="pt-2">
         <button

@@ -35,7 +35,6 @@ export const authOptions: AuthOptions = {
           user.password,
         );
 
-
         if (!isValid) return null;
 
         return user;
@@ -48,6 +47,7 @@ export const authOptions: AuthOptions = {
       if (user) {
         token.id = user.id;
         token.role = user.role;
+        token.trainerId = user.trainerId;
       }
       return token;
     },
@@ -56,6 +56,7 @@ export const authOptions: AuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as Role;
+        session.user.trainerId = token.trainerId as string | null;
       }
       return session;
     },

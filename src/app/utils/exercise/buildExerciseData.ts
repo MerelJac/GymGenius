@@ -20,9 +20,6 @@ export function buildExerciseData(formData: FormData) {
       : null,
     trainerId: formData.get("trainerId")
       ? String(formData.get("trainerId"))
-      : null,
-    userId: formData.get("userId")
-      ? String(formData.get("userId"))
-      : null,
+      : undefined
   };
 }
