@@ -17,6 +17,7 @@ frontend:
         - echo "SES_FROM_ADDRESS=$SES_FROM_ADDRESS" >> .env
         - echo "APP_URL=$APP_URL" >> .env
         - echo "INVITE_PASS=$INVITE_PASS" >> .env
+        - echo "CRON_SECRET=$CRON_SECRET" >> .env
 
   artifacts:
     baseDirectory: .next

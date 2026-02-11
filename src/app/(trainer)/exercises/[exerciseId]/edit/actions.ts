@@ -1,7 +1,10 @@
 "use server";
 
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 import { revalidatePath } from "next/cache";
+import { notFound, redirect } from "next/navigation";
 
 export async function addSubstitution(formData: FormData) {
   const exerciseId = formData.get("exerciseId") as string;
@@ -35,4 +38,40 @@ export async function removeSubstitution(formData: FormData) {
   });
 
   revalidatePath(`/exercises/${exerciseId}/edit`);
+}
+
+export async function deleteExercise(formData: FormData) {
+  const exerciseId = formData.get("exerciseId") as string;
+
+  if (!exerciseId) {
+    return notFound();
+  }
+
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.id) {
+    return notFound();
+  }
+
+  const exercise = await prisma.exercise.findUnique({
+    where: { id: exerciseId },
+    select: { trainerId: true },
+  });
+
+  if (!exercise) {
+    return notFound();
+  }
+
+  const isAdmin = session.user.role === "ADMIN";
+  const isOwner = exercise.trainerId === session.user.id;
+
+  if (!isAdmin && !isOwner) {
+    return notFound();
+  }
+
+  await prisma.exercise.delete({
+    where: { id: exerciseId },
+  });
+
+  redirect("/exercises");
 }

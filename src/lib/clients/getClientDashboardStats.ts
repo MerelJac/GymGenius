@@ -23,7 +23,7 @@ export async function getClientDashboardStats(clientId: string) {
     firstWorkoutDate.setHours(0, 0, 0, 0);
 
     const hasAnyCompleted = workouts.some(
-      (w) => w.status === WorkoutStatus.COMPLETED
+      (w) => w.status === WorkoutStatus.COMPLETED,
     );
 
     if (hasAnyCompleted) {
@@ -37,13 +37,12 @@ export async function getClientDashboardStats(clientId: string) {
 
         const dayWorkouts = workouts.filter(
           (w) =>
-            new Date(w.scheduledDate).toDateString() ===
-            date.toDateString()
+            new Date(w.scheduledDate).toDateString() === date.toDateString(),
         );
 
         const hasScheduled = dayWorkouts.length > 0;
         const completed = dayWorkouts.some(
-          (w) => w.status === WorkoutStatus.COMPLETED
+          (w) => w.status === WorkoutStatus.COMPLETED,
         );
 
         // On-plan logic
@@ -57,16 +56,27 @@ export async function getClientDashboardStats(clientId: string) {
   }
 
   // ---------- THIS WEEK ----------
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - startOfWeek.getDay());
+const startOfWeek = new Date(today);
+const day = startOfWeek.getDay(); // 0 = Sun, 1 = Mon, ...
+const diffToMonday = day === 0 ? -6 : 1 - day;
 
-  const weekWorkouts = workouts.filter(
-    (w) => w.scheduledDate >= startOfWeek
-  );
+startOfWeek.setDate(startOfWeek.getDate() + diffToMonday);
+startOfWeek.setHours(0, 0, 0, 0);
 
-  const completedThisWeek = weekWorkouts.filter(
-    (w) => w.status === WorkoutStatus.COMPLETED
-  ).length;
+const endOfWeek = new Date(startOfWeek);
+endOfWeek.setDate(startOfWeek.getDate() + 6);
+endOfWeek.setHours(23, 59, 59, 999);
+
+const weekWorkouts = workouts.filter((w) => {
+  const d = new Date(w.scheduledDate);
+  d.setHours(0, 0, 0, 0);
+
+  return d >= startOfWeek && d <= endOfWeek;
+});
+
+const completedThisWeek = weekWorkouts.filter(
+  (w) => w.status === WorkoutStatus.COMPLETED,
+).length;
 
   // ---------- NEXT WORKOUT ----------
   const nextWorkout = await prisma.scheduledWorkout.findFirst({

@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, Trash } from "lucide-react";
 import WorkoutCalendarWeek from "../CalendarScheduledWorkout";
 import { SyncProgramButton } from "../programs/SyncProgramButton";
+import { formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
 
 export default function ClientProfile({
   client,
@@ -308,7 +309,7 @@ export default function ClientProfile({
                         <div>
                           <span className="font-medium">{w.workout.name}</span>
                           <span className="text-gray-500 ml-2">
-                            • {new Date(w.scheduledDate).toLocaleDateString()}
+                            • {formatDateFromInputReturnString(w.scheduledDate)}
                           </span>
                         </div>
                         <span
@@ -368,11 +369,7 @@ export default function ClientProfile({
                 </div>
 
                 <div className="text-gray-500 text-sm">
-                  {new Date(w.performedAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {formatDateFromInputReturnString(w.performedAt)}
                 </div>
               </li>
             ))}

@@ -9,7 +9,7 @@ export default async function TrainerHomePage() {
 
   if (!session?.user?.id) {
     console.log("Unauthorized (Trainer Home)");
-    redirect("/"); 
+    redirect("/");
   }
 
   const trainerId = session.user.id;
@@ -33,6 +33,38 @@ export default async function TrainerHomePage() {
     },
     orderBy: { createdAt: "desc" },
   });
+
+  const missedWorkouts = clients.flatMap((client) =>
+    client.scheduledWorkouts
+      .filter((w) => w.status === "SKIPPED")
+      .map((w) => ({
+        id: w.id,
+        clientName: `${client.profile?.firstName ?? ""} ${client.profile?.lastName ?? ""}`,
+        workoutName: w.workout.name,
+        programName: w.workout.program?.name,
+        date: w.scheduledDate,
+      })),
+  );
+
+  const recentlyCompleted = clients.flatMap((client) =>
+    client.scheduledWorkouts
+      .filter((w) => w.status === "COMPLETED")
+      .map((w) => ({
+        id: w.id,
+        clientName: `${client.profile?.firstName ?? ""} ${client.profile?.lastName ?? ""}`,
+        workoutName: w.workout.name,
+        programName: w.workout.program?.name,
+        date: w.scheduledDate,
+      })),
+  );
+
+  const recentMissedWorkouts = [...missedWorkouts]
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .slice(0, 5);
+
+  const recentCompletedWorkouts = [...recentlyCompleted]
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .slice(0, 5);
 
   return (
     <div className="space-y-10">
@@ -71,9 +103,31 @@ export default async function TrainerHomePage() {
           Missed Workouts
         </h2>
 
-        <p className="text-sm text-gray-400 italic">
-          No missed workouts to show.
-        </p>
+        {recentMissedWorkouts.length === 0 ? (
+          <p className="text-sm text-gray-400 italic">
+            No missed workouts to show.
+          </p>
+        ) : (
+          <ul className="divide-y divide-gray-200">
+            {recentMissedWorkouts.map((w) => (
+              <li key={w.id} className="py-3 flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {w.clientName}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {w.workoutName}
+                    {w.programName && ` · ${w.programName}`}
+                  </p>
+                </div>
+
+                <p className="text-xs text-gray-400">
+                  {w.date.toLocaleDateString()}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       {/* RECENTLY COMPLETED */}
@@ -82,9 +136,31 @@ export default async function TrainerHomePage() {
           Recently Completed
         </h2>
 
-        <p className="text-sm text-gray-400 italic">
-          Completed workouts will appear here.
-        </p>
+        {recentCompletedWorkouts.length === 0 ? (
+          <p className="text-sm text-gray-400 italic">
+            No recently completed workouts to show.
+          </p>
+        ) : (
+          <ul className="divide-y divide-gray-200">
+            {recentCompletedWorkouts.map((w) => (
+              <li key={w.id} className="py-3 flex justify-between items-start">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {w.clientName}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {w.workoutName}
+                    {w.programName && ` · ${w.programName}`}
+                  </p>
+                </div>
+
+                <p className="text-xs text-gray-400">
+                  {w.date.toLocaleDateString()}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </div>
   );

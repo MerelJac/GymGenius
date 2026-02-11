@@ -6,8 +6,6 @@ import Link from "next/link";
 import { TrainerStats } from "./components/TrainerStats";
 import { TrainerAccountSection } from "./components/TrainerAccountSection";
 import InviteTrainer from "./components/InviteTrainer";
-import { Mail } from "lucide-react";
-import { sendWelcomeEmail } from "@/lib/email-templates/welcomeEmail";
 import { ResendInviteButton } from "@/app/components/ResendEmailButton";
 
 export default async function TrainerProfilePage() {
@@ -149,19 +147,6 @@ export default async function TrainerProfilePage() {
                       Invited {new Date(t.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  {/* 
-                  {t.password ? (
-                    <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
-                      Active
-                    </span>
-                  ) : (
-                    <>
-                      <span className="text-xs font-medium text-yellow-700 bg-yellow-100 px-2 py-0.5 rounded-full">
-                        Pending
-                      </span>
-                      <ResendInviteButton email={t.email} />
-                    </>
-                  )} */}
                   <ResendInviteButton email={t.email} />
                 </li>
               ))}

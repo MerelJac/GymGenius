@@ -6,11 +6,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { calculateOneRepMax } from "@/app/utils/oneRepMax/calculateOneRepMax";
 import { buildPerformedFromPrescribed } from "@/app/utils/workoutFunctions";
-import {  redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 export async function startWorkout(scheduledId: string) {
   const session = await getServerSession(authOptions);
- if (!session?.user?.id) return  redirect("/login");
+  if (!session?.user?.id) return redirect("/login");
 
   return await prisma.$transaction(async (tx) => {
     // 1️⃣ Check for existing ACTIVE log
@@ -81,16 +81,39 @@ export async function logExercise(
   prescribed: Prescribed,
   performed: Performed,
   note?: string,
+  sectionId?: string,
 ) {
-  const exerciseLog = await prisma.exerciseLog.create({
-    data: {
+  const exisitngLog = await prisma.exerciseLog.findFirst({
+    where: {
       workoutLogId,
       exerciseId,
-      prescribed,
-      performed,
-      substitutionReason: note || null,
+      sectionId,
     },
   });
+
+  let exerciseLog;
+  
+  if (exisitngLog) {
+    exerciseLog = await prisma.exerciseLog.update({
+      where: { id: exisitngLog.id },
+      data: {
+        performed,
+        prescribed,
+        substitutionReason: note || null,
+      },
+    });
+  } else {
+    exerciseLog = await prisma.exerciseLog.create({
+      data: {
+        workoutLogId,
+        exerciseId,
+        prescribed,
+        performed,
+        substitutionReason: note || null,
+        sectionId,
+      },
+    });
+  }
 
   // ── 1RM tracking ─────────────────────────────
   if (performed.kind === "strength" || performed.kind === "hybrid") {
@@ -114,14 +137,25 @@ export async function logExercise(
         select: { clientId: true },
       });
 
+      // Only track if 1RM is better than before
       if (workoutLog?.clientId) {
-        await prisma.exerciseOneRepMax.create({
-          data: {
+        const latest = await prisma.exerciseOneRepMax.findFirst({
+          where: {
             clientId: workoutLog.clientId,
             exerciseId,
-            oneRepMax,
           },
+          orderBy: { recordedAt: "desc" },
         });
+
+        if (!latest || oneRepMax > latest.oneRepMax) {
+          await prisma.exerciseOneRepMax.create({
+            data: {
+              clientId: workoutLog.clientId,
+              exerciseId,
+              oneRepMax,
+            },
+          });
+        }
       }
     }
   }
@@ -152,7 +186,7 @@ export async function addExerciseToWorkout(
 
 export async function removeClientExercise(exerciseLogId: string) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return  redirect("/login");
+  if (!session?.user?.id) return redirect("/login");
   const log = await prisma.exerciseLog.findUnique({
     where: { id: exerciseLogId },
     include: {

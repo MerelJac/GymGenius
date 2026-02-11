@@ -3,6 +3,8 @@
 import { useState, startTransition } from "react";
 import { updateClientProfile } from "@/app/(trainer)/clients/[clientId]/actions";
 import { ResendInviteButton } from "../ResendEmailButton";
+import {  formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
+import { formatPhoneDisplay } from "@/app/utils/format/formatPhoneNumber";
 
 export function ClientProfileEditor({
   clientId,
@@ -135,7 +137,7 @@ export function ClientProfileEditor({
             </label>
             <input
               type="phone"
-              value={phone}
+              value={phone ? formatPhoneDisplay(phone) : ""}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
             />
@@ -206,18 +208,19 @@ export function ClientProfileEditor({
             </span>
           </div>
 
-          <div>
+          <div className="flex flex-row gap-2">
+                        <ResendInviteButton email={email} />
             <span className="block text-gray-500">
               Resend Invitiation Email
             </span>
 
-            <ResendInviteButton email={email} />
+
           </div>
           {/* phone */}
           <div>
             <span className="block text-gray-500">Phone</span>
             <span className="font-medium text-gray-900">
-              {phone || "Not set"}
+              {phone ? formatPhoneDisplay(phone) : "Not set"}
             </span>
           </div>
 
@@ -227,7 +230,7 @@ export function ClientProfileEditor({
             <div>
               <span className="block text-gray-500">Date of Birth</span>
               <span className="font-medium text-gray-900">
-                {dob ? new Date(dob).toLocaleDateString() : "Not set"}
+                {dob ? formatDateFromInputReturnString(dob) : "Not set"}
               </span>
             </div>
 

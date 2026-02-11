@@ -7,4 +7,5 @@ export type Profile = {
   dob?: Date | null;
   experience?: string | null;
   injuryNotes?: string | null;
+  phone?: string | null;
 };

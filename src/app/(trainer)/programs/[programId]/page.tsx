@@ -4,12 +4,12 @@ import ProgramBuilder from "@/app/components/ProgramBuilder";
 export default async function ProgramBuilderPage({
   params,
 }: {
-  params: { programId: string };
+  params:   Promise<{ programId: string }>;
 }) {
-  const { programId } = params;
+  const { programId } = await params;
   console.log("Program ID:", programId);
   const program = await prisma.program.findUnique({
-    where: { id: params.programId },
+    where: { id: programId },
     include: {
       workouts: {
         orderBy: { order: "asc" },

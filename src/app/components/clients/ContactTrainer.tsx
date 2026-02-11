@@ -1,3 +1,5 @@
+import { formatPhoneDisplay } from "@/app/utils/format/formatPhoneNumber";
+
 type ContactTrainerProps = {
   trainer: {
     email: string;
@@ -6,7 +8,9 @@ type ContactTrainerProps = {
   };
 };
 
+
 export function ContactTrainer({ trainer }: ContactTrainerProps) {
+  // console.log("ContactTrainerProps", trainer);
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
       <h2 className="text-lg font-semibold text-gray-900">
@@ -31,7 +35,7 @@ export function ContactTrainer({ trainer }: ContactTrainerProps) {
             href={`sms:${trainer.phone}`}
             className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline"
           >
-            {trainer.phone}
+            {formatPhoneDisplay(trainer.phone)}
           </a>
         </div>
       )}

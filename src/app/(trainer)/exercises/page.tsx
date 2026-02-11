@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Exercise } from "@/types/exercise";
 import { ExerciseType, Prisma } from "@prisma/client";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Video } from "lucide-react";
 import Link from "next/link";
 
 export default async function ExerciseLibraryPage({
@@ -129,8 +129,14 @@ export default async function ExerciseLibraryPage({
                 <div className="font-medium text-gray-900 truncate group-hover:text-blue-700 transition-colors">
                   {ex.name}
                 </div>
-                <div className="text-sm text-gray-500 mt-0.5">
+                <div className="text-sm text-gray-500 mt-0.5 flex flex-row flex-wrap items-center gap-1">
                   {ex.type} • {ex.muscleGroup}
+                  {ex.videoUrl && (
+                    <>
+                      {" • "}
+                      <Video size={12} />
+                    </>
+                  )}
                 </div>
               </div>
 

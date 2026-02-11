@@ -23,6 +23,10 @@ export type Exercise = {
 
   createdAt?: string
 }
+export type OneRMPoint = {
+  date: string;
+  value: number;
+};
 
 export type ExerciseDetail = {
   id: string;
@@ -30,6 +34,7 @@ export type ExerciseDetail = {
   type: string;
   equipment: string | null;
   notes: string | null;
+  muscleGroup: string | null;
   videoUrl: string | null;
   substitutions: {
     id: string;

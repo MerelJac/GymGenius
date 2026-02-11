@@ -22,12 +22,17 @@ export default async function ClientDashboard() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  console.log(today, "today's date client dashboard");
   const profile = await prisma.profile.findUnique({
     where: { userId: clientId },
     include: {
       user: {
         include: {
-          trainer: true, // assumes User → trainer relation
+          trainer: {
+            include: {
+              profile: true,
+            },
+          },
         },
       },
     },
@@ -42,6 +47,15 @@ export default async function ClientDashboard() {
   if (!trainer) {
     throw new Error("Trainer not found for client");
   }
+
+  const trainerForContact = {
+    email: trainer.email,
+    phone: trainer.profile?.phone ?? null,
+    name:
+      trainer.profile?.firstName || trainer.profile?.lastName
+        ? `${trainer.profile?.firstName ?? ""} ${trainer.profile?.lastName ?? ""}`.trim()
+        : null,
+  };
 
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
@@ -76,13 +90,43 @@ export default async function ClientDashboard() {
     take: 5, // today + next few
   });
 
+  const pastWorkouts = await prisma.scheduledWorkout.findMany({
+    where: {
+      clientId,
+      scheduledDate: { lt: today },
+    },
+    include: {
+      workout: {
+        include: {
+          workoutSections: {
+            orderBy: { order: "asc" },
+            include: {
+              exercises: {
+                orderBy: { order: "asc" },
+                include: {
+                  exercise: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    orderBy: { scheduledDate: "desc" },
+    take: 5,
+  });
+
   const todaysWorkout = upcomingWorkouts.find(
     (w) => w.scheduledDate < tomorrow,
   );
   const futureWorkouts = upcomingWorkouts.filter(
     (w) => w.scheduledDate >= tomorrow,
   );
-  const pastWorkouts = upcomingWorkouts.filter((w) => w.scheduledDate <= today);
+  const completedWorkouts = pastWorkouts.filter(
+    (w) => w.status === "COMPLETED",
+  );
+
+  const overdueWorkouts = pastWorkouts.filter((w) => w.status !== "COMPLETED");
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -110,20 +154,22 @@ export default async function ClientDashboard() {
       </section>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UpcomingWorkouts workouts={futureWorkouts} />
-        <PastWorkouts workouts={pastWorkouts} />
+        <OverdueWorkouts workouts={overdueWorkouts} />
+        <PastWorkouts workouts={completedWorkouts} />
       </div>
 
       {/* Placeholder cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
           <ProgressChanges
+            clientId={clientId}
             strength={progress.strength}
             weight={progress.weight}
             bodyFat={progress.bodyFat}
           />
         </div>
 
-        <ContactTrainer trainer={trainer} />
+        <ContactTrainer trainer={trainerForContact} />
       </div>
     </div>
   );
@@ -176,7 +222,7 @@ function TodayWorkout({
         ) : (
           <Link href={`/workouts/${workout.id}`}>
             <button className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
-              Start workout
+              View workout
             </button>
           </Link>
         )}
@@ -215,7 +261,41 @@ function UpcomingWorkouts({
   );
 }
 
+function OverdueWorkouts({
+  workouts,
+}: {
+  workouts: ScheduledWorkoutDashboard[];
+}) {
+  console.log("overdue workouts", workouts.slice(0, 2));
+
+  if (workouts.length === 0) return null;
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
+      <h2 className="font-semibold text-gray-900">Missed</h2>
+
+      <ul className="text-sm space-y-2">
+        {workouts.map((w) => (
+          <li key={w.id} className="flex justify-between items-center">
+            <Link
+              href={`/workouts/${w.id}`}
+              className="text-gray-900 hover:underline"
+            >
+              {w.workout.name}
+            </Link>
+            <span className="text-gray-500">
+              {w.scheduledDate.toLocaleDateString()}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
+  console.log("past workouts", workouts);
+
   if (workouts.length === 0) return null;
 
   return (

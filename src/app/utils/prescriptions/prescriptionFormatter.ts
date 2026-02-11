@@ -2,29 +2,45 @@ import { Exercise } from "@/types/exercise";
 import { Prescribed } from "@/types/prescribed";
 
 export function formatPrescribed(p: Prescribed): string {
-  // Strength / Hybrid (has weight)
-  if ("sets" in p && "reps" in p && "weight" in p) {
-    return `${p.sets}×${p.reps}${p.weight ? ` @ ${p.weight}` : ""}`;
-  }
+  switch (p.kind) {
+    case "strength":
+    case "hybrid":
+      return `${p.sets}×${p.reps}${p.weight ? ` @ ${p.weight}` : ""}`;
 
-  // Bodyweight (no weight)
-  if ("sets" in p && "reps" in p) {
-    return `${p.sets}×${p.reps}`;
-  }
+    case "bodyweight":
+      return `${p.sets}×${p.reps}`;
 
-  // Timed
-  if ("duration" in p) {
-    return `${p.duration}s`;
-  }
+    case "core":
+    case "mobility": {
+      const repsPart =
+        typeof p.reps === "number" && p.reps > 0
+          ? `${p.sets}×${p.reps}`
+          : `${p.sets}×`;
 
-  return "—";
+      const durationPart =
+        typeof p.duration === "number" && p.duration > 0
+          ? `${p.duration}s`
+          : "";
+
+      const weightPart =
+        typeof p.weight === "number" && p.weight > 0 ? ` @ ${p.weight}` : "";
+
+      return `${repsPart}${durationPart}${weightPart}`;
+    }
+
+    case "timed":
+      return `${p.duration}s`;
+
+    default:
+      return "—";
+  }
 }
 
 export function buildPrescribed(
   exercise: Exercise,
   sets: number,
   reps: number,
-  weight: number | null
+  weight: number | null,
 ): Prescribed {
   switch (exercise.type) {
     case "STRENGTH":

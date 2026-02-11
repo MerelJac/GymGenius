@@ -1,15 +1,23 @@
 export function formatNextWorkout(date: Date) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
 
-  const workoutDay = new Date(date);
-  workoutDay.setHours(0, 0, 0, 0);
+  const todayLocal = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+  );
 
-  if (workoutDay.getTime() === today.getTime()) {
+  const workoutLocal = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+  );
+
+  if (workoutLocal.getTime() === todayLocal.getTime()) {
     return "Today";
   }
 
-  return workoutDay.toLocaleDateString(undefined, {
+  return workoutLocal.toLocaleDateString(undefined, {
     weekday: "long",
   });
 }
