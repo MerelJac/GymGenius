@@ -4,20 +4,24 @@ import { prisma } from "@/lib/prisma";
 import { missedWorkoutToTrainer } from "@/lib/email-templates/missedWorkoutToTrainer";
 
 export async function updateWorkoutStatus() {
-  const today = new Date();
+  const now = new Date();
 
-  const startOfDay = new Date(today);
-  startOfDay.setHours(0, 0, 0, 0);
+  // 👇 Move back one day
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
 
-  const endOfDay = new Date(today);
-  endOfDay.setHours(23, 59, 59, 999);
+  const startOfYesterday = new Date(yesterday);
+  startOfYesterday.setHours(0, 0, 0, 0);
+
+  const endOfYesterday = new Date(yesterday);
+  endOfYesterday.setHours(23, 59, 59, 999);
 
   // 1️⃣ Find workouts scheduled today that were not completed
   const missedWorkouts = await prisma.scheduledWorkout.findMany({
     where: {
       scheduledDate: {
-        gte: startOfDay,
-        lte: endOfDay,
+        gte: startOfYesterday,
+        lte: endOfYesterday,
       },
       status: {
         notIn: ["COMPLETED"],
