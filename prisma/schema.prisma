@@ -144,8 +144,8 @@ model Program {
 
 model WorkoutTemplate {
   id        String  @id @default(uuid())
-  programId String
-  program   Program @relation(fields: [programId], references: [id])
+  programId String?
+  program   Program? @relation(fields: [programId], references: [id])
 
   name              String
   order             Int

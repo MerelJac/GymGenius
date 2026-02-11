@@ -81,16 +81,39 @@ export async function logExercise(
   prescribed: Prescribed,
   performed: Performed,
   note?: string,
+  sectionId?: string,
 ) {
-  const exerciseLog = await prisma.exerciseLog.create({
-    data: {
+  const exisitngLog = await prisma.exerciseLog.findFirst({
+    where: {
       workoutLogId,
       exerciseId,
-      prescribed,
-      performed,
-      substitutionReason: note || null,
+      sectionId,
     },
   });
+
+  let exerciseLog;
+  
+  if (exisitngLog) {
+    exerciseLog = await prisma.exerciseLog.update({
+      where: { id: exisitngLog.id },
+      data: {
+        performed,
+        prescribed,
+        substitutionReason: note || null,
+      },
+    });
+  } else {
+    exerciseLog = await prisma.exerciseLog.create({
+      data: {
+        workoutLogId,
+        exerciseId,
+        prescribed,
+        performed,
+        substitutionReason: note || null,
+        sectionId,
+      },
+    });
+  }
 
   // ── 1RM tracking ─────────────────────────────
   if (performed.kind === "strength" || performed.kind === "hybrid") {

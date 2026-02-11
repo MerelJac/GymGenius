@@ -19,6 +19,7 @@ export function ExerciseLogger({
   prescribed,
   workoutLogId,
   clientId,
+  sectionId,
   disabled,
   notes,
   isClientAdded = false,
@@ -29,7 +30,7 @@ export function ExerciseLogger({
   prescribed: Prescribed;
   workoutLogId: string | null;
   clientId: string;
-
+  sectionId?: string | undefined;
   disabled: boolean;
   notes?: string | null;
   isClientAdded?: boolean;
@@ -66,26 +67,24 @@ useEffect(() => {
 
 useEffect(() => {
   if (!onRegisterAutoSave) return;
+  if (!workoutLogId) return;
   if (hasRegisteredRef.current) return;
 
   const fn = async () => {
-    if (!workoutLogId || hasSavedRef.current) return;
-
     await logExercise(
       workoutLogId,
       exercise.id,
       prescribed,
       performedRef.current,
       noteRef.current,
+      sectionId
     );
-
-    setHasSaved(true);
-    hasSavedRef.current = true;
   };
 
   onRegisterAutoSave(fn);
   hasRegisteredRef.current = true;
-}, [onRegisterAutoSave, workoutLogId, exercise.id, prescribed]);
+
+}, [onRegisterAutoSave, workoutLogId, exercise.id]);
 
   useEffect(() => {
     async function loadOneRepMax() {
@@ -462,6 +461,7 @@ useEffect(() => {
                   prescribed,
                   performed,
                   note,
+                  sectionId
                 );
 
                 setIsSaving(false);

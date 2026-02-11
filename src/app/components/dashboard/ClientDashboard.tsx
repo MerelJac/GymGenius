@@ -22,6 +22,7 @@ export default async function ClientDashboard() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  console.log(today, "today's date client dashboard");
   const profile = await prisma.profile.findUnique({
     where: { userId: clientId },
     include: {
@@ -293,7 +294,7 @@ function OverdueWorkouts({
 }
 
 function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
-  console.log("past workouts", workouts.slice(0, 2));
+  console.log("past workouts", workouts);
 
   if (workouts.length === 0) return null;
 

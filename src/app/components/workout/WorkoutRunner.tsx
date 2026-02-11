@@ -31,27 +31,22 @@ export default function WorkoutRunner({
 
   const autoSaveFns = useRef<(() => Promise<void>)[]>([]);
 
-  const logs: ExerciseLog[] = scheduledWorkout.workout.workoutSections.flatMap(
-    (section) =>
-      section.exercises.map((we) => {
-        const log = activeLog
-          ? activeLog.exercises.find((l) => l.exerciseId === we.exercise?.id)
-          : null;
+const logs: ExerciseLog[] = activeLog
+  ? activeLog.exercises.map((log) => ({
+      id: log.id,
+      workoutLogId: activeLog.id,
+      exerciseId: log.exerciseId,
+      exerciseName: log.exercise.name,
+      prescribed: assertPrescribed(log.prescribed),
+      performed: log.performed as Performed,
+      substitutedFrom: log.substitutedFrom ?? null,
+      substitutionReason: log.substitutionReason ?? null,
+    }))
+  : [];
 
-        return {
-          id: log?.id ?? `planned-${we.id}`,
-          workoutLogId: activeLog?.id ?? "planned",
-          exerciseId: we.exercise!.id,
-          exerciseName: we.exercise!.name,
-          prescribed: assertPrescribed(we.prescribed),
-          performed: log?.performed ? (log.performed as Performed) : null,
-          substitutedFrom: log?.substitutedFrom ?? null,
-          substitutionReason: log?.substitutionReason ?? null,
-        };
-      }),
-  );
 
   if (isCompleted) {
+    console.log("Completed workout logs:", logs);
     return (
       <>
         <div className="rounded bg-green-50 border p-3 text-green-700 my-4">
@@ -75,6 +70,7 @@ export default function WorkoutRunner({
           className="px-4 py-2 border rounded"
           onClick={async () => {
             const id = await startWorkout(scheduledWorkout.id);
+            autoSaveFns.current = []; // 🧼 CLEAR OLD REGISTRATIONS
             setWorkoutLogId(id);
             router.refresh();
           }}
@@ -94,6 +90,7 @@ export default function WorkoutRunner({
 
               // 🔐 Auto-save all unsaved exercises
               await Promise.all(autoSaveFns.current.map((fn) => fn()));
+
               await stopWorkout(workoutLogId);
               setWorkoutLogId(null);
               router.refresh();
@@ -101,9 +98,6 @@ export default function WorkoutRunner({
           >
             {finishingText}
           </button>
-          <p>
-            Please save all exercises before clicking &quot;finish workout&quot;.
-          </p>
         </div>
       )}
 
@@ -127,6 +121,7 @@ export default function WorkoutRunner({
                     prescribed={assertPrescribed(we.prescribed)}
                     workoutLogId={workoutLogId}
                     clientId={clientId}
+                    sectionId={section.id} 
                     disabled={!isActive}
                     notes={we.notes}
                     onRegisterAutoSave={(fn) => autoSaveFns.current.push(fn)}
@@ -144,6 +139,7 @@ export default function WorkoutRunner({
                     workoutLogId={workoutLogId}
                     clientId={clientId}
                     disabled={!isActive}
+                    sectionId={section.id} 
                     notes={el.substitutionReason ?? "Client-added exercise"}
                     isClientAdded // 👈 ADD THIS FLAG
                     exerciseLogId={el.id} // 👈 PASS LOG ID
