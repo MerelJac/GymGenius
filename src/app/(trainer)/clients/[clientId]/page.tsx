@@ -17,6 +17,7 @@ export default async function ClientPage({
         orderBy: { recordedAt: "asc" },
       },
       scheduledWorkouts: {
+        orderBy: { scheduledDate: "desc" },
         include: {
           workout: {
             include: {
@@ -39,6 +40,9 @@ export default async function ClientPage({
   const scheduledWorkouts: ScheduledWorkoutWithWorkout[] =
     await prisma.scheduledWorkout.findMany({
       where: { clientId },
+      orderBy: {
+        scheduledDate: "desc",
+      },
       include: {
         workout: {
           select: { id: true, name: true },
