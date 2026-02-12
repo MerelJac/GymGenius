@@ -7,6 +7,8 @@ import { authOptions } from "@/lib/auth";
 import { calculateOneRepMax } from "@/app/utils/oneRepMax/calculateOneRepMax";
 import { buildPerformedFromPrescribed } from "@/app/utils/workoutFunctions";
 import { redirect } from "next/navigation";
+import { sendAdditionalWorkoutEmailToTrainer } from "@/lib/email-templates/additionalWorkoutEmailToTrainer";
+import { sendCompletedWorkoutEmailToTrainer } from "@/lib/email-templates/completedWorkoutToTrainer";
 
 export async function startWorkout(scheduledId: string) {
   const session = await getServerSession(authOptions);
@@ -75,6 +77,71 @@ export async function stopWorkout(workoutLogId: string) {
   });
 }
 
+export async function alertTrainerOfCompletedWorkout(
+  clientId: string,
+  workoutLogId: string,
+) {
+  const client = await prisma.user.findUnique({
+    where: { id: clientId },
+    include: {
+      profile: true,
+    },
+  });
+
+  const trainer = client?.trainerId
+    ? await prisma.user.findUnique({
+        where: { id: client.trainerId },
+        select: {
+          email: true,
+        },
+      })
+    : null;
+
+  //  workout log id > get program id.
+  const workoutLog = await prisma.workoutLog.findUnique({
+    where: { id: workoutLogId },
+    include: {
+      scheduled: {
+        include: {
+          workout: {
+            include: {
+              program: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!trainer?.email || !client?.profile?.firstName || !workoutLog?.endedAt) {
+    return;
+  }
+
+  try {
+    if (workoutLog?.scheduled?.workout?.program) {
+      await sendCompletedWorkoutEmailToTrainer(
+        trainer.email,
+        client.profile.firstName,
+        workoutLog.scheduled.workout.name,
+        workoutLog.scheduled.workout.program.name,
+        workoutLog.endedAt!,
+      );
+    } else {
+      await sendAdditionalWorkoutEmailToTrainer(
+        trainer.email,
+        client.profile.firstName,
+        "Strength Training",
+        workoutLog.endedAt!,
+      );
+    }
+  } catch (error) {
+    console.error(
+      "❌ Failed to send completed workout email to trainer",
+      error,
+    );
+  }
+}
+
 export async function logExercise(
   workoutLogId: string,
   exerciseId: string,
@@ -92,7 +159,7 @@ export async function logExercise(
   });
 
   let exerciseLog;
-  
+
   if (exisitngLog) {
     exerciseLog = await prisma.exerciseLog.update({
       where: { id: exisitngLog.id },

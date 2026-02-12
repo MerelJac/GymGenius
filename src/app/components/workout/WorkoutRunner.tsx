@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { Performed } from "@/types/prescribed";
 import {
+  alertTrainerOfCompletedWorkout,
   startWorkout,
   stopWorkout,
 } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
@@ -92,6 +93,7 @@ const logs: ExerciseLog[] = activeLog
               await Promise.all(autoSaveFns.current.map((fn) => fn()));
 
               await stopWorkout(workoutLogId);
+              await alertTrainerOfCompletedWorkout(clientId,  workoutLogId);
               setWorkoutLogId(null);
               router.refresh();
             }}
