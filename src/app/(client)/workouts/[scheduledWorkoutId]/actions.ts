@@ -148,13 +148,13 @@ export async function logExercise(
   prescribed: Prescribed,
   performed: Performed,
   note?: string,
-  sectionId?: string,
+  sectionId?: string | null,
 ) {
   const exisitngLog = await prisma.exerciseLog.findFirst({
     where: {
       workoutLogId,
       exerciseId,
-      sectionId,
+      sectionId: sectionId ?? null, 
     },
   });
 
@@ -181,6 +181,7 @@ export async function logExercise(
       },
     });
   }
+  console.log('Exercise Log' , exerciseLog)
 
   // ── 1RM tracking ─────────────────────────────
   if (performed.kind === "strength" || performed.kind === "hybrid") {

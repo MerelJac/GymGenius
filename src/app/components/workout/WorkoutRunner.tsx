@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Performed } from "@/types/prescribed";
+import { Performed, Prescribed } from "@/types/prescribed";
 import {
   alertTrainerOfCompletedWorkout,
+  logExercise,
   startWorkout,
   stopWorkout,
 } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
@@ -29,22 +30,30 @@ export default function WorkoutRunner({
   );
   const [finishingText, setFinishingText] = useState("Finish Workout");
   const [isFinishing, setIsFinishing] = useState(false);
+  const [exerciseStates, setExerciseStates] = useState<
+    {
+      exerciseId: string;
+      prescribed: Prescribed;
+      performed: Performed;
+      note: string;
+      sectionId?: string | null;
+    }[]
+  >([]);
 
   const autoSaveFns = useRef<(() => Promise<void>)[]>([]);
 
-const logs: ExerciseLog[] = activeLog
-  ? activeLog.exercises.map((log) => ({
-      id: log.id,
-      workoutLogId: activeLog.id,
-      exerciseId: log.exerciseId,
-      exerciseName: log.exercise.name,
-      prescribed: assertPrescribed(log.prescribed),
-      performed: log.performed as Performed,
-      substitutedFrom: log.substitutedFrom ?? null,
-      substitutionReason: log.substitutionReason ?? null,
-    }))
-  : [];
-
+  const logs: ExerciseLog[] = activeLog
+    ? activeLog.exercises.map((log) => ({
+        id: log.id,
+        workoutLogId: activeLog.id,
+        exerciseId: log.exerciseId,
+        exerciseName: log.exercise.name,
+        prescribed: assertPrescribed(log.prescribed),
+        performed: log.performed as Performed,
+        substitutedFrom: log.substitutedFrom ?? null,
+        substitutionReason: log.substitutionReason ?? null,
+      }))
+    : [];
 
   if (isCompleted) {
     console.log("Completed workout logs:", logs);
@@ -90,10 +99,19 @@ const logs: ExerciseLog[] = activeLog
               setFinishingText("Finishing...");
 
               // 🔐 Auto-save all unsaved exercises
-              await Promise.all(autoSaveFns.current.map((fn) => fn()));
+              for (const ex of exerciseStates) {
+                await logExercise(
+                  workoutLogId,
+                  ex.exerciseId,
+                  ex.prescribed,
+                  ex.performed,
+                  ex.note,
+                  ex.sectionId ?? null,
+                );
+              }
 
               await stopWorkout(workoutLogId);
-              await alertTrainerOfCompletedWorkout(clientId,  workoutLogId);
+              await alertTrainerOfCompletedWorkout(clientId, workoutLogId);
               setWorkoutLogId(null);
               router.refresh();
             }}
@@ -123,10 +141,29 @@ const logs: ExerciseLog[] = activeLog
                     prescribed={assertPrescribed(we.prescribed)}
                     workoutLogId={workoutLogId}
                     clientId={clientId}
-                    sectionId={section.id} 
+                    sectionId={section.id}
                     disabled={!isActive}
                     notes={we.notes}
-                    onRegisterAutoSave={(fn) => autoSaveFns.current.push(fn)}
+                    onChange={(data) => {
+                      setExerciseStates((prev) => {
+                        const existing = prev.find(
+                          (e) =>
+                            e.exerciseId === data.exerciseId &&
+                            e.sectionId === data.sectionId,
+                        );
+
+                        if (existing) {
+                          return prev.map((e) =>
+                            e.exerciseId === data.exerciseId &&
+                            e.sectionId === data.sectionId
+                              ? data
+                              : e,
+                          );
+                        }
+
+                        return [...prev, data];
+                      });
+                    }}
                   />
                 );
               })}
@@ -141,11 +178,30 @@ const logs: ExerciseLog[] = activeLog
                     workoutLogId={workoutLogId}
                     clientId={clientId}
                     disabled={!isActive}
-                    sectionId={section.id} 
+                    sectionId={section.id}
                     notes={el.substitutionReason ?? "Client-added exercise"}
                     isClientAdded // 👈 ADD THIS FLAG
                     exerciseLogId={el.id} // 👈 PASS LOG ID
-                    onRegisterAutoSave={(fn) => autoSaveFns.current.push(fn)}
+                    onChange={(data) => {
+                      setExerciseStates((prev) => {
+                        const existing = prev.find(
+                          (e) =>
+                            e.exerciseId === data.exerciseId &&
+                            e.sectionId === data.sectionId,
+                        );
+
+                        if (existing) {
+                          return prev.map((e) =>
+                            e.exerciseId === data.exerciseId &&
+                            e.sectionId === data.sectionId
+                              ? data
+                              : e,
+                          );
+                        }
+
+                        return [...prev, data];
+                      });
+                    }}
                   />
                 ))}
             </ul>
