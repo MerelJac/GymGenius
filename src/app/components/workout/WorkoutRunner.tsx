@@ -131,51 +131,6 @@ export default function WorkoutRunner({
             </h3>
 
             <ul className="space-y-3">
-              {section.exercises
-                .filter(
-                  (we) =>
-                    !activeLog?.exercises.some(
-                      (el) =>
-                        el.exerciseId === we.exerciseId &&
-                        el.sectionId === section.id,
-                    ),
-                )
-                .map((we) => {
-                  if (!we.exercise) return null;
-
-                  return (
-                    <ExerciseLogger
-                      key={we.id}
-                      exercise={we.exercise}
-                      prescribed={assertPrescribed(we.prescribed)}
-                      workoutLogId={workoutLogId}
-                      clientId={clientId}
-                      sectionId={section.id}
-                      disabled={!isActive}
-                      notes={we.notes}
-                      onChange={(data) => {
-                        setExerciseStates((prev) => {
-                          const existing = prev.find(
-                            (e) =>
-                              e.exerciseId === data.exerciseId &&
-                              e.sectionId === data.sectionId,
-                          );
-
-                          if (existing) {
-                            return prev.map((e) =>
-                              e.exerciseId === data.exerciseId &&
-                              e.sectionId === data.sectionId
-                                ? data
-                                : e,
-                            );
-                          }
-
-                          return [...prev, data];
-                        });
-                      }}
-                    />
-                  );
-                })}
               {/* CLIENT-ADDED EXERCISES */}
               {activeLog?.exercises
                 .filter((el) => el.sectionId === section.id)
@@ -188,9 +143,9 @@ export default function WorkoutRunner({
                     clientId={clientId}
                     disabled={!isActive}
                     sectionId={section.id}
-                    notes={el.substitutionReason ?? "Client-added exercise"}
-                    isClientAdded // 👈 ADD THIS FLAG
-                    exerciseLogId={el.id} // 👈 PASS LOG ID
+                    notes={el.substitutionReason ?? null}
+                    isClientAdded
+                    exerciseLogId={el.id}
                     onChange={(data) => {
                       setExerciseStates((prev) => {
                         const existing = prev.find(
