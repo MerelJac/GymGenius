@@ -1,6 +1,6 @@
 "use client";
-
-import { useOptimistic, startTransition } from "react";
+//  src/app/components/programs/ProgramClient.tsx
+// import { useOptimistic, startTransition } from "react";
 import Link from "next/link";
 import { Program } from "@/types/program";
 import {
@@ -16,53 +16,73 @@ export default function ProgramsPageClient({
   initialPrograms: Program[];
 }) {
   const router = useRouter();
-  type ProgramAction =
-    | { type: "remove"; id: string }
-    | { type: "add"; program: Program };
+  // type ProgramAction =
+  //   | { type: "remove"; id: string }
+  //   | { type: "add"; program: Program };
 
-  const [programs, updatePrograms] = useOptimistic<Program[], ProgramAction>(
-    initialPrograms,
-    (state, action) => {
-      switch (action.type) {
-        case "remove":
-          return state.filter((p) => p.id !== action.id);
-        case "add":
-          return [...state, action.program];
-        default:
-          return state;
-      }
-    },
-  );
+  // const [programs, updatePrograms] = useOptimistic<Program[], ProgramAction>(
+  //   initialPrograms,
+  //   (state, action) => {
+  //     switch (action.type) {
+  //       case "remove":
+  //         return state.filter((p) => p.id !== action.id);
+  //       case "add":
+  //         return [...state, action.program];
+  //       default:
+  //         return state;
+  //     }
+  //   },
+  // );
+
+  const programs = initialPrograms;
+
+  // async function handleDelete(program: Program) {
+  //   const confirmed = window.confirm(
+  //     "Deleting this workout will also remove all scheduled workouts for clients.\n\nThis action can’t be undone.",
+  //   );
+
+  //   if (!confirmed) return;
+
+  //   startTransition(() => {
+  //     updatePrograms({ type: "remove", id: program.id });
+  //   });
+
+  //   await deleteProgram(program.id);
+  //   router.refresh();
+  // }
 
   async function handleDelete(program: Program) {
-    const confirmed = window.confirm(
-      "Deleting this workout will also remove all scheduled workouts for clients.\n\nThis action can’t be undone.",
-    );
-
-    if (!confirmed) return;
-
-    startTransition(() => {
-      updatePrograms({ type: "remove", id: program.id });
-    });
+    if (
+      !window.confirm(
+        "Deleting this workout will also remove all scheduled workouts for clients.\n\nThis action can’t be undone.",
+      )
+    )
+      return;
 
     await deleteProgram(program.id);
     router.refresh();
   }
 
   async function handleDuplicate(program: Program) {
-    const optimisticCopy: Program = {
-      ...program,
-      id: crypto.randomUUID(),
-      name: `${program.name} (Copy)`,
-    };
-
-    startTransition(() => {
-      updatePrograms({ type: "add", program: optimisticCopy });
-    });
-
     await duplicateProgram(program.id);
     router.refresh();
   }
+  // async function handleDuplicate(program: Program) {
+  //   const optimisticCopy: Program = {
+  //     ...program,
+  //     id: crypto.randomUUID(),
+  //     name: `${program.name} (Copy)`,
+  //   };
+
+  //   startTransition(() => {
+  //     updatePrograms({ type: "add", program: optimisticCopy });
+  //   });
+
+  //   await duplicateProgram(program.id);
+  //   router.refresh();
+  // }
+
+  console.log("Programs: ", programs);
   return (
     <div className="space-y-6">
       {/* Header */}
