@@ -19,9 +19,15 @@ export default async function ClientDashboard() {
   const clientId = session?.user?.id;
   const progress = await getClientProgressSummary(clientId);
   const stats = await getClientDashboardStats(clientId);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const now = new Date();
 
+  const pstNow = new Date(
+    now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }),
+  );
+
+  pstNow.setHours(0, 0, 0, 0);
+
+  const today = pstNow;
   console.log(today, "today's date client dashboard");
   const profile = await prisma.profile.findUnique({
     where: { userId: clientId },
