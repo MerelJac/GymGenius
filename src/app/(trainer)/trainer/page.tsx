@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ClientProgramProgress } from "@/app/components/ClientProgramProgress";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 export default async function TrainerHomePage() {
   const session = await getServerSession(authOptions);
@@ -144,15 +145,20 @@ export default async function TrainerHomePage() {
           <ul className="divide-y divide-gray-200">
             {recentCompletedWorkouts.map((w) => (
               <li key={w.id} className="py-3 flex justify-between items-start">
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {w.clientName}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {w.workoutName}
-                    {w.programName && ` · ${w.programName}`}
-                  </p>
-                </div>
+                <Link
+                  href={`/view-workouts/${w.id}`}
+                  className="flex justify-between items-start hover:bg-gray-50 p-2 rounded transition"
+                >
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {w.clientName}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {w.workoutName}
+                      {w.programName && ` · ${w.programName}`}
+                    </p>
+                  </div>
+                </Link>
 
                 <p className="text-xs text-gray-400">
                   {w.date.toLocaleDateString()}
