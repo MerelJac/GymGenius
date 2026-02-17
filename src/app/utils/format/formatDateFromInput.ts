@@ -10,17 +10,10 @@ export function formatDateFromInput(value: string | Date): Date {
 
   // string case
   const d = new Date(value);
-  return new Date(
-    d.getFullYear(),
-    d.getMonth(),
-    d.getDate(),
-    12,
-  );
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12);
 }
 
-export function formatDateFromInputReturnString(
-  value: string | Date
-): string {
+export function formatDateFromInputReturnString(value: string | Date): string {
   let d: Date;
 
   if (value instanceof Date) {
@@ -29,7 +22,7 @@ export function formatDateFromInputReturnString(
       value.getUTCFullYear(),
       value.getUTCMonth(),
       value.getUTCDate(),
-      12
+      12,
     );
   } else {
     // Handle strings explicitly
@@ -39,7 +32,7 @@ export function formatDateFromInputReturnString(
         parsed.getUTCFullYear(),
         parsed.getUTCMonth(),
         parsed.getUTCDate(),
-        12
+        12,
       );
     } else {
       // YYYY-MM-DD
@@ -60,20 +53,22 @@ export function formatDateFromInputReturnString(
  * local, timezone-safe Date (normalized to noon).
  */
 export function normalizeDate(value: string | Date): Date {
+  console.log("Date coming in:", value);
   if (value instanceof Date) {
     return new Date(
       value.getUTCFullYear(),
       value.getUTCMonth(),
       value.getUTCDate(),
-      12 // noon local, stable
+      12, // noon local, stable
     );
   }
 
   // Expect YYYY-MM-DD
   const [year, month, day] = value.split("-").map(Number);
+  console.log("Date going out:", new Date(year, month - 1, day, 12));
+
   return new Date(year, month - 1, day, 12);
 }
-
 
 /**
  * Convert a Date → YYYY-MM-DD for <input type="date">
