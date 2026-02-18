@@ -12,7 +12,7 @@ export async function signupAction(formData: FormData): Promise<SignupResult> {
   const lastName = String(formData.get("lastName"));
   const passwordConfirm = String(formData.get("password-confirm"));
   const INVITE_PASS = process.env.INVITE_PASS!;
-
+  console.log("Invite pass", INVITE_PASS);
   if (!email || !password || !passwordConfirm || !firstName || !lastName) {
     return { success: false, error: "Missing required fields" };
   }
@@ -41,8 +41,13 @@ export async function signupAction(formData: FormData): Promise<SignupResult> {
         where: { id: user.id },
         data: { password: hashed },
       }),
-      prisma.profile.create({
-        data: {
+      prisma.profile.upsert({
+        where: { userId: user.id },
+        update: {
+          firstName,
+          lastName,
+        },
+        create: {
           userId: user.id,
           firstName,
           lastName,
