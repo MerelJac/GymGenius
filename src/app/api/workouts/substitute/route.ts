@@ -66,7 +66,7 @@ export async function POST(req: Request) {
         exerciseId: newExerciseId,
         substitutedFrom: oldExerciseId,
         substitutionReason: oldExercise
-          ? `Substituted with ${oldExercise.name}`
+          ? `Substituted from ${oldExercise.name}`
           : "Client substituted exercise",
       },
     });
