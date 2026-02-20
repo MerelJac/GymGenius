@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Performed } from "@/types/prescribed";
+import { Performed, Prescribed } from "@/types/prescribed";
 import {
+  alertTrainerOfCompletedWorkout,
+  logExercise,
   startWorkout,
   stopWorkout,
   rerunWorkout,
@@ -31,14 +33,17 @@ export default function WorkoutRunner({
   );
   const [finishingText, setFinishingText] = useState("Finish Workout");
   const [isFinishing, setIsFinishing] = useState(false);
+  const [exerciseStates, setExerciseStates] = useState<
+    {
+      exerciseId: string;
+      prescribed: Prescribed;
+      performed: Performed;
+      note: string;
+      sectionId?: string | null;
+    }[]
+  >([]);
 
   const autoSaveFns = useRef<(() => Promise<void>)[]>([]);
-
-  const handleRerunWorkout = async () => {
-    if (!confirm("Restart this workout?")) return;
-
-    await rerunWorkout(scheduledWorkout.id);
-  };
 
   const logs: ExerciseLog[] = activeLog
     ? activeLog.exercises.map((log) => ({
@@ -105,9 +110,19 @@ export default function WorkoutRunner({
               setFinishingText("Finishing...");
 
               // 🔐 Auto-save all unsaved exercises
-              await Promise.all(autoSaveFns.current.map((fn) => fn()));
+              for (const ex of exerciseStates) {
+                await logExercise(
+                  workoutLogId,
+                  ex.exerciseId,
+                  ex.prescribed,
+                  ex.performed,
+                  ex.note,
+                  ex.sectionId ?? null,
+                );
+              }
 
               await stopWorkout(workoutLogId);
+              await alertTrainerOfCompletedWorkout(clientId, workoutLogId);
               setWorkoutLogId(null);
               router.refresh();
             }}
@@ -127,23 +142,51 @@ export default function WorkoutRunner({
             </h3>
 
             <ul className="space-y-3">
-              {section.exercises.map((we) => {
-                if (!we.exercise) return null;
+              {section.exercises
+                .filter(
+                  (we) =>
+                    !activeLog?.exercises.some(
+                      (el) =>
+                        el.exerciseId === we.exerciseId &&
+                        el.sectionId === section.id,
+                    ),
+                )
+                .map((we) => {
+                  if (!we.exercise) return null;
 
-                return (
-                  <ExerciseLogger
-                    key={we.id}
-                    exercise={we.exercise}
-                    prescribed={assertPrescribed(we.prescribed)}
-                    workoutLogId={workoutLogId}
-                    clientId={clientId}
-                    sectionId={section.id}
-                    disabled={!isActive}
-                    notes={we.notes}
-                    onRegisterAutoSave={(fn) => autoSaveFns.current.push(fn)}
-                  />
-                );
-              })}
+                  return (
+                    <ExerciseLogger
+                      key={we.id}
+                      exercise={we.exercise}
+                      prescribed={assertPrescribed(we.prescribed)}
+                      workoutLogId={workoutLogId}
+                      clientId={clientId}
+                      sectionId={section.id}
+                      disabled={!isActive}
+                      notes={we.notes}
+                      onChange={(data) => {
+                        setExerciseStates((prev) => {
+                          const existing = prev.find(
+                            (e) =>
+                              e.exerciseId === data.exerciseId &&
+                              e.sectionId === data.sectionId,
+                          );
+
+                          if (existing) {
+                            return prev.map((e) =>
+                              e.exerciseId === data.exerciseId &&
+                              e.sectionId === data.sectionId
+                                ? data
+                                : e,
+                            );
+                          }
+
+                          return [...prev, data];
+                        });
+                      }}
+                    />
+                  );
+                })}
               {/* CLIENT-ADDED EXERCISES */}
               {activeLog?.exercises
                 .filter((el) => el.sectionId === section.id)
@@ -159,7 +202,26 @@ export default function WorkoutRunner({
                     notes={el.substitutionReason ?? "Client-added exercise"}
                     isClientAdded // 👈 ADD THIS FLAG
                     exerciseLogId={el.id} // 👈 PASS LOG ID
-                    onRegisterAutoSave={(fn) => autoSaveFns.current.push(fn)}
+                    onChange={(data) => {
+                      setExerciseStates((prev) => {
+                        const existing = prev.find(
+                          (e) =>
+                            e.exerciseId === data.exerciseId &&
+                            e.sectionId === data.sectionId,
+                        );
+
+                        if (existing) {
+                          return prev.map((e) =>
+                            e.exerciseId === data.exerciseId &&
+                            e.sectionId === data.sectionId
+                              ? data
+                              : e,
+                          );
+                        }
+
+                        return [...prev, data];
+                      });
+                    }}
                   />
                 ))}
             </ul>

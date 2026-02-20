@@ -25,7 +25,7 @@ export function ExerciseLogger({
   notes,
   isClientAdded = false,
   exerciseLogId,
-  onRegisterAutoSave,
+  onChange,
 }: {
   exercise: Exercise;
   prescribed: Prescribed;
@@ -36,7 +36,13 @@ export function ExerciseLogger({
   notes?: string | null;
   isClientAdded?: boolean;
   exerciseLogId?: string;
-  onRegisterAutoSave?: (fn: () => Promise<void>) => void;
+  onChange: (data: {
+    exerciseId: string;
+    prescribed: Prescribed;
+    performed: Performed;
+    note: string;
+    sectionId?: string | null;
+  }) => void;
 }) {
   const router = useRouter();
   const [performed, setPerformed] = useState<Performed>(
@@ -58,7 +64,16 @@ export function ExerciseLogger({
   const performedRef = useRef(performed);
   const noteRef = useRef(note);
   const hasSavedRef = useRef(hasSaved);
-  const hasRegisteredRef = useRef(false);
+
+  useEffect(() => {
+    onChange({
+      exerciseId: exercise.id,
+      prescribed,
+      performed,
+      note,
+      sectionId: sectionId ?? null,
+    });
+  }, [performed, note]);
 
   useEffect(() => {
     performedRef.current = performed;
@@ -66,25 +81,7 @@ export function ExerciseLogger({
     hasSavedRef.current = hasSaved;
   }, [performed, note, hasSaved]);
 
-  useEffect(() => {
-    if (!onRegisterAutoSave) return;
-    if (!workoutLogId) return;
-    if (hasRegisteredRef.current) return;
-
-    const fn = async () => {
-      await logExercise(
-        workoutLogId,
-        exercise.id,
-        prescribed,
-        performedRef.current,
-        noteRef.current,
-        sectionId,
-      );
-    };
-
-    onRegisterAutoSave(fn);
-    hasRegisteredRef.current = true;
-  }, [onRegisterAutoSave, workoutLogId, exercise.id]);
+  const hasRegisteredRef = useRef(false);
 
   useEffect(() => {
     async function loadOneRepMax() {
