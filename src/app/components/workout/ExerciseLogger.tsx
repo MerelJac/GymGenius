@@ -18,6 +18,7 @@ import SubstitutionModal from "../exercise/SubstitutionModal";
 export function ExerciseLogger({
   exercise,
   prescribed,
+  performed,
   workoutLogId,
   clientId,
   sectionId,
@@ -29,6 +30,7 @@ export function ExerciseLogger({
 }: {
   exercise: Exercise;
   prescribed: Prescribed;
+  performed?: Performed;
   workoutLogId: string | null;
   clientId: string;
   sectionId?: string | undefined;
@@ -45,9 +47,10 @@ export function ExerciseLogger({
   }) => void;
 }) {
   const router = useRouter();
-  const [performed, setPerformed] = useState<Performed>(
-    buildPerformedFromPrescribed(prescribed),
+  const [performedState, setPerformedState] = useState<Performed>(
+    performed ?? buildPerformedFromPrescribed(prescribed),
   );
+
   const [hasSaved, setHasSaved] = useState(false);
   const [openSubModal, setOpenSubModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,7 +62,7 @@ export function ExerciseLogger({
     updater: (prev: Performed) => Performed,
   ) {
     setHasSaved(false);
-    setPerformed((prev) => updater(prev));
+    setPerformedState((prev) => updater(prev));
   }
   const performedRef = useRef(performed);
   const noteRef = useRef(note);
@@ -69,11 +72,11 @@ export function ExerciseLogger({
     onChange({
       exerciseId: exercise.id,
       prescribed,
-      performed,
+      performed: performedState,
       note,
       sectionId: sectionId ?? null,
     });
-  }, [performed, note]);
+  }, [performedState, note]);
 
   useEffect(() => {
     performedRef.current = performed;
@@ -107,7 +110,7 @@ export function ExerciseLogger({
         </h4>
         <div className="flex flex-row gap-2">
           {/* Substitution */}
-          {/* <button
+          <button
             onClick={(e) => {
               e.stopPropagation();
               setOpenSubModal(true);
@@ -115,7 +118,7 @@ export function ExerciseLogger({
             className="text-xs text-black-600"
           >
             <Ellipsis size={14} />
-          </button> */}
+          </button>
 
           {isClientAdded && !disabled && (
             <button
@@ -146,7 +149,7 @@ export function ExerciseLogger({
       {!disabled && (
         <div className="space-y-4">
           {/* Timed */}
-          {prescribed.kind === "timed" && performed.kind === "timed" && (
+          {prescribed.kind === "timed" && performedState.kind === "timed" && (
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium w-24 text-gray-700">
                 Time
@@ -154,7 +157,7 @@ export function ExerciseLogger({
               <input
                 type="number"
                 className="w-28 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                value={performed.duration}
+                value={performedState.duration}
                 onChange={(e) =>
                   updatePerformed(() => ({
                     kind: "timed",
@@ -167,9 +170,10 @@ export function ExerciseLogger({
           )}
 
           {/* Strength / Hybrid */}
-          {(performed.kind === "strength" || performed.kind === "hybrid") && (
+          {(performedState.kind === "strength" ||
+            performedState.kind === "hybrid") && (
             <div className="space-y-3">
-              {performed.sets.map((set, index) => {
+              {performedState.sets.map((set, index) => {
                 const reps = set.reps;
                 const recommendedWeight =
                   oneRepMax && reps
@@ -192,7 +196,7 @@ export function ExerciseLogger({
                       value={set.reps}
                       onChange={(e) => {
                         setHasSaved(false);
-                        setPerformed((prev) => {
+                        setPerformedState((prev) => {
                           if (
                             prev.kind !== "strength" &&
                             prev.kind !== "hybrid"
@@ -224,7 +228,7 @@ export function ExerciseLogger({
                       onFocus={() => {
                         if (!set.weight && recommendedWeight) {
                           setHasSaved(false);
-                          setPerformed((prev) => {
+                          setPerformedState((prev) => {
                             if (
                               prev.kind !== "strength" &&
                               prev.kind !== "hybrid"
@@ -243,7 +247,7 @@ export function ExerciseLogger({
                       }}
                       onChange={(e) => {
                         setHasSaved(false);
-                        setPerformed((prev) => {
+                        setPerformedState((prev) => {
                           if (
                             prev.kind !== "strength" &&
                             prev.kind !== "hybrid"
@@ -269,17 +273,20 @@ export function ExerciseLogger({
             </div>
           )}
           {/* CORE & MOBILITY */}
-          {(performed.kind === "core" || performed.kind === "mobility") && (
+          {(performedState.kind === "core" ||
+            performedState.kind === "mobility") && (
             <div className="space-y-3">
               {/* Sets */}
               <div className="space-y-2">
                 {(() => {
-                  const firstDuration = performed.sets[0]?.duration;
+                  const firstDuration = performedState.sets[0]?.duration;
                   const sameDuration =
                     firstDuration != null &&
-                    performed.sets.every((s) => s.duration === firstDuration);
+                    performedState.sets.every(
+                      (s) => s.duration === firstDuration,
+                    );
 
-                  return performed.sets.map((set, index) => (
+                  return performedState.sets.map((set, index) => (
                     <div
                       key={index}
                       className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 flex-wrap gap-2"
@@ -296,7 +303,7 @@ export function ExerciseLogger({
                             value={set.reps ?? ""}
                             onChange={(e) => {
                               setHasSaved(false);
-                              setPerformed((prev) => {
+                              setPerformedState((prev) => {
                                 if (
                                   prev.kind !== "core" &&
                                   prev.kind !== "mobility"
@@ -334,7 +341,7 @@ export function ExerciseLogger({
                             value={set.weight ?? ""}
                             onChange={(e) => {
                               setHasSaved(false);
-                              setPerformed((prev) => {
+                              setPerformedState((prev) => {
                                 if (
                                   prev.kind !== "core" &&
                                   prev.kind !== "mobility"
@@ -372,7 +379,7 @@ export function ExerciseLogger({
                           value={set.duration ?? ""}
                           onChange={(e) => {
                             setHasSaved(false);
-                            setPerformed((prev) => {
+                            setPerformedState((prev) => {
                               if (
                                 prev.kind !== "core" &&
                                 prev.kind !== "mobility"
@@ -404,9 +411,9 @@ export function ExerciseLogger({
           )}
 
           {/* Bodyweight */}
-          {performed.kind === "bodyweight" && (
+          {performedState.kind === "bodyweight" && (
             <div className="space-y-3">
-              {performed.sets.map((set, index) => (
+              {performedState.sets.map((set, index) => (
                 <div
                   key={index}
                   className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2"
@@ -421,7 +428,7 @@ export function ExerciseLogger({
                     value={set.reps}
                     onChange={(e) => {
                       setHasSaved(false);
-                      setPerformed((prev) => {
+                      setPerformedState((prev) => {
                         if (prev.kind !== "bodyweight") return prev;
 
                         const sets = [...prev.sets];
@@ -469,7 +476,7 @@ export function ExerciseLogger({
                   workoutLogId,
                   exercise.id,
                   prescribed,
-                  performed,
+                  performedState,
                   note,
                   sectionId,
                 );
