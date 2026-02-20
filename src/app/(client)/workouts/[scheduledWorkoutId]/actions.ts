@@ -92,14 +92,14 @@ export async function logExercise(
   });
 
   let exerciseLog;
-  
+
   if (exisitngLog) {
     exerciseLog = await prisma.exerciseLog.update({
       where: { id: exisitngLog.id },
       data: {
         performed,
         prescribed,
-        substitutionReason: note || null,
+        substitutionReason: exisitngLog.substitutionReason,
       },
     });
   } else {
@@ -203,7 +203,7 @@ export async function removeClientExercise(exerciseLogId: string) {
 
   // 🔐 Only allow removal if it was client-added
   if (log.substitutedFrom) {
-    throw new Error("Cannot remove substituted exercises");
+    return { success: false, error: "Cannot remove substituted exercises" };
   }
 
   await prisma.exerciseLog.delete({
@@ -211,30 +211,34 @@ export async function removeClientExercise(exerciseLogId: string) {
   });
 }
 
-
 export async function rerunWorkout(scheduledWorkoutId: string) {
-  // 1️⃣ Get original scheduled workout
   const original = await prisma.scheduledWorkout.findUnique({
     where: { id: scheduledWorkoutId },
   });
 
-  console.log('Original wokrout id:', original)
-
   if (!original) {
-    throw new Error("Scheduled workout not found");
+    return { success: false, error: "Scheduled workout not founds" };
   }
 
-  // 2️⃣ Create new scheduled workout
+  // 1️⃣ Create new scheduled workout
   const newScheduled = await prisma.scheduledWorkout.create({
     data: {
       workoutId: original.workoutId,
       clientId: original.clientId,
-      scheduledDate: new Date(), // rerun today
+      scheduledDate: new Date(),
       status: "SCHEDULED",
     },
   });
 
-  console.log('new schedueld workout id: ', newScheduled)
-  // 3️⃣ Redirect to new workout page
+  // 2️⃣ Create empty workout log
+  await prisma.workoutLog.create({
+    data: {
+      clientId: original.clientId,
+      scheduledId: newScheduled.id,
+      status: "IN_PROGRESS",
+      startedAt: new Date(),
+    },
+  });
+
   redirect(`/workouts/${newScheduled.id}`);
 }

@@ -17,7 +17,7 @@ export function ExerciseLogViewer({ logs }: { logs: ExerciseLog[] }) {
             </h4>
             <div className="flex flex-col items-center justify-between gap-2">
               {log.substitutedFrom && (
-                <span className="text-xs text-green-400">Substituted</span>
+                <span className="text-xs text-green-400">Substituted In</span>
               )}
               <span className="text-xs text-gray-400">Logged</span>
             </div>

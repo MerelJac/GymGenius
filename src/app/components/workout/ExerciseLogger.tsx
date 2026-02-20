@@ -503,6 +503,7 @@ export function ExerciseLogger({
           exerciseId={exercise.id}
           workoutLogId={workoutLogId}
           sectionId={sectionId}
+          prescribed={prescribed}
           onClose={() => setOpenSubModal(false)}
         />
       )}

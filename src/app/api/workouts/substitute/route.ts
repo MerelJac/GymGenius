@@ -1,4 +1,6 @@
+// src/app/api/workouts/substitute/route.ts
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -8,17 +10,23 @@ export async function POST(req: Request) {
       sectionId,
       oldExerciseId,
       newExerciseId,
+      prescribed,
     } = await req.json();
 
+    console.log("old ex:", oldExerciseId);
+    console.log("new ex:", newExerciseId);
+    console.log("workoutlogId:", workoutLogId);
+    console.log("sectionId:", sectionId);
+    console.log("Presecribed", prescribed);
     if (!workoutLogId || !oldExerciseId || !newExerciseId) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Find the existing log row
-    const existingLog = await prisma.exerciseLog.findFirst({
+    let existingLog = await prisma.exerciseLog.findFirst({
       where: {
         workoutLogId,
         sectionId,
@@ -26,13 +34,23 @@ export async function POST(req: Request) {
       },
     });
 
-    if (!existingLog) {
-      return NextResponse.json(
-        { error: "Exercise log not found" },
-        { status: 404 }
-      );
-    }
+    console.log("exisitng log:", existingLog);
 
+    if (!existingLog) {
+      existingLog = await prisma.exerciseLog.create({
+        data: {
+          workoutLogId,
+          exerciseId: oldExerciseId,
+          sectionId,
+          prescribed: prescribed
+            ? (prescribed as Prisma.InputJsonValue)
+            : Prisma.JsonNull,
+          performed: Prisma.JsonNull,
+          substitutionReason: oldExerciseId,
+        },
+      });
+    }
+    
     // Update the log
     await prisma.exerciseLog.update({
       where: {
@@ -41,6 +59,7 @@ export async function POST(req: Request) {
       data: {
         exerciseId: newExerciseId,
         substitutedFrom: oldExerciseId,
+        substitutionReason: "Substituted from Client"
       },
     });
 
@@ -49,7 +68,7 @@ export async function POST(req: Request) {
     console.error("Substitution error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

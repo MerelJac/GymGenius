@@ -39,6 +39,7 @@ export default function WorkoutRunner({
 
     await rerunWorkout(scheduledWorkout.id);
   };
+
   const logs: ExerciseLog[] = activeLog
     ? activeLog.exercises.map((log) => ({
         id: log.id,
@@ -52,6 +53,8 @@ export default function WorkoutRunner({
       }))
     : [];
 
+  console.log("schedueld logs:", scheduledWorkout);
+  console.log("active logs", activeLog);
   if (isCompleted) {
     console.log("Completed workout logs:", logs);
     return (

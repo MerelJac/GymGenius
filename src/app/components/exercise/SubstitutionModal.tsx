@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Prescribed } from "@/types/prescribed";
 
 type Exercise = {
   id: string;
@@ -12,11 +13,13 @@ export default function SubstitutionModal({
   exerciseId,
   workoutLogId,
   sectionId,
+  prescribed,
   onClose,
 }: {
   exerciseId: string;
   workoutLogId: string;
   sectionId?: string;
+  prescribed?: Prescribed | null;
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -42,6 +45,7 @@ export default function SubstitutionModal({
         sectionId,
         oldExerciseId: exerciseId,
         newExerciseId,
+        prescribed,
       }),
     });
 
@@ -55,16 +59,20 @@ export default function SubstitutionModal({
       <div className="bg-white rounded-xl p-6 w-96 space-y-4">
         <h3 className="font-semibold text-lg">Substitute Exercise</h3>
 
-        {subs.map((ex) => (
-          <button
-            key={ex.id}
-            onClick={() => handleSubstitute(ex.id)}
-            disabled={loading}
-            className="w-full text-left p-3 rounded-lg border hover:bg-gray-50"
-          >
-            {ex.name}
-          </button>
-        ))}
+        {subs.length === 0 ? (
+          <p className="text-sm text-gray-500">No substitutions available</p>
+        ) : (
+          subs.map((ex) => (
+            <button
+              key={ex.id}
+              onClick={() => handleSubstitute(ex.id)}
+              disabled={loading}
+              className="w-full text-left p-3 rounded-lg border hover:bg-gray-50"
+            >
+              {ex.name}
+            </button>
+          ))
+        )}
 
         <button
           onClick={onClose}
