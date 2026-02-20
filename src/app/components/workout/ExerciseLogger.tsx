@@ -107,7 +107,7 @@ export function ExerciseLogger({
         </h4>
         <div className="flex flex-row gap-2">
           {/* Substitution */}
-          <button
+          {/* <button
             onClick={(e) => {
               e.stopPropagation();
               setOpenSubModal(true);
@@ -115,7 +115,7 @@ export function ExerciseLogger({
             className="text-xs text-black-600"
           >
             <Ellipsis size={14} />
-          </button>
+          </button> */}
 
           {isClientAdded && !disabled && (
             <button
