@@ -33,6 +33,12 @@ export default function WorkoutRunner({
   );
   const [finishingText, setFinishingText] = useState("Finish Workout");
   const [isFinishing, setIsFinishing] = useState(false);
+  const handleRerunWorkout = async () => {
+    if (!confirm("Restart this workout?")) return;
+
+    await rerunWorkout(scheduledWorkout.id);
+  };
+
   const [exerciseStates, setExerciseStates] = useState<
     {
       exerciseId: string;
