@@ -206,7 +206,7 @@ export default function WorkoutRunner({
                     clientId={clientId}
                     disabled={!isActive}
                     sectionId={section.id}
-                    notes={el.substitutionReason ?? "Client-added exercise"}
+                    notes={el.substitutionReason}
                     isClientAdded // 👈 ADD THIS FLAG
                     exerciseLogId={el.id} // 👈 PASS LOG ID
                     onChange={(data) => {
