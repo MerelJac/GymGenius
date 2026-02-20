@@ -1,4 +1,5 @@
 // src/app/trainer/clients/page.tsx
+export const dynamic = "force-dynamic";
 
 import { prisma } from "@/lib/prisma";
 import AddClientForm from "@/app/components/clients/AddClientForm";
