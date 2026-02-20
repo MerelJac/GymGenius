@@ -10,9 +10,10 @@ import {
 } from "@/app/utils/workoutFunctions";
 import { Exercise } from "@/types/exercise";
 import { Performed, Prescribed } from "@/types/prescribed";
-import { Trash2 } from "lucide-react";
+import { Ellipsis, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import SubstitutionModal from "../exercise/SubstitutionModal";
 
 export function ExerciseLogger({
   exercise,
@@ -48,7 +49,7 @@ export function ExerciseLogger({
     buildPerformedFromPrescribed(prescribed),
   );
   const [hasSaved, setHasSaved] = useState(false);
-
+  const [openSubModal, setOpenSubModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [note, setNote] = useState("");
   const [openExerciseId, setOpenExerciseId] = useState<string | null>(null);
@@ -104,22 +105,35 @@ export function ExerciseLogger({
         >
           {exercise.name}
         </h4>
-        {isClientAdded && !disabled && (
+        <div className="flex flex-row gap-2">
+          {/* Substitution */}
           <button
-            onClick={async (e) => {
+            onClick={(e) => {
               e.stopPropagation();
-              if (!exerciseLogId || !workoutLogId) return;
-
-              if (!confirm("Remove this exercise from your workout?")) return;
-
-              await removeClientExercise(exerciseLogId);
-              router.refresh();
+              setOpenSubModal(true);
             }}
-            className="text-xs text-red-600 hover:underline"
+            className="text-xs text-black-600"
           >
-            <Trash2 size={14} />
+            <Ellipsis size={14} />
           </button>
-        )}
+
+          {isClientAdded && !disabled && (
+            <button
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (!exerciseLogId || !workoutLogId) return;
+
+                if (!confirm("Remove this exercise from your workout?")) return;
+
+                await removeClientExercise(exerciseLogId);
+                router.refresh();
+              }}
+              className="text-xs text-red-600 hover:underline"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Prescribed */}
@@ -432,7 +446,7 @@ export function ExerciseLogger({
           />
 
           {notes && (
-            <div className="text-sm text-gray-500 italic bg-gray-50 border rounded-lg px-3 py-2">
+            <div className="text-sm text-gray-500 italic bg-green-50 border rounded-lg px-3 py-2">
               Coach notes: {notes}
             </div>
           )}
@@ -471,12 +485,23 @@ export function ExerciseLogger({
         </div>
       )}
 
-      {/* Modal */}
+      {/* Exercise info Modal */}
       {openExerciseId && (
         <ExerciseModal
           exerciseId={openExerciseId}
           clientId={clientId}
           onClose={() => setOpenExerciseId(null)}
+        />
+      )}
+
+      {/* Substitution modal */}
+      {openSubModal && workoutLogId && (
+        <SubstitutionModal
+          exerciseId={exercise.id}
+          workoutLogId={workoutLogId}
+          sectionId={sectionId}
+          prescribed={prescribed}
+          onClose={() => setOpenSubModal(false)}
         />
       )}
     </li>
