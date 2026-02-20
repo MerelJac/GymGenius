@@ -7,6 +7,7 @@ import {
   logExercise,
   startWorkout,
   stopWorkout,
+  rerunWorkout,
 } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
 import { ExerciseLogger } from "./ExerciseLogger";
 import { ExerciseLog, ScheduledWorkoutWithLogs } from "@/types/workout";
@@ -14,6 +15,7 @@ import { ExerciseLogViewer } from "./ExerciseLogViewer";
 import { useRouter } from "next/navigation";
 import { assertPrescribed } from "@/app/utils/prescriptions/assertPrescribed";
 import { AddExerciseToWorkout } from "./AddExerciseToWorkout";
+import { RotateCcw } from "lucide-react";
 
 export default function WorkoutRunner({
   scheduledWorkout,
@@ -25,6 +27,7 @@ export default function WorkoutRunner({
   const router = useRouter();
   const clientId = scheduledWorkout.clientId;
   const isCompleted = activeLog?.status === "COMPLETED";
+
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(
     activeLog?.id ?? null,
   );
@@ -55,12 +58,20 @@ export default function WorkoutRunner({
       }))
     : [];
 
+  console.log("schedueld logs:", scheduledWorkout);
+  console.log("active logs", activeLog);
   if (isCompleted) {
     console.log("Completed workout logs:", logs);
     return (
       <>
-        <div className="rounded bg-green-50 border p-3 text-green-700 my-4">
-          Workout completed 🎉
+        <div className="flex flex-row justify-between ">
+          <div className="rounded bg-green-50 border p-3 text-green-700 my-4  min-w-fit">
+            Workout completed 🎉
+          </div>
+          {}
+          <button onClick={handleRerunWorkout}>
+            <RotateCcw size={14} />
+          </button>
         </div>
 
         <ExerciseLogViewer logs={logs} />

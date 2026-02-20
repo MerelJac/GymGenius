@@ -15,7 +15,12 @@ export function ExerciseLogViewer({ logs }: { logs: ExerciseLog[] }) {
             <h4 className="font-semibold text-gray-900">
               {log.exerciseName ?? "Exercise"}
             </h4>
-            <span className="text-xs text-gray-400">Logged</span>
+            <div className="flex flex-col items-center justify-between gap-2">
+              {log.substitutedFrom && (
+                <span className="text-xs text-green-400">Substituted In</span>
+              )}
+              <span className="text-xs text-gray-400">Logged</span>
+            </div>
           </div>
 
           {/* Prescribed */}

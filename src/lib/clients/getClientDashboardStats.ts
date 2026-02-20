@@ -15,6 +15,7 @@ export async function getClientDashboardStats(clientId: string) {
     orderBy: { scheduledDate: "asc" },
   });
 
+  
   // ---------- ON-PLAN STREAK ----------
   let streak = 0;
 
