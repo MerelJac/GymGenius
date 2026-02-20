@@ -154,15 +154,16 @@ export async function logExercise(
     where: {
       workoutLogId,
       exerciseId,
-      sectionId: sectionId ?? null, 
+      sectionId: sectionId ?? null,
     },
   });
 
   let exerciseLog;
 
+  console.log("Exisitng performend: ", exisitngLog?.performed);
+  console.log("Incoming performed: ", performed);
 
   if (exisitngLog && exisitngLog?.performed !== performed) {
-
     exerciseLog = await prisma.exerciseLog.update({
       where: { id: exisitngLog.id },
       data: {
@@ -183,7 +184,7 @@ export async function logExercise(
       },
     });
   }
-  console.log('Exercise Log' , exerciseLog)
+  console.log("Exercise Log", exerciseLog);
 
   // ── 1RM tracking ─────────────────────────────
   if (performed.kind === "strength" || performed.kind === "hybrid") {
