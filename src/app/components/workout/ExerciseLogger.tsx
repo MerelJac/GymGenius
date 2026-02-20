@@ -449,7 +449,7 @@ export function ExerciseLogger({
           />
 
           {notes && (
-            <div className="text-sm text-gray-500 italic bg-gray-50 border rounded-lg px-3 py-2">
+            <div className="text-sm text-gray-500 italic bg-green-50 border rounded-lg px-3 py-2">
               Coach notes: {notes}
             </div>
           )}

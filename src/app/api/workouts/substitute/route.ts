@@ -50,7 +50,13 @@ export async function POST(req: Request) {
         },
       });
     }
-    
+
+    const oldExercise = await prisma.exercise.findFirst({
+      where: {
+        id: oldExerciseId,
+      },
+    });
+
     // Update the log
     await prisma.exerciseLog.update({
       where: {
@@ -59,7 +65,9 @@ export async function POST(req: Request) {
       data: {
         exerciseId: newExerciseId,
         substitutedFrom: oldExerciseId,
-        substitutionReason: "Substituted from Client"
+        substitutionReason: oldExercise
+          ? `Substituted with ${oldExercise.name}`
+          : "Client substituted exercise",
       },
     });
 
