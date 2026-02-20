@@ -210,3 +210,31 @@ export async function removeClientExercise(exerciseLogId: string) {
     where: { id: exerciseLogId },
   });
 }
+
+
+export async function rerunWorkout(scheduledWorkoutId: string) {
+  // 1️⃣ Get original scheduled workout
+  const original = await prisma.scheduledWorkout.findUnique({
+    where: { id: scheduledWorkoutId },
+  });
+
+  console.log('Original wokrout id:', original)
+
+  if (!original) {
+    throw new Error("Scheduled workout not found");
+  }
+
+  // 2️⃣ Create new scheduled workout
+  const newScheduled = await prisma.scheduledWorkout.create({
+    data: {
+      workoutId: original.workoutId,
+      clientId: original.clientId,
+      scheduledDate: new Date(), // rerun today
+      status: "SCHEDULED",
+    },
+  });
+
+  console.log('new schedueld workout id: ', newScheduled)
+  // 3️⃣ Redirect to new workout page
+  redirect(`/workouts/${newScheduled.id}`);
+}

@@ -5,6 +5,7 @@ import { Performed } from "@/types/prescribed";
 import {
   startWorkout,
   stopWorkout,
+  rerunWorkout,
 } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
 import { ExerciseLogger } from "./ExerciseLogger";
 import { ExerciseLog, ScheduledWorkoutWithLogs } from "@/types/workout";
@@ -12,6 +13,7 @@ import { ExerciseLogViewer } from "./ExerciseLogViewer";
 import { useRouter } from "next/navigation";
 import { assertPrescribed } from "@/app/utils/prescriptions/assertPrescribed";
 import { AddExerciseToWorkout } from "./AddExerciseToWorkout";
+import { RotateCcw } from "lucide-react";
 
 export default function WorkoutRunner({
   scheduledWorkout,
@@ -23,6 +25,7 @@ export default function WorkoutRunner({
   const router = useRouter();
   const clientId = scheduledWorkout.clientId;
   const isCompleted = activeLog?.status === "COMPLETED";
+
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(
     activeLog?.id ?? null,
   );
@@ -31,26 +34,36 @@ export default function WorkoutRunner({
 
   const autoSaveFns = useRef<(() => Promise<void>)[]>([]);
 
-const logs: ExerciseLog[] = activeLog
-  ? activeLog.exercises.map((log) => ({
-      id: log.id,
-      workoutLogId: activeLog.id,
-      exerciseId: log.exerciseId,
-      exerciseName: log.exercise.name,
-      prescribed: assertPrescribed(log.prescribed),
-      performed: log.performed as Performed,
-      substitutedFrom: log.substitutedFrom ?? null,
-      substitutionReason: log.substitutionReason ?? null,
-    }))
-  : [];
+  const handleRerunWorkout = async () => {
+    if (!confirm("Restart this workout?")) return;
 
+    await rerunWorkout(scheduledWorkout.id);
+  };
+  const logs: ExerciseLog[] = activeLog
+    ? activeLog.exercises.map((log) => ({
+        id: log.id,
+        workoutLogId: activeLog.id,
+        exerciseId: log.exerciseId,
+        exerciseName: log.exercise.name,
+        prescribed: assertPrescribed(log.prescribed),
+        performed: log.performed as Performed,
+        substitutedFrom: log.substitutedFrom ?? null,
+        substitutionReason: log.substitutionReason ?? null,
+      }))
+    : [];
 
   if (isCompleted) {
     console.log("Completed workout logs:", logs);
     return (
       <>
-        <div className="rounded bg-green-50 border p-3 text-green-700 my-4">
-          Workout completed 🎉
+        <div className="flex flex-row justify-between ">
+          <div className="rounded bg-green-50 border p-3 text-green-700 my-4  min-w-fit">
+            Workout completed 🎉
+          </div>
+          {}
+          <button onClick={handleRerunWorkout}>
+            <RotateCcw size={14} />
+          </button>
         </div>
 
         <ExerciseLogViewer logs={logs} />
@@ -121,7 +134,7 @@ const logs: ExerciseLog[] = activeLog
                     prescribed={assertPrescribed(we.prescribed)}
                     workoutLogId={workoutLogId}
                     clientId={clientId}
-                    sectionId={section.id} 
+                    sectionId={section.id}
                     disabled={!isActive}
                     notes={we.notes}
                     onRegisterAutoSave={(fn) => autoSaveFns.current.push(fn)}
@@ -139,7 +152,7 @@ const logs: ExerciseLog[] = activeLog
                     workoutLogId={workoutLogId}
                     clientId={clientId}
                     disabled={!isActive}
-                    sectionId={section.id} 
+                    sectionId={section.id}
                     notes={el.substitutionReason ?? "Client-added exercise"}
                     isClientAdded // 👈 ADD THIS FLAG
                     exerciseLogId={el.id} // 👈 PASS LOG ID
