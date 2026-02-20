@@ -160,7 +160,9 @@ export async function logExercise(
 
   let exerciseLog;
 
-  if (exisitngLog) {
+
+  if (exisitngLog && exisitngLog?.performed !== performed) {
+
     exerciseLog = await prisma.exerciseLog.update({
       where: { id: exisitngLog.id },
       data: {

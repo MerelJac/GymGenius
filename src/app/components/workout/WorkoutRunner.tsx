@@ -201,6 +201,7 @@ export default function WorkoutRunner({
                     key={el.id}
                     exercise={el.exercise}
                     prescribed={assertPrescribed(el.prescribed)}
+                    performed={el.performed as Performed}  
                     workoutLogId={workoutLogId}
                     clientId={clientId}
                     disabled={!isActive}
