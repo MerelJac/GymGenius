@@ -88,7 +88,8 @@ export function AddAdditionalWorkout({
         </select>
       </div>
       {/* SHOW for strength training additional workout */}
-      {typeId == "5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d" ? (
+      {/* 5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d */}
+      {typeId == "124test" ? (
         <div className="space-y-4">
           <input
             className="w-full border rounded px-3 py-2"
