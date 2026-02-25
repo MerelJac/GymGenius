@@ -3,6 +3,7 @@
 
 import { createAdditionalStrengthWorkout } from "@/app/(client)/workouts/actions";
 import { addAdditionalWorkout } from "@/app/actions/workout";
+import { normalizeDate, toInputDate } from "@/app/utils/format/formatDateFromInput";
 import { useEffect, useState, startTransition } from "react";
 
 type AdditionalWorkoutType = {
@@ -22,7 +23,7 @@ export function AddAdditionalWorkout({
   const [duration, setDuration] = useState<number | "">("");
   const [distance, setDistance] = useState<number | "">("");
   const [notes, setNotes] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(new Date());
   const [addWorkoutName, setAddWorkoutName] = useState("");
 
   const [saving, setSaving] = useState(false);
@@ -150,8 +151,8 @@ export function AddAdditionalWorkout({
             </label>
             <input
               type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={toInputDate(date)}
+              onChange={(e) => setDate(normalizeDate(e.target.value))}
               className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>

@@ -27,7 +27,8 @@ export default function WorkoutRunner({
   const router = useRouter();
   const clientId = scheduledWorkout.clientId;
   const isCompleted = activeLog?.status === "COMPLETED";
-
+  const programId = scheduledWorkout.workout.program?.id ?? null;
+  console.log("Program Id: ", programId);
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(
     activeLog?.id ?? null,
   );
@@ -70,14 +71,19 @@ export default function WorkoutRunner({
     console.log("Completed workout logs:", logs);
     return (
       <>
-        <div className="flex flex-row justify-between ">
+        <div className="flex flex-row justify-between items-center gap-2">
           <div className="rounded bg-green-50 border p-3 text-green-700 my-4  min-w-fit">
             Workout completed 🎉
           </div>
-          {}
-          <button onClick={handleRerunWorkout}>
-            <RotateCcw size={14} />
-          </button>
+          {programId ? (
+            <button onClick={handleRerunWorkout}>
+              <RotateCcw size={14} />
+            </button>
+          ) : (
+            <p className="text-xs text-gray-500 pb-4 max-w-[140px] break-words">
+              You created this workout!
+            </p>
+          )}
         </div>
 
         <ExerciseLogViewer logs={logs} />
@@ -201,7 +207,7 @@ export default function WorkoutRunner({
                     key={el.id}
                     exercise={el.exercise}
                     prescribed={assertPrescribed(el.prescribed)}
-                    performed={el.performed as Performed}  
+                    performed={el.performed as Performed}
                     workoutLogId={workoutLogId}
                     clientId={clientId}
                     disabled={!isActive}

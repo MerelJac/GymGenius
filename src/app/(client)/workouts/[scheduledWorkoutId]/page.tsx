@@ -15,41 +15,41 @@ export default async function ClientWorkoutPage({
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return notFound();
 
-const scheduledWorkout = await prisma.scheduledWorkout.findFirst({
-  where: {
-    id: scheduledWorkoutId,
-    clientId: session.user.id,
-  },
-  include: {
-    workout: {
-      include: {
-        workoutSections: {
-          orderBy: { order: "asc" },
-          include: {
-            exercises: {
-              orderBy: { order: "asc" },
-              include: {
-                exercise: true,
+  const scheduledWorkout = await prisma.scheduledWorkout.findFirst({
+    where: {
+      id: scheduledWorkoutId,
+      clientId: session.user.id,
+    },
+    include: {
+      workout: {
+        include: {
+          program: true,
+          workoutSections: {
+            orderBy: { order: "asc" },
+            include: {
+              exercises: {
+                orderBy: { order: "asc" },
+                include: {
+                  exercise: true,
+                },
               },
             },
           },
         },
       },
-    },
-    workoutLogs: {
-      orderBy: { createdAt: "desc" },
-      take: 1,
-      include: {
-        exercises: {
-          include: {
-            exercise: true,
+      workoutLogs: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        include: {
+          exercises: {
+            include: {
+              exercise: true,
+            },
           },
         },
       },
     },
-  },
-});
-
+  });
 
   if (!scheduledWorkout) return notFound();
 
