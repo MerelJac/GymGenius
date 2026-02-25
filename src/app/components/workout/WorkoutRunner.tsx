@@ -144,6 +144,12 @@ export default function WorkoutRunner({
         </div>
       )}
 
+      {!programId && (
+        <p className="text-xs text-gray">
+  You are creating this workout. Log your exercises or add new ones if you don’t see what you need.
+
+        </p>
+      )}
       {/* EXERCISES */}
       <div className="space-y-6">
         {scheduledWorkout.workout.workoutSections.map((section) => (
