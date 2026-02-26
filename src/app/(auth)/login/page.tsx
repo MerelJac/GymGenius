@@ -7,10 +7,12 @@ import { useState } from "react";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
+  const [signInText, setSignInText] = useState("Sign In");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+    setSignInText("Signing in...");
 
     const formData = new FormData(e.currentTarget);
 
@@ -23,6 +25,7 @@ export default function LoginPage() {
 
     if (res?.error) {
       setError("Invalid email or password");
+      setSignInText('Sign In')
       return;
     }
 
@@ -88,7 +91,7 @@ export default function LoginPage() {
             type="submit"
             className="w-full px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
           >
-            Sign in
+            {signInText}
           </button>
 
           <div className="flex flex-col md:flex-row items-center justify-between">

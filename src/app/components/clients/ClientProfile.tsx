@@ -17,6 +17,7 @@ import { AlertCircle, Trash } from "lucide-react";
 import WorkoutCalendarWeek from "../CalendarScheduledWorkout";
 import { SyncProgramButton } from "../programs/SyncProgramButton";
 import { formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
+import Link from "next/link";
 
 export default function ClientProfile({
   client,
@@ -29,7 +30,7 @@ export default function ClientProfile({
     program: {
       id: string;
       name: string;
-    } 
+    };
     workouts: ScheduledWorkoutWithProgram[];
   };
 
@@ -273,7 +274,6 @@ export default function ClientProfile({
               const total = workouts.length;
               const progress = total ? (completed / total) * 100 : 0;
 
-              
               return (
                 <div
                   key={program.id}
@@ -309,12 +309,15 @@ export default function ClientProfile({
                         key={w.id}
                         className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-2 border-b border-gray-100 last:border-0 last:pb-0"
                       >
-                        <div>
+                        <Link
+                          href={`/view-workouts/${w.id}`}
+                          className="flex justify-between items-start hover:bg-gray-50 p-2 rounded transition"
+                        >
                           <span className="font-medium">{w.workout.name}</span>
                           <span className="text-gray-500 ml-2">
                             • {formatDateFromInputReturnString(w.scheduledDate)}
                           </span>
-                        </div>
+                        </Link>
                         <span
                           className={`inline-block px-3 py-1 text-xs font-medium rounded-full uppercase tracking-wide ${
                             w.status === "COMPLETED"
