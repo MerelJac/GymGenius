@@ -73,7 +73,7 @@ export function AddExerciseToWorkoutModal({
                 value={prescribed}
                 onChange={setPrescribed}
               />
-              <small className="text-xs text-center">Adjust sets & reps then add.</small>
+              <p className="text-xs text-center">Adjust sets & reps then add.</p>
             </div>
           )}
 
