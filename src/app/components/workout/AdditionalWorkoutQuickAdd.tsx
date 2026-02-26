@@ -30,7 +30,7 @@ export function AdditionalWorkoutQuickAdd({
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg">
+          <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg max-h-[80vh] overflow-y-scroll">
             <button
               onClick={() => setOpen(false)}
               className="absolute right-3 top-3 rounded p-1 hover:bg-gray-100"
