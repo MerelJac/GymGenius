@@ -11,6 +11,7 @@ import { getClientProgressSummary } from "@/lib/clients/clientProgress";
 import { ProgressChanges } from "../clients/ProgressChanges";
 import { redirect } from "next/navigation";
 import { ContactTrainer } from "../clients/ContactTrainer";
+import { ArrowRight } from "lucide-react";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
@@ -282,12 +283,13 @@ function OverdueWorkouts({
 
       <ul className="text-sm space-y-2">
         {workouts.map((w) => (
-          <li key={w.id} className="flex justify-between items-center">
+          <li key={w.id} className="flex justify-between items-center flex-row">
             <Link
               href={`/workouts/${w.id}`}
-              className="text-gray-900 hover:underline"
+              className="text-gray-900 hover:underline flex flex-row items-center gap-2"
             >
               {w.workout.name}
+              <ArrowRight size={10}/>
             </Link>
             <span className="text-gray-500">
               {w.scheduledDate.toLocaleDateString()}
@@ -310,13 +312,16 @@ function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
 
       <ul className="text-sm space-y-2">
         {workouts.map((w) => (
-          <li key={w.id} className="flex justify-between items-center">
-            <Link
+          <li key={w.id} className="flex justify-between items-center flex-row">
+
+                  <Link
               href={`/workouts/${w.id}`}
-              className="text-gray-900 hover:underline"
+              className="text-gray-900 hover:underline flex flex-row items-center gap-2"
             >
               {w.workout.name}
+              <ArrowRight size={10}/>
             </Link>
+
             <span className="text-gray-500">
               {w.scheduledDate.toLocaleDateString()}
             </span>

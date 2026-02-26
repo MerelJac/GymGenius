@@ -90,8 +90,9 @@ export function AddAdditionalWorkout({
       </div>
       {/* SHOW for strength training additional workout */}
       {/* 5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d */}
-      {typeId == "5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d" ? (
+      {typeId == "5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d" && (
         <div className="space-y-4">
+          <p className="text-center font-bold uppercase">Log your weights & reps</p>
           <input
             className="w-full border rounded px-3 py-2"
             value={addWorkoutName}
@@ -105,10 +106,11 @@ export function AddAdditionalWorkout({
               await createAdditionalStrengthWorkout(clientId, addWorkoutName);
             }}
           >
-            Start Workout
+            Log Workout
           </button>
+          <p className="text-center font-bold">OR QUICK ADD</p>
         </div>
-      ) : typeId ? (
+      ) } {typeId ? (
         // 🟢 CARDIO / OTHER ACTIVITIES
         <div className="space-y-4">
           {/* Duration */}
