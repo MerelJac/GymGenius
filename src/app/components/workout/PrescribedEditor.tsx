@@ -47,9 +47,7 @@ export function PrescribedEditor({
         <label className="text-xs text-gray-600">Duration (seconds)</label>
         <input
           type="number"
-          defaultValue={
-            value?.kind === "timed" ? value.duration : 30
-          }
+          defaultValue={value?.kind === "timed" ? value.duration : 30}
           className="w-full border rounded px-3 py-2 text-sm"
           onChange={(e) =>
             onChange({
@@ -58,6 +56,109 @@ export function PrescribedEditor({
             })
           }
         />
+      </div>
+    );
+  }
+  /* ---------------- BODYWEIGHT ---------------- */
+  if (exercise.type === "BODYWEIGHT") {
+    const sets = value?.kind === "bodyweight" ? value.sets : 3;
+    const reps = value?.kind === "bodyweight" ? value.reps : 10;
+
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="text-xs text-gray-600">Sets</label>
+          <input
+            type="number"
+            defaultValue={sets}
+            className="w-full border rounded px-2 py-1 text-sm"
+            onChange={(e) =>
+              onChange({
+                kind: "bodyweight",
+                sets: Number(e.target.value),
+                reps,
+              })
+            }
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-gray-600">Reps</label>
+          <input
+            type="number"
+            defaultValue={reps}
+            className="w-full border rounded px-2 py-1 text-sm"
+            onChange={(e) =>
+              onChange({
+                kind: "bodyweight",
+                sets,
+                reps: Number(e.target.value),
+              })
+            }
+          />
+        </div>
+      </div>
+    );
+  } 
+  /* -------- HYBRID -------- */
+
+  if (exercise.type === "HYBRID") {
+    const sets = value?.kind === "hybrid" ? value.sets : 3;
+    const reps = value?.kind === "hybrid" ? value.reps : 8;
+    const weight = value?.kind === "hybrid" ? value.weight : null;
+
+    return (
+      <div className="grid grid-cols-3 gap-2">
+        <div>
+          <label className="text-xs text-gray-600">Sets</label>
+          <input
+            type="number"
+            defaultValue={sets}
+            className="w-full border rounded px-2 py-1 text-sm"
+            onChange={(e) =>
+              onChange({
+                kind: "hybrid",
+                sets: Number(e.target.value),
+                reps,
+                weight,
+              })
+            }
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-gray-600">Reps</label>
+          <input
+            type="number"
+            defaultValue={reps}
+            className="w-full border rounded px-2 py-1 text-sm"
+            onChange={(e) =>
+              onChange({
+                kind: "hybrid",
+                sets,
+                reps: Number(e.target.value),
+                weight,
+              })
+            }
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-gray-600">Weight</label>
+          <input
+            type="number"
+            defaultValue={weight ?? ""}
+            className="w-full border rounded px-2 py-1 text-sm"
+            onChange={(e) =>
+              onChange({
+                kind: "hybrid",
+                sets,
+                reps,
+                weight: e.target.value === "" ? null : Number(e.target.value),
+              })
+            }
+          />
+        </div>
       </div>
     );
   }
