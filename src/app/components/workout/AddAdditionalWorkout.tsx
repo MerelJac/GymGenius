@@ -3,6 +3,7 @@
 
 import { createAdditionalStrengthWorkout } from "@/app/(client)/workouts/actions";
 import { addAdditionalWorkout } from "@/app/actions/workout";
+import { normalizeDate, toInputDate } from "@/app/utils/format/formatDateFromInput";
 import { useEffect, useState, startTransition } from "react";
 
 type AdditionalWorkoutType = {
@@ -22,7 +23,7 @@ export function AddAdditionalWorkout({
   const [duration, setDuration] = useState<number | "">("");
   const [distance, setDistance] = useState<number | "">("");
   const [notes, setNotes] = useState("");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(new Date());
   const [addWorkoutName, setAddWorkoutName] = useState("");
 
   const [saving, setSaving] = useState(false);
@@ -89,8 +90,9 @@ export function AddAdditionalWorkout({
       </div>
       {/* SHOW for strength training additional workout */}
       {/* 5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d */}
-      {typeId == "124test" ? (
+      {typeId == "5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d" && (
         <div className="space-y-4">
+          <p className="text-center font-bold uppercase">Log your weights & reps</p>
           <input
             className="w-full border rounded px-3 py-2"
             value={addWorkoutName}
@@ -104,10 +106,11 @@ export function AddAdditionalWorkout({
               await createAdditionalStrengthWorkout(clientId, addWorkoutName);
             }}
           >
-            Start Workout
+            Log Workout
           </button>
+          <p className="text-center font-bold">OR QUICK ADD</p>
         </div>
-      ) : typeId ? (
+      ) } {typeId ? (
         // 🟢 CARDIO / OTHER ACTIVITIES
         <div className="space-y-4">
           {/* Duration */}
@@ -150,8 +153,8 @@ export function AddAdditionalWorkout({
             </label>
             <input
               type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
+              value={toInputDate(date)}
+              onChange={(e) => setDate(normalizeDate(e.target.value))}
               className="w-full rounded-lg border border-gray-300 px-3 py-2"
             />
           </div>

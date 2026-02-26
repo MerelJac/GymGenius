@@ -45,7 +45,7 @@ export type WorkoutWithSections = {
     exercises: {
       id: string;
       order: number;
-      prescribed: Prescribed | JsonValue| null;
+      prescribed: Prescribed | JsonValue | null;
       notes: string | null;
       exercise: {
         id: string;
@@ -79,7 +79,7 @@ export type WorkoutWithExercises = {
     notes?: string | null;
     id: string;
     order: number;
-    prescribed: Prescribed | JsonValue| null;
+    prescribed: Prescribed | JsonValue | null;
     exercise: Exercise;
   }[];
   day: WorkoutDay;
@@ -114,7 +114,7 @@ export type ExerciseLog = {
   workoutLogId: string;
   exerciseId: string;
   exerciseName: string;
-  prescribed:Prescribed | JsonValue | null;
+  prescribed: Prescribed | JsonValue | null;
   performed: Performed | null;
 
   substitutedFrom?: string | null;
@@ -125,6 +125,7 @@ export type ScheduledWorkoutWithLogs = Prisma.ScheduledWorkoutGetPayload<{
   include: {
     workout: {
       include: {
+        program: true;
         workoutSections: {
           include: {
             exercises: {
@@ -166,7 +167,7 @@ export type ProgramWithWorkouts = {
 export type ScheduledWorkoutDashboard = {
   id: string;
   scheduledDate: Date;
-    status: WorkoutStatus;
+  status: WorkoutStatus;
   workout: {
     id: string;
     name: string;
@@ -195,15 +196,13 @@ export type SectionExercise = {
   notes: string | null;
 };
 
-
-export type ScheduledWorkoutWithWorkout =
-  Prisma.ScheduledWorkoutGetPayload<{
-    include: {
-      workout: {
-        select: {
-          id: true;
-          name: true;
-        };
+export type ScheduledWorkoutWithWorkout = Prisma.ScheduledWorkoutGetPayload<{
+  include: {
+    workout: {
+      select: {
+        id: true;
+        name: true;
       };
     };
-  }>;
+  };
+}>;
