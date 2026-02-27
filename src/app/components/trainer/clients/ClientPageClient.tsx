@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
 import { ClientListItem } from "@/types/client";
@@ -13,6 +13,11 @@ export default function ClientPageClient({
 }) {
   // ✅ Client now owns the data
   const [clients, setClients] = useState<ClientListItem[]>(initialClients);
+
+  // Add this back if caching is still a problem
+  //   useEffect(() => {
+  //     setClients(initialClients);
+  //   }, [initialClients]);
 
   return (
     <div className="space-y-8">

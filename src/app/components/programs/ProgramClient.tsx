@@ -8,15 +8,19 @@ import {
   duplicateProgram,
 } from "@/app/(trainer)/programs/actions";
 import { Copy, Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProgramsPageClient({
   initialPrograms,
 }: {
   initialPrograms: Program[];
 }) {
-
   const [programs, setPrograms] = useState(initialPrograms);
+
+  // Add this back if caching is still a problem
+  //   useEffect(() => {
+  //   setPrograms(initialPrograms);
+  // }, [initialPrograms]);
 
   async function handleDelete(program: Program) {
     if (
