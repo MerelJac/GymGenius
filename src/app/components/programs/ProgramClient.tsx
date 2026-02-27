@@ -8,17 +8,15 @@ import {
   duplicateProgram,
 } from "@/app/(trainer)/programs/actions";
 import { Copy, Plus, Trash2 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function ProgramsPageClient({
   initialPrograms,
 }: {
   initialPrograms: Program[];
 }) {
-  const router = useRouter();
 
-
-  const programs = initialPrograms;
+  const [programs, setPrograms] = useState(initialPrograms);
 
   async function handleDelete(program: Program) {
     if (
@@ -28,15 +26,30 @@ export default function ProgramsPageClient({
     )
       return;
 
-    await deleteProgram(program.id);
-    router.refresh();
+    // Optimistic update
+    setPrograms((prev) => prev.filter((p) => p.id !== program.id));
+
+    try {
+      await deleteProgram(program.id);
+    } catch (err) {
+      // rollback if needed
+      setPrograms(initialPrograms);
+      console.log("error deleting programs: ", err);
+    }
   }
 
   async function handleDuplicate(program: Program) {
-    await duplicateProgram(program.id);
-    router.refresh();
-  }
+    const newId = await duplicateProgram(program.id);
 
+    setPrograms((prev) => [
+      {
+        ...program,
+        id: newId,
+        name: `${program.name} (Copy)`,
+      },
+      ...prev,
+    ]);
+  }
   console.log("Programs: ", programs);
   return (
     <div className="space-y-6">
