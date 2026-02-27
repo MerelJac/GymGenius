@@ -2,10 +2,14 @@
 
 import { useState, startTransition } from "react";
 import { createClient } from "@/app/(trainer)/clients/actions";
-import { useRouter } from "next/navigation";
+import { ClientListItem } from "@/types/client";
 
-export default function AddClientForm() {
-  const router = useRouter();
+
+type Props = {
+  onClientCreated?: (client: ClientListItem) => void;
+};
+
+export default function AddClientForm({ onClientCreated }: Props) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null | undefined>(null);
   const [saving, setSaving] = useState(false);
@@ -27,7 +31,12 @@ export default function AddClientForm() {
         }
 
         setEmail("");
-        router.push(`/clients/${result.id}`);
+        setSaving(false);
+
+        // ✅ Update parent list immediately
+        if (onClientCreated && result.client) {
+          onClientCreated(result.client);
+        }
       } catch (err) {
         setSaving(false);
         setError(err instanceof Error ? err.message : "Something went wrong");

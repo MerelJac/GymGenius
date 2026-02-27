@@ -16,6 +16,16 @@ export type Client = {
 
 };
 
+export type ClientListItem = {
+  id: string;
+  email: string;
+  profile: {
+    firstName: string;
+    lastName: string;
+    waiverSignedAt: Date | null;
+  } | null;
+};
+
 export type ClientWithWorkouts = {
   id: string;
   email: string;

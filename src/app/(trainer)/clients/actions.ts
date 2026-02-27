@@ -37,6 +37,10 @@ export async function createClient(email: string) {
       trainerId: session.user.id,
       password: INVITE_PASS,
     },
+    include: {
+      profile: true
+    }
+
   });
 
   try {
@@ -50,5 +54,6 @@ export async function createClient(email: string) {
   return {
     ok: true,
     id: client.id,
+    client: client
   };
 }
