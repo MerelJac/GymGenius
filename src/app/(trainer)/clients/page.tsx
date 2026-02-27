@@ -4,6 +4,8 @@ import ClientPageClient from "@/app/components/trainer/clients/ClientPageClient"
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 export default async function TrainerClientsPage() {
   const session = await getServerSession(authOptions);
 
