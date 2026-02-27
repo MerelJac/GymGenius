@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
-import { Client, ClientListItem } from "@/types/client";
+import { ClientListItem } from "@/types/client";
 import AddClientForm from "../../clients/AddClientForm";
 
 export default function ClientPageClient({
