@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { revalidatePath } from "next/cache";
 import { sendWelcomeEmail } from "@/lib/email-templates/welcomeEmail";
 
 export async function createClient(email: string) {
@@ -50,7 +49,6 @@ export async function createClient(email: string) {
     console.error("❌ Error sending welcome email:", err);
   }
 
-  revalidatePath("/trainer/clients");
   return {
     ok: true,
     id: client.id,
