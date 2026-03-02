@@ -21,10 +21,16 @@ const navItems = [
   { href: "/programs", label: "Programs", icon: ClipboardList },
 ];
 
+const adminNavLinks = [
+{ href: "/admin/exercises", label: "Review Exercises", icon: Dumbbell },
+];
+
 export default function SidebarLayout({
   children,
+  role,
 }: {
   children: React.ReactNode;
+  role?: string;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -33,6 +39,34 @@ export default function SidebarLayout({
     return (
       <>
         {navItems.map((item) => {
+          const active = pathname === item.href;
+          const Icon = item.icon;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onClick}
+              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition
+                ${
+                  active
+                    ? "bg-blue-50 text-blue-700"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
+            >
+              <Icon className="w-4 h-4 shrink-0" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </>
+    );
+  }
+
+  function AdminNavLinks({ onClick }: { onClick?: () => void }) {
+    return (
+      <>
+        {adminNavLinks.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
 
@@ -79,8 +113,8 @@ export default function SidebarLayout({
       )}
 
       {/* Sidebar */}
-<aside
-  className={`
+      <aside
+        className={`
     fixed inset-y-0 left-0 z-50
     w-64 bg-white border-r flex flex-col
     transform transition-transform duration-200
@@ -88,8 +122,7 @@ export default function SidebarLayout({
 
     md:sticky md:top-0 md:translate-x-0 md:h-screen
   `}
->
-
+      >
         {/* Brand */}
         <div className="px-6 py-5 border-b flex items-center justify-between">
           <div>
@@ -111,6 +144,17 @@ export default function SidebarLayout({
         <nav className="flex-1 px-4 py-6 space-y-1">
           <NavLinks onClick={() => setOpen(false)} />
         </nav>
+
+        {role === "ADMIN" && (
+          <div className="px-4 py-6 space-y-1 border-t">
+            <h2 className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700">
+              Admin
+            </h2>
+
+              <AdminNavLinks onClick={() => setOpen(false)} />
+          
+          </div>
+        )}
 
         {/* Footer */}
         <div className="px-4 py-6 space-y-1 border-t">

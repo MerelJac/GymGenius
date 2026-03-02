@@ -13,7 +13,7 @@ import {
 import { ClientProfileEditor } from "./ClientProfileEditor";
 import { BackButton } from "../BackButton";
 import { useRouter } from "next/navigation";
-import { AlertCircle, Trash } from "lucide-react";
+import { AlertCircle, RotateCcw, Trash } from "lucide-react";
 import WorkoutCalendarWeek from "../CalendarScheduledWorkout";
 import { SyncProgramButton } from "../programs/SyncProgramButton";
 import { formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
@@ -37,6 +37,7 @@ export default function ClientProfile({
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [activeStatusId, setActiveStatusId] = useState<string | null>(null);
   const [error, setError] = useState<string | null | undefined>(null);
 
   const router = useRouter();
@@ -98,6 +99,27 @@ export default function ClientProfile({
     }
   }
 
+  const handleChangeStatus = async (workoutId: string, status: string) => {
+    setError(null);
+
+    try {
+      const res = await fetch(`/api/workouts/status/${workoutId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ newStatus: status }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update status");
+      }
+
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to change status");
+    }
+  };
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       {/* Header with back + name */}
@@ -318,19 +340,44 @@ export default function ClientProfile({
                             • {formatDateFromInputReturnString(w.scheduledDate)}
                           </span>
                         </Link>
-                        <span
-                          className={`inline-block px-3 py-1 text-xs font-medium rounded-full uppercase tracking-wide ${
-                            w.status === "COMPLETED"
-                              ? "bg-green-100 text-green-800"
-                              : w.status === "SKIPPED"
-                                ? "bg-red-100 text-red-800"
-                                : w.status === "IN_PROGRESS"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-amber-100 text-amber-800"
-                          }`}
-                        >
-                          {w.status}
-                        </span>
+                        <div className="flex flex-row gap-2 items-center">
+                          <span
+                            className={`inline-block px-3 py-1 text-xs font-medium rounded-full uppercase tracking-wide ${
+                              w.status === "COMPLETED"
+                                ? "bg-green-100 text-green-800"
+                                : w.status === "SKIPPED"
+                                  ? "bg-red-100 text-red-800"
+                                  : w.status === "IN_PROGRESS"
+                                    ? "bg-yellow-100 text-yellow-800"
+                                    : "bg-amber-100 text-amber-800"
+                            }`}
+                          >
+                            {w.status}
+                          </span>
+                          <RotateCcw
+                            size={14}
+                            className="cursor-pointer"
+                            onClick={() =>
+                              setActiveStatusId(
+                                activeStatusId === w.id ? null : w.id,
+                              )
+                            }
+                          />
+                          {activeStatusId === w.id && (
+                            <select
+                              onChange={(e) => {
+                                handleChangeStatus(w.id, e.target.value);
+                                setActiveStatusId(null);
+                              }}
+                              defaultValue={w.status}
+                              className="border rounded px-3 py-2"
+                            >
+                              <option value="SCHEDULED">Scheduled</option>
+                              <option value="COMPLETED">Completed</option>
+                              <option value="SKIPPED">Skipped</option>
+                            </select>
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>
