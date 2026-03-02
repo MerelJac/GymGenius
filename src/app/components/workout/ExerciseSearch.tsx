@@ -79,7 +79,7 @@ export function ExerciseSearch({
 
         {!loading && query && results.length === 0 && (
           <li className="px-3 py-2 text-sm text-gray-500 flex flex-wrap">
-            No exercises found. Click + Add Exercise to create
+            No exercises found. Click + Add Exercise to create it.
           </li>
         )}
       </ul>

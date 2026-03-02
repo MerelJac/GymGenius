@@ -56,7 +56,7 @@ export function AddExerciseToWorkoutModal({
             {/* Create new exercise button */}
             <button
               onClick={() => setShowCreateExerciseModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 text-xs  rounded-lg border border-gray-300 hover:bg-gray-100 transition"
             >
               + Create New Exercise
             </button>

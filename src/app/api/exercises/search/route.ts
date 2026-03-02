@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  console.log("Token: ", token);
+  // console.log("Token: ", token);
 
   let trainerFilter: Prisma.ExerciseWhereInput | undefined;
 
