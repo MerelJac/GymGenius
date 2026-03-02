@@ -1,11 +1,12 @@
+// src/app/api/workouts/status/[workoutId]/route.ts
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
-  req: Request,
-  { params }: { params: { workoutId: string } }
+  req: NextRequest,
+  context: { params: Promise<{ workoutId: string }> }
 ) {
-  const workoutId = params.workoutId;
+  const { workoutId } = await context.params;
 
   console.log("changing status for workout id: ", workoutId)
   if (!workoutId || typeof workoutId !== "string") {
