@@ -40,6 +40,7 @@ export async function POST(req: Request) {
         sets: Number(formData.get("sets")),
         reps: Number(formData.get("reps")),
         weight: formData.get("weight") ? Number(formData.get("weight")) : null,
+        duration:formData.get("duration") ? Number(formData.get("weight")) : null,
       };
       break;
 
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
       prescribed = {
         kind: "timed",
         duration: Number(formData.get("duration")),
-                sets: Number(formData.get("sets")),
+        
       };
       break;
 

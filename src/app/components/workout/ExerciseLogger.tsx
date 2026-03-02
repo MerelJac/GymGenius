@@ -169,9 +169,8 @@ export function ExerciseLogger({
             </div>
           )}
 
-          {/* Strength / Hybrid */}
-          {(performedState.kind === "strength" ||
-            performedState.kind === "hybrid") && (
+          {/* Strength  */}
+          {performedState.kind === "strength" && (
             <div className="space-y-3">
               {performedState.sets.map((set, index) => {
                 const reps = set.reps;
@@ -198,8 +197,7 @@ export function ExerciseLogger({
                         setHasSaved(false);
                         setPerformedState((prev) => {
                           if (
-                            prev.kind !== "strength" &&
-                            prev.kind !== "hybrid"
+                            prev.kind !== "strength"
                           )
                             return prev;
 
@@ -229,11 +227,7 @@ export function ExerciseLogger({
                         if (!set.weight && recommendedWeight) {
                           setHasSaved(false);
                           setPerformedState((prev) => {
-                            if (
-                              prev.kind !== "strength" &&
-                              prev.kind !== "hybrid"
-                            )
-                              return prev;
+                            if (prev.kind !== "strength") return prev;
 
                             const sets = [...prev.sets];
                             sets[index] = {
@@ -248,11 +242,7 @@ export function ExerciseLogger({
                       onChange={(e) => {
                         setHasSaved(false);
                         setPerformedState((prev) => {
-                          if (
-                            prev.kind !== "strength" &&
-                            prev.kind !== "hybrid"
-                          )
-                            return prev;
+                          if (prev.kind !== "strength") return prev;
 
                           const sets = [...prev.sets];
                           sets[index] = {
@@ -272,6 +262,127 @@ export function ExerciseLogger({
               })}
             </div>
           )}
+
+          {/* Hybrid */}
+          {performedState.kind === "hybrid" && (
+            <div className="space-y-3">
+              {performedState.sets.map((set, index) => {
+                const reps = set.reps;
+                const recommendedWeight =
+                  oneRepMax && reps
+                    ? Math.round(oneRepMax * getPercentageForReps(reps))
+                    : null;
+
+                return (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2"
+                  >
+                    <span className="text-sm font-medium w-14 text-gray-700">
+                      Set {index + 1}
+                    </span>
+
+                    {/* Reps */}
+                    <input
+                      type="number"
+                      className="w-16 rounded-lg border border-gray-300 px-2 py-1 text-sm"
+                      value={set.reps}
+                      onChange={(e) => {
+                        setHasSaved(false);
+                        setPerformedState((prev) => {
+                          if (prev.kind !== "hybrid") return prev;
+
+                          const sets = [...prev.sets];
+                          sets[index] = {
+                            ...sets[index],
+                            reps: Number(e.target.value),
+                          };
+
+                          return { ...prev, sets };
+                        });
+                      }}
+                    />
+                    <span className="text-sm text-gray-500">reps</span>
+
+                    {/* Weight */}
+                    <input
+                      type="number"
+                      className="w-20 rounded-lg border border-gray-300 px-2 py-1 text-sm"
+                      value={set.weight ?? ""}
+                      placeholder={
+                        recommendedWeight
+                          ? `${recommendedWeight}`
+                          : "Enter weight"
+                      }
+                      onFocus={() => {
+                        if (!set.weight && recommendedWeight) {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (
+                              
+                              prev.kind !== "hybrid"
+                            )
+                              return prev;
+
+                            const sets = [...prev.sets];
+                            sets[index] = {
+                              ...sets[index],
+                              weight: recommendedWeight,
+                            };
+
+                            return { ...prev, sets };
+                          });
+                        }
+                      }}
+                      onChange={(e) => {
+                        setHasSaved(false);
+                        setPerformedState((prev) => {
+                          if (prev.kind !== "hybrid") return prev;
+
+                          const sets = [...prev.sets];
+                          sets[index] = {
+                            ...sets[index],
+                            weight: e.target.value
+                              ? Number(e.target.value)
+                              : null,
+                          };
+
+                          return { ...prev, sets };
+                        });
+                      }}
+                    />
+                    <span className="text-sm text-gray-500">lb</span>
+
+                    {/* Duration */}
+                    <input
+                      type="number"
+                      className="w-20 rounded-lg border border-gray-300 px-2 py-1 text-sm"
+                      value={set.duration ?? ""}
+                      placeholder="sec"
+                      onChange={(e) => {
+                        setHasSaved(false);
+                        setPerformedState((prev) => {
+                          if (prev.kind !== "hybrid") return prev;
+
+                          const sets = [...prev.sets];
+                          sets[index] = {
+                            ...sets[index],
+                            duration: e.target.value
+                              ? Number(e.target.value)
+                              : 0,
+                          };
+
+                          return { ...prev, sets };
+                        });
+                      }}
+                    />
+                    <span className="text-sm text-gray-500">sec</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
           {/* CORE & MOBILITY */}
           {(performedState.kind === "core" ||
             performedState.kind === "mobility") && (

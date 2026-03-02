@@ -7,12 +7,20 @@ export function buildPerformedFromPrescribed(
   }
   switch (prescribed.kind) {
     case "strength":
+      return {
+        kind: prescribed.kind,
+        sets: Array.from({ length: prescribed.sets }, () => ({
+          reps: prescribed.reps,
+          weight: prescribed.weight,
+        })),
+      };
     case "hybrid":
       return {
         kind: prescribed.kind,
         sets: Array.from({ length: prescribed.sets }, () => ({
           reps: prescribed.reps,
           weight: prescribed.weight,
+          duration: prescribed.duration,
         })),
       };
 
@@ -57,10 +65,13 @@ export function buildPerformedFromPrescribed(
 export function renderPrescribed(prescribed: Prescribed) {
   switch (prescribed.kind) {
     case "strength":
-    case "hybrid":
       return `${prescribed.sets} × ${prescribed.reps}${
         prescribed.weight ? ` @ ${prescribed.weight} lb` : ""
       }`;
+    case "hybrid":
+      return `${prescribed.sets} × ${prescribed.reps}${
+        prescribed.weight ? ` @ ${prescribed.weight} lb` : ""
+      }${prescribed.duration ? ` for ${prescribed.duration} s` : ""}`;
 
     case "bodyweight":
       return `${prescribed.sets} × ${prescribed.reps}`;

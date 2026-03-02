@@ -9,6 +9,7 @@ export type HybridPrescribed = {
   sets: number;
   reps: number;
   weight: number | null;
+  duration: number | null;
 };
 
 export type StrengthPrescribed = {
@@ -60,6 +61,7 @@ export type HybridPerformed = {
   sets: {
     reps: number;
     weight: number | null;
+    duration: number | null;
   }[];
 };
 

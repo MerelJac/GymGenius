@@ -99,13 +99,14 @@ export function PrescribedEditor({
         </div>
       </div>
     );
-  } 
+  }
   /* -------- HYBRID -------- */
 
   if (exercise.type === "HYBRID") {
     const sets = value?.kind === "hybrid" ? value.sets : 3;
     const reps = value?.kind === "hybrid" ? value.reps : 8;
     const weight = value?.kind === "hybrid" ? value.weight : null;
+    const duration = value?.kind === "hybrid" ? value.duration : null;
 
     return (
       <div className="grid grid-cols-3 gap-2">
@@ -121,6 +122,7 @@ export function PrescribedEditor({
                 sets: Number(e.target.value),
                 reps,
                 weight,
+                duration,
               })
             }
           />
@@ -138,6 +140,7 @@ export function PrescribedEditor({
                 sets,
                 reps: Number(e.target.value),
                 weight,
+                duration,
               })
             }
           />
@@ -155,6 +158,25 @@ export function PrescribedEditor({
                 sets,
                 reps,
                 weight: e.target.value === "" ? null : Number(e.target.value),
+                duration,
+              })
+            }
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-gray-600">Duration</label>
+          <input
+            type="number"
+            defaultValue={duration ?? ""}
+            className="w-full border rounded px-2 py-1 text-sm"
+            onChange={(e) =>
+              onChange({
+                kind: "hybrid",
+                sets,
+                reps,
+                weight,
+                duration: e.target.value === "" ? null : Number(e.target.value),
               })
             }
           />

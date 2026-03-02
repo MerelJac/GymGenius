@@ -225,6 +225,7 @@ export async function seedProgramEccentric() {
     sets: 2,
     reps: 21,
     weight: null,
+    duration: null,
   });
 
   /* ------------------------------------------------------------------ */

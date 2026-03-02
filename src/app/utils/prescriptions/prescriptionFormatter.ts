@@ -4,9 +4,19 @@ import { Prescribed } from "@/types/prescribed";
 export function formatPrescribed(p: Prescribed): string {
   switch (p.kind) {
     case "strength":
-    case "hybrid":
       return `${p.sets}×${p.reps}${p.weight ? ` @ ${p.weight}` : ""}`;
+      
+    case "hybrid": {
+      const base = `${p.sets}×${p.reps}`;
+      const durationPart =
+        typeof p.duration === "number" && p.duration > 0
+          ? ` for ${p.duration}s`
+          : "";
+      const weightPart =
+        typeof p.weight === "number" && p.weight > 0 ? ` @ ${p.weight}` : "";
 
+      return `${base}${durationPart}${weightPart}`;
+    }
     case "bodyweight":
       return `${p.sets}×${p.reps}`;
 
@@ -41,6 +51,7 @@ export function buildPrescribed(
   sets: number,
   reps: number,
   weight: number | null,
+  duration: number | null,
 ): Prescribed {
   switch (exercise.type) {
     case "STRENGTH":
@@ -57,6 +68,7 @@ export function buildPrescribed(
         sets,
         reps,
         weight,
+        duration,
       };
 
     case "BODYWEIGHT":

@@ -80,8 +80,9 @@ export default function WorkoutCard({
 
   const showStrengthFields =
     selectedExercise?.type === "STRENGTH" ||
-    selectedExercise?.type === "HYBRID" ||
     selectedExercise?.type === "BODYWEIGHT";
+
+  const showHybridFields = selectedExercise?.type === "HYBRID";
 
   const showTimedFields = selectedExercise?.type === "TIMED";
 
@@ -309,7 +310,7 @@ export default function WorkoutCard({
     } else if (exercise.type === "BODYWEIGHT") {
       prescribed = { kind: "bodyweight", sets, reps };
     } else if (exercise.type === "HYBRID") {
-      prescribed = { kind: "hybrid", sets, reps, weight };
+      prescribed = { kind: "hybrid", sets, reps, weight, duration: time };
     } else if (exercise.type === "CORE") {
       prescribed = { kind: "core", sets, reps, weight, duration: time };
     } else if (exercise.type === "MOBILITY") {
@@ -1032,6 +1033,63 @@ export default function WorkoutCard({
                       />
                     </div>
                   )}
+                </>
+              )}
+
+              {showHybridFields && (
+                <>
+                  <div className="w-20">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Sets
+                    </label>
+                    <input
+                      type="number"
+                      value={sets}
+                      onChange={(e) => setSets(Number(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                    />
+                  </div>
+                  <div className="w-20">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Reps
+                    </label>
+                    <input
+                      type="number"
+                      value={reps}
+                      onChange={(e) => setReps(Number(e.target.value))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                    />
+                  </div>
+                  {selectedExercise?.type !== "BODYWEIGHT" && (
+                    <div className="w-24">
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        Weight
+                      </label>
+                      <input
+                        type="number"
+                        value={weight ?? ""}
+                        onChange={(e) =>
+                          setWeight(
+                            e.target.value ? Number(e.target.value) : null,
+                          )
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      />
+                    </div>
+                  )}
+                  <div className="w-20">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                      Duration
+                    </label>
+                    <input
+                      type="number"
+                      value={time ?? ""}
+                      onChange={(e) =>
+                        setTime(e.target.value ? Number(e.target.value) : null)
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                    />
+                  </div>
                 </>
               )}
 

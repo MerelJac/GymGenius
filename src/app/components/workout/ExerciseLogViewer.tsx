@@ -49,9 +49,8 @@ export function ExerciseLogViewer({ logs }: { logs: ExerciseLog[] }) {
               </div>
             )}
 
-            {/* Strength / Hybrid */}
-            {(log.performed?.kind === "strength" ||
-              log.performed?.kind === "hybrid") && (
+            {/* Strength  */}
+            {log.performed?.kind === "strength" && (
               <div className="space-y-2">
                 {log.performed.sets.map((set, index) => (
                   <div
@@ -69,6 +68,37 @@ export function ExerciseLogViewer({ logs }: { logs: ExerciseLog[] }) {
                     {set.weight != null && (
                       <span className="text-sm text-gray-500">
                         @ {set.weight} lb
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {log.performed?.kind === "hybrid" && (
+              <div className="space-y-2">
+                {log.performed.sets.map((set, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2"
+                  >
+                    <span className="text-sm font-medium w-14 text-gray-700">
+                      Set {index + 1}
+                    </span>
+
+                    <span className="text-sm text-gray-900">
+                      {set.reps} reps
+                    </span>
+
+                    {set.weight != null && (
+                      <span className="text-sm text-gray-500">
+                        @ {set.weight} lb
+                      </span>
+                    )}
+
+                    {set.duration != null && (
+                      <span className="text-sm text-gray-500">
+                        for {set.duration} s
                       </span>
                     )}
                   </div>
