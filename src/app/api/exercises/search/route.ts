@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ExerciseType, Prisma } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -10,7 +11,39 @@ export async function GET(req: Request) {
     (v) => v.toLowerCase() === q?.toLowerCase(),
   );
 
-  const where: Prisma.ExerciseWhereInput | undefined = q
+  const token = await getToken({
+    req: req as NextRequest,
+    secret: process.env.NEXTAUTH_SECRET!,
+  });
+
+  if (!token) {
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  console.log("Token: ", token);
+
+  let trainerFilter: Prisma.ExerciseWhereInput | undefined;
+
+  if (token.role === "TRAINER") {
+    // Trainer + Client → only their exercises OR global exercises
+    trainerFilter = {
+      OR: [{ trainerId: token.id }, { trainerId: null }],
+    };
+  } else if (token.role === "CLIENT") {
+    //Client → only their exercises, trainer exercises, OR global exercises
+    trainerFilter = {
+      OR: [
+        { trainerId: token.id },
+        { trainerId: token.trainerId },
+        { trainerId: null },
+      ],
+    };
+  } else {
+    // Admin can see everything
+    trainerFilter = undefined;
+  }
+
+  const searchFilter: Prisma.ExerciseWhereInput | undefined = q
     ? {
         OR: [
           {
@@ -37,6 +70,13 @@ export async function GET(req: Request) {
         ],
       }
     : undefined;
+
+  const where: Prisma.ExerciseWhereInput = {
+    AND: [
+      ...(searchFilter ? [searchFilter] : []),
+      ...(trainerFilter ? [trainerFilter] : []),
+    ],
+  };
 
   const exercises = await prisma.exercise.findMany({
     where,
