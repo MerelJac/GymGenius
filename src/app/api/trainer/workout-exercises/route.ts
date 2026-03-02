@@ -55,6 +55,7 @@ export async function POST(req: Request) {
       prescribed = {
         kind: "timed",
         duration: Number(formData.get("duration")),
+                sets: Number(formData.get("sets")),
       };
       break;
 

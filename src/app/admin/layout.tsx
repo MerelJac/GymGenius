@@ -4,7 +4,8 @@ import SidebarLayout from "../components/trainer/Sidebar";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 
-export default async function TrainerLayout({
+// SAME AS TRAINER LAYOUT
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
