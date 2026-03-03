@@ -12,6 +12,7 @@ import {
   User2,
   Menu,
   X,
+  GitCompare,
 } from "lucide-react";
 
 const navItems = [
@@ -22,7 +23,7 @@ const navItems = [
 ];
 
 const adminNavLinks = [
-{ href: "/admin/exercises", label: "Review Exercises", icon: Dumbbell },
+{ href: "/admin/exercises", label: "Review Exercises", icon: GitCompare },
 ];
 
 export default function SidebarLayout({
