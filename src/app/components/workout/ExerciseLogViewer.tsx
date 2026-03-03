@@ -149,11 +149,6 @@ export function ExerciseLogViewer({ logs }: { logs: ExerciseLog[] }) {
                                 </span>
                               )}
                             </div>
-
-                            {/* Optional cue */}
-                            <span className="text-xs text-gray-400 italic">
-                              controlled
-                            </span>
                           </div>
                         ))}
                       </div>

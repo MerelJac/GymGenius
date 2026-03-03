@@ -60,7 +60,8 @@ export default function SubstitutionModal({
         <h3 className="font-semibold text-lg">Substitute Exercise</h3>
 
         {subs.length === 0 ? (
-          <p className="text-sm text-gray-500">No substitutions available</p>
+          <p className="text-sm text-gray-500">No substitutions available. Click &apos;+ Add Exercise&apos; at the
+                bottom of the set to add your own substitution.</p>
         ) : (
           subs.map((ex) => (
             <button

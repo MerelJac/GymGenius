@@ -196,10 +196,7 @@ export function ExerciseLogger({
                       onChange={(e) => {
                         setHasSaved(false);
                         setPerformedState((prev) => {
-                          if (
-                            prev.kind !== "strength"
-                          )
-                            return prev;
+                          if (prev.kind !== "strength") return prev;
 
                           const sets = [...prev.sets];
                           sets[index] = {
@@ -318,11 +315,7 @@ export function ExerciseLogger({
                         if (!set.weight && recommendedWeight) {
                           setHasSaved(false);
                           setPerformedState((prev) => {
-                            if (
-                              
-                              prev.kind !== "hybrid"
-                            )
-                              return prev;
+                            if (prev.kind !== "hybrid") return prev;
 
                             const sets = [...prev.sets];
                             sets[index] = {
@@ -402,7 +395,7 @@ export function ExerciseLogger({
                       key={index}
                       className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 flex-wrap gap-2"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-wrap">
                         <span className="text-xs font-medium text-gray-500 w-10">
                           Set {index + 1}
                         </span>
@@ -434,15 +427,9 @@ export function ExerciseLogger({
                             }}
                             placeholder="—"
                             className="w-14 rounded-md border border-gray-300 px-2 py-1 text-sm
-                focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                           />
                           <span className="text-xs text-gray-500">reps</span>
-
-                          {sameDuration && firstDuration != null && (
-                            <span className="text-xs text-gray-400">
-                              • {firstDuration}s
-                            </span>
-                          )}
                         </div>
 
                         {/* Weight (optional, de-emphasized) */}
@@ -472,47 +459,42 @@ export function ExerciseLogger({
                             }}
                             placeholder="bw / lb"
                             className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm
-                focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                            focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                           />
                           <span className="text-xs text-gray-400">lb</span>
                         </div>
-                      </div>
 
-                      {/* Cue */}
-                      <span className="text-xs text-gray-400 italic">
-                        controlled
-                      </span>
+                        {/* Duration per set */}
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="number"
+                            value={set.duration ?? ""}
+                            onChange={(e) => {
+                              setHasSaved(false);
+                              setPerformedState((prev) => {
+                                if (
+                                  prev.kind !== "core" &&
+                                  prev.kind !== "mobility"
+                                )
+                                  return prev;
 
-                      {/* Duration per set */}
-                      <div className="flex items-center gap-1">
-                        <input
-                          type="number"
-                          value={set.duration ?? ""}
-                          onChange={(e) => {
-                            setHasSaved(false);
-                            setPerformedState((prev) => {
-                              if (
-                                prev.kind !== "core" &&
-                                prev.kind !== "mobility"
-                              )
-                                return prev;
+                                const sets = [...prev.sets];
+                                sets[index] = {
+                                  ...sets[index],
+                                  duration: e.target.value
+                                    ? Number(e.target.value)
+                                    : 0,
+                                };
 
-                              const sets = [...prev.sets];
-                              sets[index] = {
-                                ...sets[index],
-                                duration: e.target.value
-                                  ? Number(e.target.value)
-                                  : 0,
-                              };
-
-                              return { ...prev, sets };
-                            });
-                          }}
-                          placeholder="sec"
-                          className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm
-              focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        />
-                        <span className="text-xs text-gray-500">sec</span>
+                                return { ...prev, sets };
+                              });
+                            }}
+                            placeholder="sec"
+                            className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm
+                              focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                          />
+                          <span className="text-xs text-gray-500">sec</span>
+                        </div>
                       </div>
                     </div>
                   ));
