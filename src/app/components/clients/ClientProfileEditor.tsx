@@ -1,10 +1,13 @@
 "use client";
-
 import { useState, startTransition } from "react";
 import { updateClientProfile } from "@/app/(trainer)/clients/[clientId]/actions";
 import { ResendInviteButton } from "../ResendEmailButton";
-import {  formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
+import { formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
 import { formatPhoneDisplay } from "@/app/utils/format/formatPhoneNumber";
+import { Pencil } from "lucide-react";
+
+const inputClass = "w-full px-4 py-2.5 bg-surface2 border border-surface2 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
+const labelClass = "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
 
 export function ClientProfileEditor({
   clientId,
@@ -29,21 +32,16 @@ export function ClientProfileEditor({
 }) {
   const [firstName, setFirstName] = useState(initialFirstName ?? "");
   const [lastName, setLastName] = useState(initialLastName ?? "");
-  const [dob, setDob] = useState(
-    initialDob ? initialDob.toISOString().split("T")[0] : "",
-  );
+  const [dob, setDob] = useState(initialDob ? initialDob.toISOString().split("T")[0] : "");
   const [phone, setPhone] = useState(initalPhone ?? "");
   const [email, setEmail] = useState(initialEmail ?? "");
-
   const [experience, setExperience] = useState(initialExperience ?? "");
   const [injuryNotes, setInjuryNotes] = useState(initialInjuryNotes ?? "");
-
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   function handleSave() {
     setSaving(true);
-
     startTransition(async () => {
       await updateClientProfile(clientId, {
         firstName,
@@ -54,7 +52,6 @@ export function ClientProfileEditor({
         phone: phone || null,
         email: email || null,
       });
-
       setSaving(false);
       setIsEditing(false);
       onSave?.();
@@ -62,203 +59,134 @@ export function ClientProfileEditor({
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-5 max-h-screen overflow-scroll">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Profile Information
-        </h2>
+    <div className="p-5 space-y-5">
 
-        {!isEditing && (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            <span>Edit</span>
-          </button>
-        )}
-      </div>
-
+      {/* ── EDIT FORM ── */}
       {isEditing ? (
-        <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                First Name
-              </label>
-              <input
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="First name"
-                autoFocus
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-base"
-              />
+              <label className={labelClass}>First Name</label>
+              <input value={firstName} onChange={(e) => setFirstName(e.target.value)}
+                placeholder="First name" autoFocus className={inputClass} />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Last Name
-              </label>
-              <input
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Last name"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm text-base"
-              />
+              <label className={labelClass}>Last Name</label>
+              <input value={lastName} onChange={(e) => setLastName(e.target.value)}
+                placeholder="Last name" className={inputClass} />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Date of Birth
-            </label>
-            <input
-              type="date"
-              value={dob}
-              onChange={(e) => setDob(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
-            />
+            <label className={labelClass}>Date of Birth</label>
+            <input type="date" value={dob} onChange={(e) => setDob(e.target.value)}
+              className={inputClass} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
-            />
+            <label className={labelClass}>Email</label>
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+              className={inputClass} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Phone
-            </label>
-            <input
-              type="phone"
-              value={phone ? formatPhoneDisplay(phone) : ""}
-              onChange={(e) => setPhone(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
-            />
+            <label className={labelClass}>Phone</label>
+            <input type="tel" value={phone ? formatPhoneDisplay(phone) : ""}
+              onChange={(e) => setPhone(e.target.value)} className={inputClass} />
           </div>
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Training Experience
-            </label>
-            <textarea
-              value={experience}
-              onChange={(e) => setExperience(e.target.value)}
+            <label className={labelClass}>Training Experience</label>
+            <textarea value={experience} onChange={(e) => setExperience(e.target.value)}
               placeholder="e.g. Beginner, 2 years lifting, former athlete"
-              rows={3}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
-            />
+              rows={3} className={inputClass + " resize-none"} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Injuries or limitations
-            </label>
-            <textarea
-              value={injuryNotes}
-              onChange={(e) => setInjuryNotes(e.target.value)}
-              rows={3}
+            <label className={labelClass}>Injuries / Limitations</label>
+            <textarea value={injuryNotes} onChange={(e) => setInjuryNotes(e.target.value)}
               placeholder="Anything your trainer should know"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
-            />
+              rows={3} className={inputClass + " resize-none"} />
           </div>
 
-          <div className="flex items-center gap-3 pt-2">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition shadow-sm min-w-[100px]"
-            >
+          <div className="flex gap-3 pt-1">
+            <button onClick={handleSave} disabled={saving}
+              className="flex-1 py-2.5 bg-lime-green text-black font-syne font-bold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition disabled:opacity-50 disabled:cursor-not-allowed">
               {saving ? "Saving…" : "Save Changes"}
             </button>
-
-            <button
-              onClick={() => setIsEditing(false)}
-              disabled={saving}
-              className="px-5 py-2.5 text-gray-700 font-medium hover:text-gray-900 hover:bg-gray-100 rounded-lg border border-gray-300 transition focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:opacity-50"
-            >
+            <button onClick={() => setIsEditing(false)} disabled={saving}
+              className="px-5 py-2.5 bg-surface2 text-muted font-medium text-sm rounded-xl hover:text-foreground transition disabled:opacity-50">
               Cancel
             </button>
           </div>
         </div>
+
       ) : (
-        <div className="space-y-4 py-2">
-          {/* NAME */}
-          <div className="text-gray-900">
-            <span className="text-xl font-semibold">
-              {firstName || "—"} {lastName || ""}
-            </span>
-            {!firstName && !lastName && (
-              <span className="ml-2 text-sm text-gray-400 italic">
-                (not set)
-              </span>
-            )}
+        /* ── READ VIEW ── */
+        <div className="space-y-0 divide-y divide-surface2">
+
+          {/* Name + edit button */}
+          <div className="flex items-center justify-between pb-4">
+            <div>
+              <p className={labelClass}>Name</p>
+              <p className="font-syne font-bold text-base text-foreground">
+                {firstName || lastName ? `${firstName} ${lastName}`.trim() : "—"}
+              </p>
+            </div>
+            <button onClick={() => setIsEditing(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface2 text-muted hover:text-lime-green transition-colors text-sm font-medium">
+              <Pencil size={13} />
+            </button>
           </div>
 
-          {/* email */}
-          <div>
-            <span className="block text-gray-500">Email</span>
-            <span className="font-medium text-gray-900">
-              {email || "Not set"}
-            </span>
+          {/* Email */}
+          <div className="py-3.5">
+            <p className={labelClass}>Email</p>
+            <p className="text-sm font-medium text-foreground">{email || "Not set"}</p>
           </div>
 
-          <div className="flex flex-row gap-2">
-                        <ResendInviteButton email={email} />
-            <span className="block text-gray-500">
-              Resend Invitiation Email
-            </span>
-
-
+          {/* Resend invite */}
+          <div className="py-3.5 flex items-center gap-3">
+            <ResendInviteButton email={email} />
+            <span className="text-sm text-muted">Resend Invitation Email</span>
           </div>
-          {/* phone */}
-          <div>
-            <span className="block text-gray-500">Phone</span>
-            <span className="font-medium text-gray-900">
+
+          {/* Phone */}
+          <div className="py-3.5">
+            <p className={labelClass}>Phone</p>
+            <p className="text-sm font-medium text-foreground">
               {phone ? formatPhoneDisplay(phone) : "Not set"}
-            </span>
+            </p>
           </div>
 
-          {/* DETAILS */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-            {/* DOB */}
+          {/* DOB + Experience */}
+          <div className="grid grid-cols-2 gap-4 py-3.5">
             <div>
-              <span className="block text-gray-500">Date of Birth</span>
-              <span className="font-medium text-gray-900">
+              <p className={labelClass}>Date of Birth</p>
+              <p className="text-sm font-medium text-foreground">
                 {dob ? formatDateFromInputReturnString(dob) : "Not set"}
-              </span>
+              </p>
             </div>
-
-            {/* EXPERIENCE */}
             <div>
-              <span className="block text-gray-500">Experience</span>
-              <span className="font-medium text-gray-900">
+              <p className={labelClass}>Experience</p>
+              <p className="text-sm font-medium text-foreground">
                 {experience || "Not set"}
-              </span>
+              </p>
             </div>
           </div>
 
-          {/* INJURIES */}
-          <div>
-            <span className="block text-sm text-gray-500 mb-1">
-              Injuries / Limitations
-            </span>
-
+          {/* Injuries */}
+          <div className="pt-3.5">
+            <p className={labelClass}>Injuries / Limitations</p>
             {injuryNotes ? (
-              <div className="rounded-lg bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
+              <div className="mt-1.5 rounded-xl bg-danger/10 border border-danger/20 px-4 py-3 text-sm text-danger/90">
                 {injuryNotes}
               </div>
             ) : (
-              <span className="text-sm text-gray-400 italic">
-                None reported
-              </span>
+              <p className="text-sm text-muted italic">None reported</p>
             )}
           </div>
+
         </div>
       )}
     </div>

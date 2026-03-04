@@ -6,141 +6,129 @@ import Link from "next/link";
 import { signupAction } from "./actions";
 import { signIn } from "next-auth/react";
 
+const inputCls =
+  "w-full px-4 py-2.5 bg-background border border-surface2 rounded-xl text-black text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
+const labelCls =
+  "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
+
 export default function SignupPage() {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
 
-async function signup(formData: FormData) {
-  setError(null);
+  async function signup(formData: FormData) {
+    setError(null);
 
-  const result = await signupAction(formData);
+    const result = await signupAction(formData);
 
-  if (result.success) {
-    await signIn("credentials", {
-      email: formData.get("email"),
-      password: formData.get("password"),
-      redirect: true,
-      callbackUrl: "/dashboard",
-    });
-  } else {
-    setError(result.error);
+    if (result.success) {
+      await signIn("credentials", {
+        email: formData.get("email"),
+        password: formData.get("password"),
+        redirect: true,
+        callbackUrl: "/dashboard",
+      });
+    } else {
+      setError(result.error);
       return;
+    }
+
+    router.push("/");
   }
 
-  router.push("/");
-}
-
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center bg-black px-4">
+      <div className="w-full max-w-sm space-y-6">
+        {/* Brand */}
+        <div className="text-center space-y-1">
+          <h1 className="font-syne font-extrabold text-3xl text-lime-green tracking-tight">
+            Dialed Fitness
+          </h1>
+          <p className="text-sm text-muted">Create your account</p>
+        </div>
+
         <form
           action={signup}
-          className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 space-y-6"
+          className="bg-surface border border-surface2 rounded-2xl p-6 space-y-4"
         >
-          <h1 className="text-2xl font-bold text-center">
-            Create your account
-          </h1>
-
+          {/* Error */}
           {error && (
-            <section className="flex flex-col gap-2 mb-4">
-              <div className="rounded bg-red-50 border border-red-200 px-3 py-2 text-sm text-red-700">
-                {error}
+            <div className="space-y-2">
+              <div className="rounded-xl bg-danger/10 border border-danger/20 px-4 py-3">
+                <p className="text-sm text-danger">{error}</p>
               </div>
-              <small className="text-black text-sm">
-                Thanks for your interest! At the moment, registration is limited
-                to invited users only. We appreciate your patience and will be
-                opening access soon.{" "}
+              <p className="text-xs text-muted leading-relaxed">
+                Registration is limited to invited users only.{" "}
                 <a
                   href="mailto:coachmerel.training@gmail.com?subject=Dialed%20Fitness%20Inquiry"
-                  className="underline text-blue-600 hover:text-blue-700"
+                  className="underline text-foreground hover:text-blue-700"
                 >
-                  Contact us
-                </a>{" "}
-                for more information.
-              </small>
-            </section>
+                  Contact us{" "}
+                </a> for more information.
+              </p>
+            </div>
           )}
 
-            {/* firstName */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              First Name
-            </label>
-            <input
-              name="firstName"
-              type="firstName"
-              placeholder="First"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition text-base"
-              required
-            />
+          {/* firstName */}
+          {/* Name row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className={labelCls}>First Name</label>
+              <input
+                name="firstName"
+                type="text"
+                placeholder="First"
+                className={inputCls}
+                required
+              />
+            </div>
+            <div>
+              <label className={labelCls}>Last Name</label>
+              <input
+                name="lastName"
+                type="text"
+                placeholder="Last"
+                className={inputCls}
+                required
+              />
+            </div>
           </div>
 
-          {/* LastName */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              Last Name
-            </label>
-            <input
-              name="lastName"
-              type="lastName"
-              placeholder="Last"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition text-base"
-              required
-            />
-          </div>
-
-
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+          <div>
+            <label className={labelCls}>Email</label>
             <input
               name="email"
               type="email"
-              required
               placeholder="Email from invitation"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition text-base"
+              className={inputCls}
+              required
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
+
+          <div>
+            <label className={labelCls}>Password</label>
             <input
               name="password"
               type="password"
+              placeholder="••••••••"
+              className={inputCls}
               required
-              placeholder="Password"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition text-base"
             />
           </div>
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              Confirm Password
-            </label>
+
+          <div>
+            <label className={labelCls}>Confirm Password</label>
             <input
               name="password-confirm"
               type="password"
+              placeholder="••••••••"
+              className={inputCls}
               required
-              placeholder="Password"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition text-base"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+            className="w-full py-2.5 bg-lime-green text-black font-syne font-bold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition"
           >
             Create account
           </button>

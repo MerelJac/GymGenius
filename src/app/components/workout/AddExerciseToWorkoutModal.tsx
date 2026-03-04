@@ -1,5 +1,4 @@
 "use client";
-
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Modal } from "@/app/components/ui/Modal";
@@ -9,6 +8,7 @@ import { addExerciseToWorkout } from "@/app/(client)/workouts/[scheduledWorkoutI
 import { ExerciseSearch } from "./ExerciseSearch";
 import { PrescribedEditor } from "./PrescribedEditor";
 import { AddExerciseModal } from "@/app/(trainer)/exercises/components/AddExerciseModal";
+import { Plus } from "lucide-react";
 
 export function AddExerciseToWorkoutModal({
   open,
@@ -22,25 +22,20 @@ export function AddExerciseToWorkoutModal({
   onClose: () => void;
 }) {
   const router = useRouter();
-
   const [exercise, setExercise] = useState<Exercise | null>(null);
   const [prescribed, setPrescribed] = useState<Prescribed | null>(null);
   const [showCreateExerciseModal, setShowCreateExerciseModal] = useState(false);
 
   async function handleAdd() {
     if (!exercise || !prescribed) return;
-
     await addExerciseToWorkout(
       workoutLogId,
       exercise.id,
       prescribed,
       sectionId,
     );
-
-    // Reset local state
     setExercise(null);
     setPrescribed(null);
-
     onClose();
     router.refresh();
   }
@@ -49,23 +44,30 @@ export function AddExerciseToWorkoutModal({
     <>
       <Modal open={open} onClose={onClose} title="Add Exercise">
         <div className="space-y-4">
-          <div className="flex flex-row gap-2 items-center justify-between">
-            {/* Search existing exercises */}
-            <ExerciseSearch onSelect={setExercise} />
-
-            {/* Create new exercise button */}
+          {/* Search + Create row */}
+          <div className="flex gap-2 items-center flex-col">
+            <div className="flex-1">
+              <ExerciseSearch onSelect={setExercise} />
+            </div>
             <button
               onClick={() => setShowCreateExerciseModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs  rounded-lg border border-gray-300 hover:bg-gray-100 transition"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-surface2 border border-surface2 text-muted hover:text-lime-green hover:border-lime-green/30 transition-colors text-xs font-medium flex-shrink-0"
             >
-              + Create New Exercise
+              <Plus size={13} />
+              New
             </button>
           </div>
-          {/* Selected Exercise + Prescribed */}
+
+          {/* Selected exercise */}
           {exercise && (
             <div className="space-y-3">
-              <div className="text-sm text-gray-700">
-                Selected: <strong>{exercise.name}</strong>
+              <div className="flex items-center gap-2 bg-lime-green/5 border border-lime-green/15 rounded-xl px-3 py-2">
+                <span className="text-[10px] font-semibold tracking-widest uppercase text-lime-green/70">
+                  Selected
+                </span>
+                <span className="text-sm text-foreground font-medium">
+                  {exercise.name}
+                </span>
               </div>
 
               <PrescribedEditor
@@ -73,22 +75,27 @@ export function AddExerciseToWorkoutModal({
                 value={prescribed}
                 onChange={setPrescribed}
               />
-              <p className="text-xs text-center">Adjust sets & reps then add.</p>
+
+              <p className="text-xs text-center text-muted">
+                Adjust sets & reps then add.
+              </p>
             </div>
           )}
 
-          {/* Add Button */}
+          {/* Add button */}
           <button
             onClick={handleAdd}
             disabled={!exercise || !prescribed}
-            className="w-full rounded-lg bg-blue-600 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className={
+              !exercise || !prescribed
+                ? "w-full py-2.5 rounded-xl font-syne font-bold text-sm bg-lime-green text-black opacity-30 cursor-not-allowed"
+                : "w-full py-2.5 rounded-xl font-syne font-bold text-sm bg-lime-green text-black hover:opacity-90 active:scale-[0.98] transition"
+            }
           >
             Add to Workout
           </button>
         </div>
       </Modal>
-
-      {/* Separate modal for creating exercise */}
       <AddExerciseModal
         open={showCreateExerciseModal}
         onClose={() => setShowCreateExerciseModal(false)}

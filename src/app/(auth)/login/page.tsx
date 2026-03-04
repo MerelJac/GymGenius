@@ -1,9 +1,10 @@
-// src/app/(auth)/login/page.tsx
 "use client";
-
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
+
+const inputCls = "w-full px-4 py-2.5 bg-background border border-surface2 rounded-xl text-black text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
+const labelCls = "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
@@ -13,75 +14,64 @@ export default function LoginPage() {
     e.preventDefault();
     setError(null);
     setSignInText("Signing in...");
-
     const formData = new FormData(e.currentTarget);
-
     const res = await signIn("credentials", {
       email: formData.get("email"),
       password: formData.get("password"),
       passwordConfrim: formData.get("password-confirm"),
       redirect: false,
     });
-
     if (res?.error) {
       setError("Invalid email or password");
-      setSignInText('Sign In')
+      setSignInText("Sign In");
       return;
     }
-
     window.location.href = "/dashboard";
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 bg-black">
+      <div className="w-full max-w-sm space-y-6">
+
+        {/* Brand */}
+        <div className="text-center space-y-1">
+          <h1 className="font-syne font-extrabold text-3xl text-lime-green tracking-tight">
+            Dialed Fitness
+          </h1>
+          <p className="text-sm text-muted">Sign in to your account</p>
+        </div>
+
         <form
           onSubmit={handleSubmit}
-          className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 space-y-6"
+          className="bg-surface border border-surface2 rounded-2xl p-6 space-y-5"
         >
-          {/* Header */}
-          <div className="text-center space-y-1">
-            <h1 className="text-2xl font-bold text-gray-900">Welcome back</h1>
-            <p className="text-sm text-gray-500">
-              Sign in to your Dialed Fitness account
-            </p>
-          </div>
-
           {/* Error */}
           {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-2 text-sm text-red-700">
-              {error}
+            <div className="flex items-center gap-2 rounded-xl bg-danger/10 border border-danger/20 px-4 py-3">
+              <span className="text-sm text-danger">{error}</span>
             </div>
           )}
 
           {/* Email */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              Email
-            </label>
+          <div>
+            <label className={labelCls}>Email</label>
             <input
               name="email"
               type="email"
               placeholder="you@example.com"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition text-base"
+              className={inputCls}
               required
             />
           </div>
 
           {/* Password */}
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
+          <div>
+            <label className={labelCls}>Password</label>
             <input
               name="password"
               type="password"
               placeholder="••••••••"
-              className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       transition text-base"
+              className={inputCls}
               required
             />
           </div>
@@ -89,31 +79,31 @@ export default function LoginPage() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+            className="w-full py-2.5 bg-lime-green text-black font-syne font-bold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition"
           >
             {signInText}
           </button>
 
-          <div className="flex flex-col md:flex-row items-center justify-between">
+          {/* Links */}
+          <div className="flex items-center justify-between pt-1">
             <Link
               href="/signup"
-              className="text-sm text-center block hover:underline text-black"
+              className="text-xs text-muted hover:text-lime-green transition-colors"
             >
-              New here? Get Started
+              New here? Get started
             </Link>
             <Link
               href="/forgot-password"
-              className="text-sm text-center block hover:underline text-black"
+              className="text-xs text-muted hover:text-lime-green transition-colors"
             >
               Forgot password?
             </Link>
           </div>
-
-          {/* Footer */}
-          <p className="text-xs text-center text-gray-500">
-            © {new Date().getFullYear()} Dialed Fitness
-          </p>
         </form>
+
+        <p className="text-xs text-center text-muted">
+          © {new Date().getFullYear()} Dialed Fitness
+        </p>
       </div>
     </div>
   );

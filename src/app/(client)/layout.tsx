@@ -9,11 +9,11 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50 overflow-x-hidden
+    <div className="min-h-screen bg-black overflow-x-hidden
 ">
       <ClientHeader />
 
-      <main className="p-6 max-w-6xl mx-auto bg-black">{children}</main>
+      <main className="p-6  mx-auto bg-black">{children}</main>
     </div>
   );
 }

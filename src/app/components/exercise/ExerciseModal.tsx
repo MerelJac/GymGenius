@@ -1,6 +1,6 @@
 "use client";
-
 import { useEffect, useState } from "react";
+import { X, Dumbbell, TrendingUp } from "lucide-react";
 import { ExerciseDetail, OneRMPoint } from "@/types/exercise";
 import { getEmbedUrl } from "@/lib/video";
 import { OneRMLineChart } from "../clients/OneRmLineChart";
@@ -17,129 +17,142 @@ export default function ExerciseModal({
   const [exercise, setExercise] = useState<ExerciseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [oneRMHistory, setOneRMHistory] = useState<OneRMPoint[]>([]);
-  // Get client's 1RM history for this exercise to show progress over time
+
   useEffect(() => {
     if (!clientId) return;
-
     fetch(`/api/clients/${clientId}/exercises/${exerciseId}/one-rm`)
       .then((res) => res.json())
       .then(setOneRMHistory);
   }, [clientId, exerciseId]);
 
-  // Get exercise details
   useEffect(() => {
     let active = true;
-
     fetch(`/api/exercises/${exerciseId}`)
       .then((res) => res.json())
       .then((data) => {
-        if (active) {
-          setExercise(data);
-          setLoading(false);
-        }
+        if (active) { setExercise(data); setLoading(false); }
       });
-
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [exerciseId]);
 
-  if (!exercise && loading) {
-    return (
-      <>
-        <div className="fixed inset-0 z-40 bg-black/40" />
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="bg-white rounded-xl p-6">Loading…</div>
-        </div>
-      </>
-    );
-  }
+  const embedUrl = exercise?.videoUrl ? getEmbedUrl(exercise.videoUrl) : null;
 
-  if (!exercise) return null;
-
-  const embedUrl = exercise.videoUrl ? getEmbedUrl(exercise.videoUrl) : null;
-
-  console.log("embed url:", embedUrl);
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-        <div className="bg-white rounded-xl shadow-xl max-w-xl w-full p-6 relative pointer-events-auto">
-          {/* Close */}
-          <button
-            onClick={onClose}
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
-          >
-            ✕
-          </button>
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 pointer-events-none">
+        <div className="bg-surface border border-surface2 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto pointer-events-auto">
 
-          <h2 className="text-xl font-semibold mb-2">{exercise.name}</h2>
+          {/* Loading state */}
+          {loading && (
+            <div className="flex items-center justify-center p-12">
+              <div className="text-muted text-sm">Loading…</div>
+            </div>
+          )}
 
-          <div className="text-sm text-gray-500 mb-4">
-            {exercise.type}
-            {exercise.equipment && ` • ${exercise.equipment}`}
-            {exercise.muscleGroup && ` • ${exercise.muscleGroup}`}
-          </div>
-
-          {/* 🎥 Video */}
-          {embedUrl && (
-            <div className="mb-4">
-              {embedUrl.endsWith(".mp4") ? (
-                <video controls className="w-full rounded-md" src={embedUrl} />
-              ) : (
-                <div className="relative aspect-video rounded-md overflow-hidden">
-                  <iframe
-                    src={embedUrl}
-                    className="absolute inset-0 w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
+          {!loading && exercise && (
+            <>
+              {/* Header */}
+              <div className="flex items-start justify-between px-5 pt-5 pb-4 border-b border-surface2 sticky top-0 bg-surface z-10">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-lime-green/10 flex items-center justify-center flex-shrink-0">
+                    <Dumbbell size={15} className="text-lime-green" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="font-syne font-bold text-base text-foreground ">
+                      {exercise.name}
+                    </h2>
+                    <p className="text-[11px] text-muted mt-0.5">
+                      {[exercise.type, exercise.equipment, exercise.muscleGroup]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  </div>
                 </div>
-              )}
-            </div>
-          )}
-
-          {/* Notes */}
-          {exercise.notes && (
-            <div className="mb-4">
-              <h3 className="font-medium mb-1">Notes</h3>
-              <p className="text-sm">{exercise.notes}</p>
-            </div>
-          )}
-
-          {/* Substitutions */}
-          <div>
-            <h3 className="font-medium mb-2">Substitutions</h3>
-
-            {exercise.substitutions.length === 0 && (
-              <p className="text-sm text-gray-500">
-                No substitutions available
-              </p>
-            )}
-
-            <ul className="space-y-2">
-              {exercise.substitutions.map((sub) => (
-                <li key={sub.id} className="border p-2 rounded">
-                  <div className="font-medium">{sub.name}</div>
-                  {sub.note && (
-                    <div className="text-sm text-gray-600">{sub.note}</div>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            {clientId && (
-              <div className="my-6">
-                <h3 className="font-medium mb-2">1RM Progress</h3>
-                <OneRMLineChart data={oneRMHistory} />
+                <button
+                  onClick={onClose}
+                  className="w-8 h-8 rounded-xl bg-surface2 flex items-center justify-center text-muted hover:text-foreground transition-colors flex-shrink-0 ml-3"
+                >
+                  <X size={15} />
+                </button>
               </div>
-            )}
-          </div>
+
+              <div className="p-5 space-y-5">
+
+                {/* Video */}
+                {embedUrl && (
+                  <div className="rounded-xl overflow-hidden border border-surface2">
+                    {embedUrl.endsWith(".mp4") ? (
+                      <video controls className="w-full" src={embedUrl} />
+                    ) : (
+                      <div className="relative aspect-video">
+                        <iframe
+                          src={embedUrl}
+                          className="absolute inset-0 w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Notes */}
+                {exercise.notes && (
+                  <div className="bg-surface2 rounded-xl px-4 py-3.5">
+                    <p className="text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5">
+                      Notes
+                    </p>
+                    <p className="text-sm text-foreground/80 leading-relaxed">
+                      {exercise.notes}
+                    </p>
+                  </div>
+                )}
+
+                {/* 1RM Progress */}
+                {clientId && oneRMHistory.length > 0 && (
+                  <div className="bg-surface2 rounded-xl px-4 py-3.5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <TrendingUp size={13} className="text-lime-green" />
+                      <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">
+                        1RM Progress
+                      </p>
+                    </div>
+                    <OneRMLineChart data={oneRMHistory} />
+                  </div>
+                )}
+
+                {/* Substitutions */}
+                <div>
+                  <p className="text-[10px] font-semibold tracking-widest uppercase text-muted mb-3">
+                    Substitutions
+                  </p>
+                  {exercise.substitutions.length === 0 ? (
+                    <p className="text-sm text-muted italic">No substitutions available</p>
+                  ) : (
+                    <ul className="flex flex-col gap-2">
+                      {exercise.substitutions.map((sub) => (
+                        <li key={sub.id}
+                          className="flex items-start gap-3 bg-surface2 border border-surface2 rounded-xl px-4 py-3">
+                          <div className="w-1.5 h-1.5 rounded-full bg-lime-green mt-2 flex-shrink-0" />
+                          <div>
+                            <p className="text-sm font-medium text-foreground">{sub.name}</p>
+                            {sub.note && (
+                              <p className="text-xs text-muted mt-0.5">{sub.note}</p>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>

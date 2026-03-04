@@ -81,9 +81,10 @@ export default function WorkoutRunner({
     return (
       <>
         <div className="flex flex-row justify-between items-center gap-2">
-          <div className="rounded bg-green-50 border p-3 text-green-700 my-4  min-w-fit">
-            Workout completed 🎉
+          <div className="greeting">
+            <h1>Workout completed!</h1>
           </div>
+
           {/* {programId ? (
             <button onClick={handleRerunWorkout}>
               <RotateCcw size={14} />
@@ -105,10 +106,8 @@ export default function WorkoutRunner({
   }
 
   return (
-    <div className="max-w-xl space-y-4">
-      <h1 className="text-2xl font-semibold">
-        {scheduledWorkout.workout.name}
-      </h1>
+    <div className="greeting h-full">
+      <h1 className="pb-2">{scheduledWorkout.workout.name}</h1>
 
       {/* START / STOP */}
       {!isActive ? (
@@ -116,7 +115,7 @@ export default function WorkoutRunner({
           {scheduledWorkout.workout.program?.id?.startsWith("__") &&
           scheduledWorkout.status == "READY_TO_BUILD" ? (
             <button
-              className="px-4 py-2 border rounded"
+              className="btn-primary mb-4"
               onClick={async () => {
                 const id = await startBuildingWorkout(scheduledWorkout.id);
                 autoSaveFns.current = [];
@@ -128,7 +127,7 @@ export default function WorkoutRunner({
             </button>
           ) : (
             <button
-              className="px-4 py-2 border rounded"
+              className="btn-primary mb-4"
               onClick={async () => {
                 const id = await startWorkout(scheduledWorkout.id);
                 autoSaveFns.current = []; // 🧼 CLEAR OLD REGISTRATIONS
@@ -146,7 +145,7 @@ export default function WorkoutRunner({
           scheduledWorkout.status == "BUILDING" ? (
             // CREATE FOR LATER
             <button
-              className="px-4 py-2 border rounded text-green-600"
+              className="btn-primary mb-4"
               disabled={isCreatingForLater}
               onClick={async () => {
                 if (!workoutLogId || isCreatingForLater) return;
@@ -179,7 +178,7 @@ export default function WorkoutRunner({
             </button>
           ) : (
             <button
-              className="px-4 py-2 border rounded text-red-600"
+              className="btn-finish"
               disabled={isFinishing}
               onClick={async () => {
                 if (!workoutLogId || isFinishing) return;
@@ -212,7 +211,7 @@ export default function WorkoutRunner({
       )}
 
       {!programId && (
-        <p className="text-xs text-gray">
+        <p className="section-label pb-4">
           You are creating this workout. Log your exercises or add new ones if
           you don’t see what you need.
         </p>
@@ -222,9 +221,9 @@ export default function WorkoutRunner({
         {scheduledWorkout.workout.workoutSections.map((section) => (
           <div key={section.id} className="space-y-3">
             {/* SECTION HEADER */}
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600">
-              {section.title}
-            </h3>
+            <div className="section-label">
+              <span>{section.title}</span>
+            </div>
 
             <ul className="space-y-3">
               {section.exercises

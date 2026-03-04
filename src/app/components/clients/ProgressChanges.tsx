@@ -15,7 +15,7 @@ export function ProgressChanges({
   } | null>(null);
 
   return (
-    <>
+    <div>
       <div className="section-header">
         <h2 className="section-title">Strength Progress</h2>
       </div>
@@ -117,6 +117,6 @@ export function ProgressChanges({
           onClose={() => setOpenExercise(null)}
         />
       )}
-    </>
+    </div>
   );
 }

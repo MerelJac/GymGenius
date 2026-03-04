@@ -11,7 +11,6 @@ import { getClientProgressSummary } from "@/lib/clients/clientProgress";
 import { ProgressChanges } from "../clients/ProgressChanges";
 import { redirect } from "next/navigation";
 import { ContactTrainer } from "../clients/ContactTrainer";
-import { ArrowRight } from "lucide-react";
 import { CreateWorkoutForLater } from "../workout/CreateWorkoutForLater";
 
 export default async function ClientDashboard() {
@@ -199,7 +198,7 @@ function TodayWorkout({
   return (
     <div className="workout-card">
       <div className="wc-top">
-        <span className="wc-badge">Today`&apos;s Workout</span>
+        <span className="wc-badge">Today&apos;s Workout</span>
         <span className="wc-date">
           {" "}
           {workout.scheduledDate.toLocaleDateString()}

@@ -22,11 +22,11 @@ export function BodyMetricLogger() {
   }
 
   return (
-  <div className="w-full max-w-sm space-y-4">
+  <div className="w-full max-w-sm space-y-4 flex flex-col items-center">
     <div className="grid grid-cols-2 gap-3">
       {/* Weight */}
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-gray-600">
+      <div className="body-stat">
+        <label className="bs-label">
           Weight
         </label>
         <input
@@ -40,8 +40,8 @@ export function BodyMetricLogger() {
       </div>
 
       {/* Body Fat */}
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-gray-600">
+      <div className="body-stat">
+        <label className="bs-label">
           Body Fat %
         </label>
         <input
@@ -59,7 +59,7 @@ export function BodyMetricLogger() {
     <button
       onClick={handleAdd}
       disabled={loading}
-      className={`w-full inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition
+      className={`btn-primary
         ${
           loading
             ? "bg-gray-200 text-gray-500 cursor-not-allowed"

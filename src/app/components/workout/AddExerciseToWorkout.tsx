@@ -13,7 +13,7 @@ export function AddExerciseToWorkout({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="mt-4 w-full rounded-lg border border-dashed border-gray-300 py-3 text-sm text-gray-600 hover:bg-gray-50"
+        className="mt-4 w-full rounded-lg border border-dashed border-gray-300 py-3 text-sm text-muted hover:bg-gray-50"
       >
         + Add Exercise
       </button>

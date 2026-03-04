@@ -37,9 +37,9 @@ export function ExerciseLogger({
   sectionId?: string | undefined;
   disabled: boolean;
   notes?: string | null;
-  status?: string
+  status?: string;
   isClientAdded?: boolean;
-  
+
   exerciseLogId?: string;
   onChange: (data: {
     exerciseId: string;
@@ -53,8 +53,8 @@ export function ExerciseLogger({
   const [performedState, setPerformedState] = useState<Performed>(
     performed ?? buildPerformedFromPrescribed(prescribed),
   );
-const isBuilding = status === "BUILDING";
-const isInputDisabled = disabled || isBuilding;
+  const isBuilding = status === "BUILDING";
+  const isInputDisabled = disabled || isBuilding;
   const [hasSaved, setHasSaved] = useState(false);
   const [openSubModal, setOpenSubModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -102,30 +102,28 @@ const isInputDisabled = disabled || isBuilding;
     loadOneRepMax();
   }, [clientId, exercise.id]);
 
-  console.log('building status: ', status)
-    console.log('isBuilding status: ', isBuilding)
-      console.log('disabled status: ', disabled)
+  console.log("building status: ", status);
+  console.log("isBuilding status: ", isBuilding);
+  console.log("disabled status: ", disabled);
 
-
-  console.log('isdisabled status: ', isInputDisabled)
+  console.log("isdisabled status: ", isInputDisabled);
   return (
-    <li className="rounded-xl border border-gray-200 bg-white p-4 space-y-4 shadow-sm">
-      {/* Header */}
-      <div className="flex items-center justify-between cursor-pointer group">
-        <h4
-          className="font-semibold text-gray-900 group-hover:underline"
+    <div className="card">
+      <div className="card-header">
+        <span
+          className="card-title"
           onClick={() => setOpenExerciseId(exercise.id)}
         >
           {exercise.name}
-        </h4>
-        <div className="flex flex-row gap-2">
+        </span>
+        <div className="icon-btns">
           {/* Substitution */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               setOpenSubModal(true);
             }}
-            className="text-xs text-black-600"
+            className="icon-btn"
           >
             <Ellipsis size={14} />
           </button>
@@ -141,17 +139,17 @@ const isInputDisabled = disabled || isBuilding;
                 await removeClientExercise(exerciseLogId);
                 router.refresh();
               }}
-              className="text-xs text-red-600 hover:underline"
+              className="icon-btn danger"
             >
-              <Trash2 size={14} />
+              🗑
             </button>
           )}
         </div>
       </div>
 
       {/* Prescribed */}
-      <div className="text-sm text-gray-600 bg-gray-50 border rounded-lg px-3 py-2">
-        <span className="font-medium text-gray-700">Prescribed:</span>{" "}
+      <div className="prescribed">
+        <span className="label">Prescribed:</span>{" "}
         {renderPrescribed(prescribed)}
       </div>
 
@@ -161,7 +159,7 @@ const isInputDisabled = disabled || isBuilding;
           {/* Timed */}
           {prescribed.kind === "timed" && performedState.kind === "timed" && (
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium w-24 text-gray-700">
+              <label className="text-sm font-medium w-24 text-muted">
                 Time
               </label>
               <input
@@ -175,13 +173,13 @@ const isInputDisabled = disabled || isBuilding;
                   }))
                 }
               />
-              <span className="text-sm text-gray-500">seconds</span>
+              <span className="text-sm text-muted">seconds</span>
             </div>
           )}
 
           {/* Strength  */}
           {performedState.kind === "strength" && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {performedState.sets.map((set, index) => {
                 const reps = set.reps;
                 const recommendedWeight =
@@ -192,78 +190,85 @@ const isInputDisabled = disabled || isBuilding;
                 return (
                   <div
                     key={index}
-                    className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2"
+                    className="bg-bg rounded-xl px-3 py-3 space-y-2"
                   >
-                    <span className="text-sm font-medium w-14 text-gray-700">
+                    <span className="text-xs font-semibold text-muted">
                       Set {index + 1}
                     </span>
 
-                    {/* Reps */}
-                    <input
-                      type="number"
-                      className="w-16 rounded-lg border border-gray-300 px-2 py-1 text-sm"
-                      value={set.reps}
-                      onChange={(e) => {
-                        setHasSaved(false);
-                        setPerformedState((prev) => {
-                          if (prev.kind !== "strength") return prev;
+                    <div className="grid grid-cols-2 gap-2">
+                      {/* Reps */}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                          Reps
+                        </span>
+                        <input
+                          type="number"
+                          value={set.reps}
+                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
+                          onChange={(e) => {
+                            setHasSaved(false);
+                            setPerformedState((prev) => {
+                              if (prev.kind !== "strength") return prev;
+                              const sets = [...prev.sets];
+                              sets[index] = {
+                                ...sets[index],
+                                reps: Number(e.target.value),
+                              };
+                              return { ...prev, sets };
+                            });
+                          }}
+                        />
+                      </div>
 
-                          const sets = [...prev.sets];
-                          sets[index] = {
-                            ...sets[index],
-                            reps: Number(e.target.value),
-                          };
-
-                          return { ...prev, sets };
-                        });
-                      }}
-                    />
-                    <span className="text-sm text-gray-500">reps</span>
-
-                    {/* Weight */}
-                    <input
-                      type="number"
-                      className="w-20 rounded-lg border border-gray-300 px-2 py-1 text-sm"
-                      value={set.weight ?? ""}
-                      placeholder={
-                        recommendedWeight
-                          ? `${recommendedWeight}`
-                          : "Enter weight"
-                      }
-                      onFocus={() => {
-                        if (!set.weight && recommendedWeight) {
-                          setHasSaved(false);
-                          setPerformedState((prev) => {
-                            if (prev.kind !== "strength") return prev;
-
-                            const sets = [...prev.sets];
-                            sets[index] = {
-                              ...sets[index],
-                              weight: recommendedWeight,
-                            };
-
-                            return { ...prev, sets };
-                          });
-                        }
-                      }}
-                      onChange={(e) => {
-                        setHasSaved(false);
-                        setPerformedState((prev) => {
-                          if (prev.kind !== "strength") return prev;
-
-                          const sets = [...prev.sets];
-                          sets[index] = {
-                            ...sets[index],
-                            weight: e.target.value
-                              ? Number(e.target.value)
-                              : null,
-                          };
-
-                          return { ...prev, sets };
-                        });
-                      }}
-                    />
-                    <span className="text-sm text-gray-500">lb</span>
+                      {/* Weight */}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                          lb{" "}
+                          {recommendedWeight && (
+                            <span className="normal-case tracking-normal font-normal text-muted/60">
+                              (rec: {recommendedWeight})
+                            </span>
+                          )}
+                        </span>
+                        <input
+                          type="number"
+                          value={set.weight ?? ""}
+                          placeholder={
+                            recommendedWeight ? `${recommendedWeight}` : "—"
+                          }
+                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
+                          onFocus={() => {
+                            if (!set.weight && recommendedWeight) {
+                              setHasSaved(false);
+                              setPerformedState((prev) => {
+                                if (prev.kind !== "strength") return prev;
+                                const sets = [...prev.sets];
+                                sets[index] = {
+                                  ...sets[index],
+                                  weight: recommendedWeight,
+                                };
+                                return { ...prev, sets };
+                              });
+                            }
+                          }}
+                          onChange={(e) => {
+                            setHasSaved(false);
+                            setPerformedState((prev) => {
+                              if (prev.kind !== "strength") return prev;
+                              const sets = [...prev.sets];
+                              sets[index] = {
+                                ...sets[index],
+                                weight: e.target.value
+                                  ? Number(e.target.value)
+                                  : null,
+                              };
+                              return { ...prev, sets };
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -272,7 +277,7 @@ const isInputDisabled = disabled || isBuilding;
 
           {/* Hybrid */}
           {performedState.kind === "hybrid" && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {performedState.sets.map((set, index) => {
                 const reps = set.reps;
                 const recommendedWeight =
@@ -283,103 +288,107 @@ const isInputDisabled = disabled || isBuilding;
                 return (
                   <div
                     key={index}
-                    className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2"
+                    className="bg-bg rounded-xl px-3 py-3 space-y-2"
                   >
-                    <span className="text-sm font-medium w-14 text-gray-700">
+                    <span className="text-xs font-semibold text-muted">
                       Set {index + 1}
                     </span>
 
-                    {/* Reps */}
-                    <input
-                      type="number"
-                      className="w-16 rounded-lg border border-gray-300 px-2 py-1 text-sm"
-                      value={set.reps}
-                      onChange={(e) => {
-                        setHasSaved(false);
-                        setPerformedState((prev) => {
-                          if (prev.kind !== "hybrid") return prev;
+                    <div className="grid grid-cols-3 gap-2">
+                      {/* Reps */}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                          Reps
+                        </span>
+                        <input
+                          type="number"
+                          value={set.reps}
+                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
+                          onChange={(e) => {
+                            setHasSaved(false);
+                            setPerformedState((prev) => {
+                              if (prev.kind !== "hybrid") return prev;
+                              const sets = [...prev.sets];
+                              sets[index] = {
+                                ...sets[index],
+                                reps: Number(e.target.value),
+                              };
+                              return { ...prev, sets };
+                            });
+                          }}
+                        />
+                      </div>
 
-                          const sets = [...prev.sets];
-                          sets[index] = {
-                            ...sets[index],
-                            reps: Number(e.target.value),
-                          };
+                      {/* Weight */}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                          lb
+                        </span>
+                        <input
+                          type="number"
+                          value={set.weight ?? ""}
+                          placeholder={
+                            recommendedWeight ? `${recommendedWeight}` : "—"
+                          }
+                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
+                          onFocus={() => {
+                            if (!set.weight && recommendedWeight) {
+                              setHasSaved(false);
+                              setPerformedState((prev) => {
+                                if (prev.kind !== "hybrid") return prev;
+                                const sets = [...prev.sets];
+                                sets[index] = {
+                                  ...sets[index],
+                                  weight: recommendedWeight,
+                                };
+                                return { ...prev, sets };
+                              });
+                            }
+                          }}
+                          onChange={(e) => {
+                            setHasSaved(false);
+                            setPerformedState((prev) => {
+                              if (prev.kind !== "hybrid") return prev;
+                              const sets = [...prev.sets];
+                              sets[index] = {
+                                ...sets[index],
+                                weight: e.target.value
+                                  ? Number(e.target.value)
+                                  : null,
+                              };
+                              return { ...prev, sets };
+                            });
+                          }}
+                        />
+                      </div>
 
-                          return { ...prev, sets };
-                        });
-                      }}
-                    />
-                    <span className="text-sm text-gray-500">reps</span>
-
-                    {/* Weight */}
-                    <input
-                      type="number"
-                      className="w-20 rounded-lg border border-gray-300 px-2 py-1 text-sm"
-                      value={set.weight ?? ""}
-                      placeholder={
-                        recommendedWeight
-                          ? `${recommendedWeight}`
-                          : "Enter weight"
-                      }
-                      onFocus={() => {
-                        if (!set.weight && recommendedWeight) {
-                          setHasSaved(false);
-                          setPerformedState((prev) => {
-                            if (prev.kind !== "hybrid") return prev;
-
-                            const sets = [...prev.sets];
-                            sets[index] = {
-                              ...sets[index],
-                              weight: recommendedWeight,
-                            };
-
-                            return { ...prev, sets };
-                          });
-                        }
-                      }}
-                      onChange={(e) => {
-                        setHasSaved(false);
-                        setPerformedState((prev) => {
-                          if (prev.kind !== "hybrid") return prev;
-
-                          const sets = [...prev.sets];
-                          sets[index] = {
-                            ...sets[index],
-                            weight: e.target.value
-                              ? Number(e.target.value)
-                              : null,
-                          };
-
-                          return { ...prev, sets };
-                        });
-                      }}
-                    />
-                    <span className="text-sm text-gray-500">lb</span>
-
-                    {/* Duration */}
-                    <input
-                      type="number"
-                      className="w-20 rounded-lg border border-gray-300 px-2 py-1 text-sm"
-                      value={set.duration ?? ""}
-                      placeholder="sec"
-                      onChange={(e) => {
-                        setHasSaved(false);
-                        setPerformedState((prev) => {
-                          if (prev.kind !== "hybrid") return prev;
-
-                          const sets = [...prev.sets];
-                          sets[index] = {
-                            ...sets[index],
-                            duration: e.target.value
-                              ? Number(e.target.value)
-                              : 0,
-                          };
-
-                          return { ...prev, sets };
-                        });
-                      }}
-                    />
-                    <span className="text-sm text-gray-500">sec</span>
+                      {/* Duration */}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                          Sec
+                        </span>
+                        <input
+                          type="number"
+                          value={set.duration ?? ""}
+                          placeholder="—"
+                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
+                          onChange={(e) => {
+                            setHasSaved(false);
+                            setPerformedState((prev) => {
+                              if (prev.kind !== "hybrid") return prev;
+                              const sets = [...prev.sets];
+                              sets[index] = {
+                                ...sets[index],
+                                duration: e.target.value
+                                  ? Number(e.target.value)
+                                  : 0,
+                              };
+                              return { ...prev, sets };
+                            });
+                          }}
+                        />
+                      </div>
+                    </div>
                   </div>
                 );
               })}
@@ -403,18 +412,23 @@ const isInputDisabled = disabled || isBuilding;
                   return performedState.sets.map((set, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 flex-wrap gap-2"
+                      className="bg-bg rounded-xl px-3 py-3 space-y-2"
                     >
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-xs font-medium text-gray-500 w-10">
-                          Set {index + 1}
-                        </span>
+                      <span className="text-xs font-semibold text-muted">
+                        Set {index + 1}
+                      </span>
 
-                        {/* Reps (optional) */}
-                        <div className="flex items-center gap-1">
+                      <div className="grid grid-cols-3 gap-2">
+                        {/* Reps */}
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                            Reps
+                          </span>
                           <input
                             type="number"
                             value={set.reps ?? ""}
+                            placeholder="—"
+                            className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
                             onChange={(e) => {
                               setHasSaved(false);
                               setPerformedState((prev) => {
@@ -423,7 +437,6 @@ const isInputDisabled = disabled || isBuilding;
                                   prev.kind !== "mobility"
                                 )
                                   return prev;
-
                                 const sets = [...prev.sets];
                                 sets[index] = {
                                   ...sets[index],
@@ -431,22 +444,22 @@ const isInputDisabled = disabled || isBuilding;
                                     ? Number(e.target.value)
                                     : 0,
                                 };
-
                                 return { ...prev, sets };
                               });
                             }}
-                            placeholder="—"
-                            className="w-14 rounded-md border border-gray-300 px-2 py-1 text-sm
-                            focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                           />
-                          <span className="text-xs text-gray-500">reps</span>
                         </div>
 
-                        {/* Weight (optional, de-emphasized) */}
-                        <div className="flex items-center gap-1">
+                        {/* Weight */}
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                            lb
+                          </span>
                           <input
                             type="number"
                             value={set.weight ?? ""}
+                            placeholder="bw"
+                            className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
                             onChange={(e) => {
                               setHasSaved(false);
                               setPerformedState((prev) => {
@@ -455,7 +468,6 @@ const isInputDisabled = disabled || isBuilding;
                                   prev.kind !== "mobility"
                                 )
                                   return prev;
-
                                 const sets = [...prev.sets];
                                 sets[index] = {
                                   ...sets[index],
@@ -463,22 +475,22 @@ const isInputDisabled = disabled || isBuilding;
                                     ? Number(e.target.value)
                                     : null,
                                 };
-
                                 return { ...prev, sets };
                               });
                             }}
-                            placeholder="bw / lb"
-                            className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm
-                            focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                           />
-                          <span className="text-xs text-gray-400">lb</span>
                         </div>
 
-                        {/* Duration per set */}
-                        <div className="flex items-center gap-1">
+                        {/* Duration */}
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                            Sec
+                          </span>
                           <input
                             type="number"
                             value={set.duration ?? ""}
+                            placeholder="—"
+                            className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
                             onChange={(e) => {
                               setHasSaved(false);
                               setPerformedState((prev) => {
@@ -487,7 +499,6 @@ const isInputDisabled = disabled || isBuilding;
                                   prev.kind !== "mobility"
                                 )
                                   return prev;
-
                                 const sets = [...prev.sets];
                                 sets[index] = {
                                   ...sets[index],
@@ -495,15 +506,10 @@ const isInputDisabled = disabled || isBuilding;
                                     ? Number(e.target.value)
                                     : 0,
                                 };
-
                                 return { ...prev, sets };
                               });
                             }}
-                            placeholder="sec"
-                            className="w-16 rounded-md border border-gray-300 px-2 py-1 text-sm
-                              focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                           />
-                          <span className="text-xs text-gray-500">sec</span>
                         </div>
                       </div>
                     </div>
@@ -515,33 +521,37 @@ const isInputDisabled = disabled || isBuilding;
 
           {/* Bodyweight */}
           {performedState.kind === "bodyweight" && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {performedState.sets.map((set, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-3 rounded-lg bg-gray-50 px-3 py-2"
+                  className="bg-bg rounded-xl px-3 py-3 space-y-2"
                 >
-                  <span className="text-sm font-medium w-14 text-gray-700">
+                  <span className="text-xs font-semibold text-muted">
                     Set {index + 1}
                   </span>
 
-                  <input
-                    type="number"
-                    className="w-16 rounded-lg border border-gray-300 px-2 py-1 text-sm"
-                    value={set.reps}
-                    onChange={(e) => {
-                      setHasSaved(false);
-                      setPerformedState((prev) => {
-                        if (prev.kind !== "bodyweight") return prev;
-
-                        const sets = [...prev.sets];
-                        sets[index] = { reps: Number(e.target.value) };
-
-                        return { kind: "bodyweight", sets };
-                      });
-                    }}
-                  />
-                  <span className="text-sm text-gray-500">reps</span>
+                  <div className="grid grid-cols-1 gap-2 max-w-[120px]">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                        Reps
+                      </span>
+                      <input
+                        type="number"
+                        value={set.reps}
+                        className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
+                        onChange={(e) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (prev.kind !== "bodyweight") return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { reps: Number(e.target.value) };
+                            return { kind: "bodyweight", sets };
+                          });
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -550,14 +560,15 @@ const isInputDisabled = disabled || isBuilding;
           {/* Notes */}
           <input
             placeholder="Notes (optional)"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="notes-input"
             value={note}
             onChange={(e) => setNote(e.target.value)}
           />
 
           {notes && (
-            <div className="text-sm text-gray-500 italic bg-green-50 border rounded-lg px-3 py-2">
-              Coach notes: {notes}
+            <div className="coach-notes">
+              <span className="cn-label">Coach</span>
+              <span className="cn-text">{notes}</span>
             </div>
           )}
 
@@ -565,11 +576,7 @@ const isInputDisabled = disabled || isBuilding;
           <div className="pt-1">
             <button
               disabled={isSaving}
-              className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
-                hasSaved
-                  ? "bg-green-600 hover:bg-green-700"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
+              className={`btn-save ${hasSaved ? "saved" : "unsaved"}`}
               onClick={async () => {
                 if (!workoutLogId) return;
 
@@ -614,6 +621,6 @@ const isInputDisabled = disabled || isBuilding;
           onClose={() => setOpenSubModal(false)}
         />
       )}
-    </li>
+    </div>
   );
 }

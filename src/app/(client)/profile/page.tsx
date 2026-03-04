@@ -146,8 +146,8 @@ export default async function ClientProfilePage() {
   return (
     <div className="max-w-3xl mx-auto space-y-8">
       {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold text-gray-900">Your Profile</h1>
+      <div className="greeting">
+        <h1>Your Profile</h1>
         <p className="text-sm text-gray-500">
           Manage your personal details and training history
         </p>
@@ -156,77 +156,89 @@ export default async function ClientProfilePage() {
       {/* Profile */}
       <ClientProfileSection user={user} />
       {/* Upcoming Workouts */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Upcoming Workouts
-        </h2>
-
+      <div>
+        <div className="flex items-center justify-between px-5 py-3">
+          <h2 className="section-title">Upcoming Workouts</h2>
+          {/* <span className="text-xs text-muted">See all</span> */}
+        </div>
         {upcomingWorkouts.length === 0 ? (
           <p className="text-sm text-gray-500">
             No upcoming workouts scheduled
           </p>
         ) : (
-          <ul className="text-sm space-y-2">
-            {upcomingWorkouts.map((sw) => (
-              <li key={sw.id} className="flex justify-between items-center">
-                <Link
-                  href={`/workouts/${sw.workout.id}`}
-                  className="text-gray-900 hover:underline flex flex-row items-center gap-2"
-                >
-                  {sw.workout.name}
-                  <ArrowRight size={10} />
-                </Link>
+          <ul className="feed">
+            {upcomingWorkouts.map((sw) => {
+              return (
+                <li key={sw.id}>
+                  <Link
+                    href={`/workouts/${sw.id}`}
+                    className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
+                  >
+                    {/* Info */}
+                    <div className="feed-info">
+                      <p className="feed-name">{sw.workout.name}</p>
+                      <p className="feed-date">
+                        {sw.scheduledDate.toLocaleDateString()}
+                      </p>
+                    </div>
 
-                <span className="text-gray-500">
-                  {sw.scheduledDate.toLocaleDateString()}
-                </span>
-              </li>
-            ))}
+                    {/* Status badge */}
+                    <span className="btn-arrow">→</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
-      </section>
+      </div>
 
-      {/* Client Made  Workouts */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Workouts You Created
-        </h2>
-
+      <div>
+        <div className="flex items-center justify-between px-5 py-3">
+          <h2 className="section-title"> Workouts You Created</h2>
+          {/* <span className="text-xs text-muted">See all</span> */}
+        </div>
         {myWorkouts.length === 0 ? (
           <p className="text-sm text-gray-500">No client created workouts</p>
         ) : (
-          <ul className="text-sm space-y-2">
-            {myWorkouts.map((sw) => (
-              <li key={sw.id} className="flex justify-between items-center">
-                <Link
-                  href={`/workouts/${sw.id}`}
-                  className="text-gray-900 hover:underline flex flex-row items-center gap-2"
-                >
-                  {sw.workout.name}
-                  <ArrowRight size={10} />
-                </Link>
+          <ul className="feed">
+            {myWorkouts.map((sw) => {
+              return (
+                <li key={sw.id}>
+                  <Link
+                    href={`/workouts/${sw.id}`}
+                    className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
+                  >
+                    {/* Info */}
+                    <div className="feed-info">
+                      <p className="feed-name">{sw.workout.name}</p>
+                      <p className="feed-date">
+                        {sw.scheduledDate.toLocaleDateString()}
+                      </p>
+                    </div>
 
-                <span className="text-gray-500">
-                  {sw.scheduledDate.toLocaleDateString()}
-                </span>
-              </li>
-            ))}
+                    {/* Status badge */}
+                    <span className="btn-arrow">→</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
-      </section>
+      </div>
 
       {/* Body Metrics */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Body Metrics</h2>
-
-        <BodyMetricLogger />
+      <section className="trainer-card">
+        <div className="flex items-center justify-between mb-4 flex-col">
+          <h2 className="section-title">Body Metrics</h2>
+          <BodyMetricLogger />
+        </div>
 
         {user.bodyMetrics.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">
+          <p className="text-sm text-muted italic">
             No body metrics logged yet.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="body-stat">
             {user.bodyMetrics
               .slice()
               .sort(
@@ -235,31 +247,26 @@ export default async function ClientProfilePage() {
                   new Date(a.recordedAt).getTime(),
               )
               .map((metric) => (
-                <div
-                  key={metric.id}
-                  className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 text-sm"
-                >
-                  {/* LEFT */}
-                  <div className="space-y-1">
-                    <div className="font-medium text-gray-900">
-                      {new Date(metric.recordedAt).toLocaleDateString()}
-                    </div>
-                  </div>
-
+                <div key={metric.id} className="bs-stat">
                   {/* RIGHT */}
-                  <div className="flex gap-4 text-right">
+                  <div className="flex gap-5 text-right">
                     <div>
-                      <div className="text-xs text-gray-500">Weight</div>
-                      <div className="font-medium">
+                      <p className="bs-label">Weight</p>
+                      <p className="bs-val">
                         {metric.weight ? `${metric.weight} lb` : "—"}
-                      </div>
+                      </p>
                     </div>
-
                     <div>
-                      <div className="text-xs text-gray-500">Body Fat</div>
-                      <div className="font-medium">
+                      <p className="bs-label">Body Fat</p>
+                      <p className="bs-val">
                         {metric.bodyFat ? `${metric.bodyFat}%` : "—"}
-                      </div>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="bs-label">Logged</p>
+                      <p className="bs-val-sub-label">
+                        {new Date(metric.recordedAt).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -268,55 +275,74 @@ export default async function ClientProfilePage() {
         )}
       </section>
 
-      {/* Workout History */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
-        <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+      <div>
+        <div className="flex items-center justify-between px-5 py-3">
+          <h2 className="section-header">Recent Activity</h2>
+        </div>
 
         {historyItems.length === 0 ? (
-          <p className="text-sm text-gray-500">No activity logged yet</p>
+          <p className="text-sm text-muted px-5">No activity logged yet</p>
         ) : (
-          <ul className="text-sm space-y-2">
-            {historyItems.map((item) => (
-              <li
-                key={`${item.kind}-${item.id}`}
-                className="flex justify-between items-center"
-              >
-                <div className="flex items-center gap-2">
-                  {item.kind === "scheduled" ? (
+          <ul className="px-5 flex flex-col gap-2">
+            {historyItems.map((item) => {
+              const isScheduled = item.kind === "scheduled";
+              const isAdditional = item.kind === "additional";
+
+              const content = (
+                <>
+                  {/* Icon */}
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center text-base flex-shrink-0 ${
+                      isAdditional ? "bg-lime-green/10" : "bg-mint/10"
+                    }`}
+                  >
+                    {isAdditional ? "😎" : "💪"}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="feed-name">{item.title}</p>
+                    <p className="feed-date">
+                      {item.date.toLocaleDateString()}
+                    </p>
+                  </div>
+
+                  {/* Right badge */}
+                  <span
+                    className={`text-[11px] font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${
+                      isAdditional
+                        ? "text-lime-green bg-lime-green/10"
+                        : "text-mint bg-mint/10"
+                    }`}
+                  >
+                    {isAdditional ? "Extra" : "Workout"}
+                  </span>
+                </>
+              );
+
+              return (
+                <li key={`${item.kind}-${item.id}`}>
+                  {isScheduled ? (
                     <Link
                       href={item.href}
-                      className="font-medium text-gray-900 hover:underline hover:text-blue-600 flex flex-row gap-2 items-center"
+                      className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform"
                     >
-                      {item.title}
-                       <ArrowRight size={10} />
+                      {content}
                     </Link>
                   ) : (
-                    <span className="font-medium text-gray-900">
-                      {item.title}
-                      {item.notes && ` • ${item.notes}`}
-                      {item.duration && ` • ${item.duration} min`}
-                      {item.distance && ` • ${item.distance} miles`}
-                    </span>
+                    <div className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3">
+                      {content}
+                    </div>
                   )}
-
-                  {item.kind === "additional" && (
-                    <span className="text-xs rounded-full bg-gray-100 px-2 py-0.5 text-gray-600">
-                      Additional
-                    </span>
-                  )}
-                </div>
-
-                <span className="text-gray-500 pl-2">
-                  {item.date.toLocaleDateString()}
-                </span>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         )}
-      </section>
+      </div>
 
       {/* Logout */}
-      <div className="pt-2 text-center">
+      <div className="pt-2 flex justify-center">
         <LogoutButton />
       </div>
     </div>

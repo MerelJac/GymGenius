@@ -6,7 +6,7 @@ type BackButtonProps = {
 
 export function BackButton({ route }: BackButtonProps) {
   return (
-    <Link href={route} className=" flex items-center gap-2 uppercase text-xs bolderfont-medium">
+    <Link href={route} className="back-link">
       < ArrowLeft size={16}/>Back
     </Link>
   );

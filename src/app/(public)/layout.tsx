@@ -1,5 +1,3 @@
-// src/app/(public)/layout.tsx
-
 import Link from "next/link";
 
 export default function PublicLayout({
@@ -8,25 +6,25 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <header className="border-b bg-black">
+    <div className="min-h-screen flex flex-col bg-background">
+
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur-md border-b border-surface2">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          {/* Logo / Brand */}
-          <Link href="/" className="text-lg font-heading font-semibold text-black">
+          <Link href="/" className="font-syne font-extrabold text-lg text-lime-green tracking-tight">
             Dialed Fitness
           </Link>
 
-          {/* Nav */}
-          <nav className="flex items-center gap-6 text-sm">
+          <nav className="flex items-center gap-3">
             <Link
               href="/login"
-              className="px-4 py-2 rounded border text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-muted hover:text-foreground border border-surface2 hover:border-lime-green/30 transition-colors"
             >
               Log in
             </Link>
             <Link
               href="/signup"
-              className="px-4 py-2 rounded bg-black text-white hover:bg-gray-800"
+              className="px-4 py-2 rounded-xl text-sm font-syne font-bold bg-lime-green text-black hover:opacity-90 active:scale-[0.98] transition"
             >
               Get started
             </Link>
@@ -34,19 +32,24 @@ export default function PublicLayout({
         </div>
       </header>
 
-      <main>{children}</main>
+      {/* Page content */}
+      <main className="flex-1">{children}</main>
 
-      {/* Optional footer */}
-      <footer className="border-t">
-        <div className="max-w-7xl mx-auto px-6 py-6 text-sm text-gray-500 flex justify-between">
-          <span>© {new Date().getFullYear()} Dialed Fitness</span>
-          <div className="flex gap-4">
-            <Link href="/terms" className="hover:text-gray-700">
-              Terms & Privacy Policy
-            </Link>
-          </div>
+      {/* Footer */}
+      <footer className="border-t border-surface2 bg-black">
+        <div className="max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+          <span className="text-xs text-muted">
+            © {new Date().getFullYear()} Dialed Fitness
+          </span>
+          <Link
+            href="/terms"
+            className="text-xs text-muted hover:text-lime-green transition-colors"
+          >
+            Terms & Privacy Policy
+          </Link>
         </div>
       </footer>
-    </>
+
+    </div>
   );
 }

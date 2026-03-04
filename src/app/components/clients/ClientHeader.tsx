@@ -6,6 +6,7 @@ import { UserRound } from "lucide-react";
 export function ClientHeader() {
   const [scrolled, setScrolled] = useState(false);
 
+
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 8);
@@ -38,7 +39,8 @@ export function ClientHeader() {
           >
             {/* Avatar */}
             <div className="client-avatar">
-              <UserRound size={16} />
+
+               <UserRound size={14} />
             </div>
           </Link>
         </nav>
