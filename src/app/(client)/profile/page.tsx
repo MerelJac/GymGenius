@@ -94,6 +94,7 @@ export default async function ClientProfilePage() {
   if (!userCreatedWorkouts) return notFound();
 
   console.log("Schedueld workouts: ", user.scheduledWorkouts);
+  console.log("userCreated workouts: ", userCreatedWorkouts);
 
   const upcomingWorkouts = user.scheduledWorkouts.filter(
     (sw) => !sw.workout.programId?.startsWith("__client-workouts-"),
@@ -115,6 +116,9 @@ export default async function ClientProfilePage() {
         id: string;
         title: string;
         date: Date;
+        notes: string | null;
+        distance: number | null;
+        duration: number | null;
       };
 
   const historyItems: HistoryItem[] = [
@@ -131,6 +135,9 @@ export default async function ClientProfilePage() {
       id: w.id,
       title: w.type.name,
       date: w.performedAt,
+      notes: w.notes,
+      duration: w.duration,
+      distance: w.distance,
     })),
   ]
     .sort((a, b) => b.date.getTime() - a.date.getTime())
@@ -278,13 +285,17 @@ export default async function ClientProfilePage() {
                   {item.kind === "scheduled" ? (
                     <Link
                       href={item.href}
-                      className="font-medium text-gray-900 hover:underline hover:text-blue-600"
+                      className="font-medium text-gray-900 hover:underline hover:text-blue-600 flex flex-row gap-2 items-center"
                     >
                       {item.title}
+                       <ArrowRight size={10} />
                     </Link>
                   ) : (
                     <span className="font-medium text-gray-900">
                       {item.title}
+                      {item.notes && ` • ${item.notes}`}
+                      {item.duration && ` • ${item.duration} min`}
+                      {item.distance && ` • ${item.distance} miles`}
                     </span>
                   )}
 
@@ -295,7 +306,7 @@ export default async function ClientProfilePage() {
                   )}
                 </div>
 
-                <span className="text-gray-500">
+                <span className="text-gray-500 pl-2">
                   {item.date.toLocaleDateString()}
                 </span>
               </li>
