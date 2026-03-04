@@ -1,4 +1,4 @@
- "use client";
+"use client";
 import { ProgressChangesProps } from "@/types/progress";
 import { useState } from "react";
 import ExerciseModal from "../exercise/ExerciseModal";
@@ -16,84 +16,98 @@ export function ProgressChanges({
 
   return (
     <>
-      <h3 className="text-sm font-semibold text-gray-700">Progress Changes</h3>
+      <div className="section-header">
+        <h2 className="section-title">Strength Progress</h2>
+      </div>
 
-      {/* Strength */}
-      <div className="space-y-3 pt-2">
-        <div className="text-xs font-medium text-gray-500 uppercase">
-          Strength
-        </div>
+      <div className="progress-card">
+        <p className="prog-sub-label">1RM Changes</p>
 
+        {/* Strength rows */}
         {strength.length === 0 ? (
-          <p className="text-sm text-gray-500">Not enough data yet</p>
+          <p className="text-sm text-muted">Not enough data yet</p>
         ) : (
           strength.map((lift) => {
             const diff = lift.current1RM - lift.previous1RM;
-            const positive = diff > 0;
+            const isPos = diff > 0;
+            const isNeg = diff < 0;
+            // bar width: scale diff to a max of 100%, cap at 10lb = 100%
+            const barWidth = Math.min((Math.abs(diff) / 10) * 100, 100);
 
             return (
               <div
                 key={lift.exerciseId}
-                onClick={() => {
-                  setOpenExercise({
-                    exerciseId: lift.exerciseId,
-                    clientId,
-                  });
-                }}
-                className="flex justify-between items-center text-sm cursor-pointer
-             hover:bg-gray-50 rounded px-2 py-1"
+                onClick={() =>
+                  setOpenExercise({ exerciseId: lift.exerciseId, clientId })
+                }
+                className="prog-row"
               >
-                <span className="text-gray-800">{lift.exerciseName}</span>
+                {/* Name */}
+                <span className="prog-name">{lift.exerciseName}</span>
+
+                {/* Bar */}
+                <div className="prog-bar-wrap">
+                  <div
+                    className={`prog-bar ${
+                      isPos ? "pos" : isNeg ? "neg" : "net"
+                    }`}
+                    style={{ width: diff === 0 ? "0%" : `${barWidth}%` }}
+                  />
+                </div>
+
+                {/* Delta */}
                 <span
-                  className={
-                    positive ? "text-green-600 font-medium" : "text-gray-500"
-                  }
+                  className={`prog-delta ${
+                    isPos ? "pos" : isNeg ? "neg" : "net"
+                  }`}
                 >
-                  {positive && "+"}
-                  {diff} lb 1RM
+                  {diff === 0 ? "No change" : `${isPos ? "+" : ""}${diff} lb`}
                 </span>
               </div>
             );
           })
         )}
-      </div>
 
-      {/* Body */}
-      <div className="grid grid-cols-2 gap-4 pt-2">
-        {/* Weight */}
-        <div>
-          <div className="text-xs font-medium text-gray-500 uppercase mb-1">
-            Body Weight
+        {/* Body stats */}
+        <div className="body-stats">
+          <div className="body-stat">
+            <p className="bs-label">Body Weight</p>
+            {weight ? (
+              <p className="bs-val">
+                {weight.current} lb{" "}
+                <span
+                  className={
+                    weight.current - weight.previous > 0 ? "neg" : "pos"
+                  }
+                >
+                  ({weight.current - weight.previous > 0 ? "+" : ""}
+                  {weight.current - weight.previous})
+                </span>
+              </p>
+            ) : (
+              <p className="bs-val">— lbs</p>
+            )}
           </div>
-          {weight ? (
-            <div className="text-sm font-medium text-gray-900">
-              {weight.current} lb{" "}
-              <span className="text-gray-500">
-                ({weight.current - weight.previous > 0 ? "+" : ""}
-                {weight.current - weight.previous})
-              </span>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500">No data</p>
-          )}
-        </div>
 
-        {/* Body Fat */}
-        <div>
-          <div className="text-xs font-medium text-gray-500 uppercase mb-1">
-            Body Fat %
+          <div className="body-stat">
+            <p className="bs-label">Body Fat %</p>
+            {bodyFat ? (
+     <p className="bs-val">
+                {bodyFat.current}%{" "}
+                <span
+                  className={
+                    bodyFat.current - bodyFat.previous > 0
+                      ? "neg" : "pos"
+                  }
+                >
+                  ({bodyFat.current - bodyFat.previous > 0 ? "+" : ""}
+                  {bodyFat.current - bodyFat.previous}%)
+                </span>
+              </p>
+            ) : (
+              <p className="bs-val">— %</p>
+            )}
           </div>
-          {bodyFat ? (
-            <div className="text-sm font-medium text-gray-900">
-              {bodyFat.current}%{" "}
-              <span className="text-gray-500">
-                ({bodyFat.current - bodyFat.previous > 0 ? "+" : ""}
-                {bodyFat.current - bodyFat.previous}%)
-              </span>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-500">No data</p>
-          )}
         </div>
       </div>
       {openExercise && (

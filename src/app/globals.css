@@ -395,6 +395,18 @@ body {
     gap: 14px;
     margin-bottom: 16px;
   }
+
+    .client-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    color: #000;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
   .trainer-avatar {
     width: 46px; height: 46px;
     border-radius: 50%;

@@ -72,7 +72,7 @@ export function AddAdditionalWorkout({
     <div className="space-y-4">
       {/* Activity type */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="add-sub pb-2">
           Activity
         </label>
         <select
@@ -115,7 +115,7 @@ export function AddAdditionalWorkout({
         <div className="space-y-4">
           {/* Duration */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="add-sub">
               Duration (minutes)
             </label>
             <input
@@ -131,7 +131,7 @@ export function AddAdditionalWorkout({
 
           {/* Distance */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="add-sub">
               Distance (optional)
             </label>
             <input
@@ -148,7 +148,7 @@ export function AddAdditionalWorkout({
 
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="add-sub">
               Date
             </label>
             <input
@@ -161,7 +161,7 @@ export function AddAdditionalWorkout({
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="add-sub">
               Notes
             </label>
             <textarea
@@ -177,7 +177,7 @@ export function AddAdditionalWorkout({
             <button
               onClick={handleSave}
               disabled={!typeId || saving}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="btn-primary"
             >
               {saving ? "Saving…" : "Add Workout"}
             </button>

@@ -159,9 +159,9 @@ export default async function ClientDashboard() {
 
       <TodayWorkout workout={todaysWorkout} />
 
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
-        <AdditionalWorkoutQuickAdd clientId={clientId} />
-      </section>
+      <AdditionalWorkoutQuickAdd clientId={clientId} />
+      <CreateWorkoutForLater clientId={clientId} />
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <UpcomingWorkouts workouts={futureWorkouts} />
         <OverdueWorkouts workouts={overdueWorkouts} />
@@ -170,20 +170,15 @@ export default async function ClientDashboard() {
 
       {/* Placeholder cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-6 text-sm text-gray-500 italic">
-          <ProgressChanges
-            clientId={clientId}
-            strength={progress.strength}
-            weight={progress.weight}
-            bodyFat={progress.bodyFat}
-          />
-        </div>
+        <ProgressChanges
+          clientId={clientId}
+          strength={progress.strength}
+          weight={progress.weight}
+          bodyFat={progress.bodyFat}
+        />
 
         <ContactTrainer trainer={trainerForContact} />
       </div>
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
-        <CreateWorkoutForLater clientId={clientId} />
-      </section>
     </div>
   );
 }
@@ -240,7 +235,6 @@ function TodayWorkout({
     </div>
   );
 }
-
 
 function UpcomingWorkouts({
   workouts,

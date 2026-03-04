@@ -37,7 +37,7 @@ export function ClientHeader() {
             className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition"
           >
             {/* Avatar */}
-            <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-semibold text-gray-700">
+            <div className="client-avatar">
               <UserRound size={16} />
             </div>
           </Link>

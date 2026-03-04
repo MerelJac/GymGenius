@@ -1,36 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { X } from "lucide-react";
 import { AddAdditionalWorkout } from "./AddAdditionalWorkout";
 
-export function AdditionalWorkoutQuickAdd({
-  clientId,
-}: {
-  clientId: string;
-}) {
+export function AdditionalWorkoutQuickAdd({ clientId }: { clientId: string }) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      {/* Trigger */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Add additional activity
-        </h2>
-
-        <button
-          onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-gray-50"
-        >
-          <Plus size={16} />
-        </button>
+      <div className="add-card">
+        <div className="add-card-text">
+          <div className="add-title">Add Activity</div>
+          <div className="add-sub">Log extra training or cardio</div>
+        </div>
+        <div className="add-btn">
+          <button onClick={() => setOpen(true)}>+</button>
+        </div>
       </div>
+
 
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="relative w-full max-w-md rounded-xl bg-white p-6 shadow-lg max-h-[80vh] overflow-y-scroll">
+          <div className="relative w-full max-w-md rounded-xl add-card p-6 shadow-lg max-h-[80vh] overflow-y-scroll flex flex-col">
             <button
               onClick={() => setOpen(false)}
               className="absolute right-3 top-3 rounded p-1 hover:bg-gray-100"
@@ -38,7 +31,7 @@ export function AdditionalWorkoutQuickAdd({
               <X size={18} />
             </button>
 
-            <h3 className="mb-4 text-lg font-semibold text-gray-900">
+            <h3 className="mb-2 text-lg font-semibold text-lime-green">
               Log additional workout
             </h3>
 
