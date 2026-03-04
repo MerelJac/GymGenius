@@ -1,6 +1,6 @@
 import { Exercise } from "@prisma/client";
 
-const inputCls = "w-full px-4 py-2.5 bg-background border border-muted rounded-xl text-black text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
+const inputCls = "w-full px-4 py-2.5 bg-background border border-lime-green/30 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/60 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
 const labelCls = "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
 
 type Props = {

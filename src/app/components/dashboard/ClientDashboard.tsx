@@ -209,7 +209,7 @@ function TodayWorkout({
         <Link href={`/workouts/${workout.id}`}>{workout.workout.name}</Link>
       </div>
       <div className="wc-sub">
-        <ul className="text-sm text-gray-700 list-disc pl-5 space-y-0.5">
+        <ul className="wc-sub">
           {workout.workout.workoutSections.flatMap((section) =>
             section.exercises.map((we) => (
               <li key={we.id}>{we.exercise?.name}</li>

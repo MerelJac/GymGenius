@@ -43,7 +43,7 @@ export function CreateWorkoutForLater({ clientId }: { clientId: string }) {
               />
 
               <button
-                className="w-full bg-blue-600 text-white rounded px-4 py-2"
+                className="btn-primary"
                 onClick={async () => {
                   await createWorkoutForLater(clientId, addWorkoutName);
                 }}
