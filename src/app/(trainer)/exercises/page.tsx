@@ -65,14 +65,9 @@ export default async function ExerciseLibraryPage({
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="nav-logo">
-          Exercise Library
-        </h1>
+        <h1 className="nav-logo">Exercise Library</h1>
 
-        <Link
-          href="/exercises/new"
-    className="btn-primary"
-        >
+        <Link href="/exercises/new" className="btn-primary">
           <Plus size={18} />{" "}
           {/* optional: import { Plus } from "lucide-react" */}
           Add Exercise
@@ -119,14 +114,17 @@ export default async function ExerciseLibraryPage({
           </Link>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden divide-y divide-gray-100">
+        <div className="gradient-bg border border-surface2 rounded-2xl overflow-hidden divide-y divide-surface2">
+          {" "}
           {exercises.map((ex: Exercise) => (
             <div
               key={ex.id}
-              className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-gray-50/70 transition-colors group"
+              className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 
+        hover:bg-surface2/50 hover:pl-6 transition-all duration-150 group
+        border-l-2 border-l-transparent hover:border-l-lime-green/50"
             >
               <div className="min-w-0">
-                <div className="font-medium text-gray-900 truncate group-hover:text-blue-700 transition-colors">
+                <div className="font-syne font-bold text-sm text-foreground truncate group-hover:text-lime-green transition-colors">
                   {ex.name}
                 </div>
                 <div className="text-sm text-gray-500 mt-0.5 flex flex-row flex-wrap items-center gap-1">
@@ -140,10 +138,7 @@ export default async function ExerciseLibraryPage({
                 </div>
               </div>
 
-              <Link
-                href={`/exercises/${ex.id}/edit`}
-                className="btn-primary"
-              >
+              <Link href={`/exercises/${ex.id}/edit`} className="btn-primary">
                 Edit Exercise
               </Link>
             </div>
@@ -152,9 +147,10 @@ export default async function ExerciseLibraryPage({
       )}
 
       {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 pt-4">
+        <div className="flex justify-center items-center gap-1.5 pt-4">
           {Array.from({ length: totalPages }).map((_, i) => {
             const p = i + 1;
+            const isActive = p === currentPage;
             return (
               <Link
                 key={p}
@@ -165,12 +161,11 @@ export default async function ExerciseLibraryPage({
                     page: p,
                   },
                 }}
-                className={`px-3 py-1.5 rounded-md border text-sm font-medium transition
-            ${
-              p === currentPage
-                ? "bg-blue-600 text-white border-blue-600"
-                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-            }`}
+                className={`w-9 h-9 rounded-xl flex items-center justify-center text-sm font-semibold transition-all active:scale-[0.95] ${
+                  isActive
+                    ? "bg-lime-green text-black font-syne"
+                    : "bg-surface2 text-muted border border-surface2 hover:border-lime-green/30 hover:text-lime-green"
+                }`}
               >
                 {p}
               </Link>

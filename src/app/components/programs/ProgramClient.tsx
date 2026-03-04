@@ -61,10 +61,7 @@ export default function ProgramsPageClient({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="nav-logo">Programs</h1>
 
-        <Link
-          href="/programs/new"
-          className="btn-primary"
-        >
+        <Link href="/programs/new" className="btn-primary">
           <Plus size={18} />
           New Program
         </Link>
@@ -72,11 +69,11 @@ export default function ProgramsPageClient({
 
       {/* Programs List */}
       {programs.length === 0 ? (
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-10 text-center">
-          <h3 className="text-lg font-medium text-gray-700 mb-2">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-10 text-center">
+          <h3 className="text-lg font-medium text-gray-700 mb-3">
             No programs yet
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
             Create your first training program to get started.
           </p>
           <Link
@@ -88,14 +85,17 @@ export default function ProgramsPageClient({
           </Link>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden divide-y divide-gray-100">
+        <div className="gradient-bg border border-surface2 rounded-2xl overflow-hidden divide-y divide-surface2">
+          {" "}
           {programs.map((program) => (
             <div
               key={program.id}
-              className="px-5 py-4 flex items-center justify-between gap-4 hover:bg-gray-50/70 transition-colors group flex-col md:flex-row"
+              className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 
+        hover:bg-surface2/50 hover:pl-6 transition-all duration-150 group
+        border-l-2 border-l-transparent hover:border-l-lime-green/50"
             >
               <Link href={`/programs/${program.id}`} className="flex-1 min-w-0">
-                <div className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors truncate">
+                <div className="font-syne font-bold text-sm text-foreground truncate group-hover:text-lime-green transition-colors">
                   {program.name}
                 </div>
                 {/* Optional: show more info if you have it */}
@@ -107,7 +107,7 @@ export default function ProgramsPageClient({
               <div className="flex items-center gap-3 opacity-70 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleDuplicate(program)}
-                  className="inline-flex items-center gap-1.5 text-sm text-gray-700 hover:text-blue-700 transition"
+                  className="inline-flex items-center gap-1.5 text-sm text-muted transition"
                   title="Duplicate program"
                 >
                   <Copy size={16} />
