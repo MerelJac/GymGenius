@@ -24,6 +24,7 @@ export function ExerciseLogger({
   sectionId,
   disabled,
   notes,
+  status,
   isClientAdded = false,
   exerciseLogId,
   onChange,
@@ -36,7 +37,9 @@ export function ExerciseLogger({
   sectionId?: string | undefined;
   disabled: boolean;
   notes?: string | null;
+  status?: string
   isClientAdded?: boolean;
+  
   exerciseLogId?: string;
   onChange: (data: {
     exerciseId: string;
@@ -50,7 +53,8 @@ export function ExerciseLogger({
   const [performedState, setPerformedState] = useState<Performed>(
     performed ?? buildPerformedFromPrescribed(prescribed),
   );
-
+const isBuilding = status === "BUILDING";
+const isInputDisabled = disabled || isBuilding;
   const [hasSaved, setHasSaved] = useState(false);
   const [openSubModal, setOpenSubModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -98,6 +102,12 @@ export function ExerciseLogger({
     loadOneRepMax();
   }, [clientId, exercise.id]);
 
+  console.log('building status: ', status)
+    console.log('isBuilding status: ', isBuilding)
+      console.log('disabled status: ', disabled)
+
+
+  console.log('isdisabled status: ', isInputDisabled)
   return (
     <li className="rounded-xl border border-gray-200 bg-white p-4 space-y-4 shadow-sm">
       {/* Header */}
@@ -120,7 +130,7 @@ export function ExerciseLogger({
             <Ellipsis size={14} />
           </button>
 
-          {isClientAdded && !disabled && (
+          {isClientAdded && !isInputDisabled && (
             <button
               onClick={async (e) => {
                 e.stopPropagation();
@@ -146,7 +156,7 @@ export function ExerciseLogger({
       </div>
 
       {/* Logging UI */}
-      {!disabled && (
+      {!isInputDisabled && (
         <div className="space-y-4">
           {/* Timed */}
           {prescribed.kind === "timed" && performedState.kind === "timed" && (

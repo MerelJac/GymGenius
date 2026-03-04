@@ -27,6 +27,8 @@ enum WorkoutStatus {
   IN_PROGRESS
   COMPLETED
   SKIPPED
+  READY_TO_BUILD
+  BUILDING
 }
 
 enum ExerciseType {
@@ -143,7 +145,7 @@ model Program {
 }
 
 model WorkoutTemplate {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   programId String?
   program   Program? @relation(fields: [programId], references: [id])
 

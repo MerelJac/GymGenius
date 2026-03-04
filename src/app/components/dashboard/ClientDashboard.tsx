@@ -12,6 +12,7 @@ import { ProgressChanges } from "../clients/ProgressChanges";
 import { redirect } from "next/navigation";
 import { ContactTrainer } from "../clients/ContactTrainer";
 import { ArrowRight } from "lucide-react";
+import { CreateWorkoutForLater } from "../workout/CreateWorkoutForLater";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
@@ -178,6 +179,9 @@ export default async function ClientDashboard() {
 
         <ContactTrainer trainer={trainerForContact} />
       </div>
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
+        <CreateWorkoutForLater clientId={clientId} />
+      </section>
     </div>
   );
 }
@@ -289,7 +293,7 @@ function OverdueWorkouts({
               className="text-gray-900 hover:underline flex flex-row items-center gap-2"
             >
               {w.workout.name}
-              <ArrowRight size={10}/>
+              <ArrowRight size={10} />
             </Link>
             <span className="text-gray-500">
               {w.scheduledDate.toLocaleDateString()}
@@ -313,13 +317,12 @@ function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
       <ul className="text-sm space-y-2">
         {workouts.map((w) => (
           <li key={w.id} className="flex justify-between items-center flex-row">
-
-                  <Link
+            <Link
               href={`/workouts/${w.id}`}
               className="text-gray-900 hover:underline flex flex-row items-center gap-2"
             >
               {w.workout.name}
-              <ArrowRight size={10}/>
+              <ArrowRight size={10} />
             </Link>
 
             <span className="text-gray-500">

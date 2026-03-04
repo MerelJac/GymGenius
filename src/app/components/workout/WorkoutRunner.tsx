@@ -8,6 +8,9 @@ import {
   startWorkout,
   stopWorkout,
   rerunWorkout,
+  saveWorkoutForLater,
+  alertTrainerOfCreateForLaterWorkout,
+  startBuildingWorkout,
 } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
 import { ExerciseLogger } from "./ExerciseLogger";
 import { ExerciseLog, ScheduledWorkoutWithLogs } from "@/types/workout";
@@ -23,7 +26,9 @@ export default function WorkoutRunner({
   scheduledWorkout: ScheduledWorkoutWithLogs;
 }) {
   const activeLog = scheduledWorkout.workoutLogs[0] ?? null;
-  const isActive = activeLog?.status === "IN_PROGRESS" && !activeLog.endedAt;
+  const isActive =
+    ["IN_PROGRESS", "BUILDING"].includes(activeLog?.status ?? "") &&
+    !activeLog?.endedAt;
   const router = useRouter();
   const clientId = scheduledWorkout.clientId;
   const isCompleted = activeLog?.status === "COMPLETED";
@@ -34,6 +39,10 @@ export default function WorkoutRunner({
   );
   const [finishingText, setFinishingText] = useState("Finish Workout");
   const [isFinishing, setIsFinishing] = useState(false);
+  const [isCreatingForLater, setIsCreatingForLater] = useState(false);
+  const [createForLaterText, setCreateForLaterText] = useState(
+    "Save Workout for Later",
+  );
   const handleRerunWorkout = async () => {
     if (!confirm("Restart this workout?")) return;
 
@@ -99,55 +108,109 @@ export default function WorkoutRunner({
 
       {/* START / STOP */}
       {!isActive ? (
-        <button
-          className="px-4 py-2 border rounded"
-          onClick={async () => {
-            const id = await startWorkout(scheduledWorkout.id);
-            autoSaveFns.current = []; // 🧼 CLEAR OLD REGISTRATIONS
-            setWorkoutLogId(id);
-            router.refresh();
-          }}
-        >
-          Start workout
-        </button>
+        <>
+          {scheduledWorkout.workout.program?.id?.startsWith("__") &&
+          scheduledWorkout.status == "READY_TO_BUILD" ? (
+            <button
+              className="px-4 py-2 border rounded"
+              onClick={async () => {
+                const id = await startBuildingWorkout(scheduledWorkout.id);
+                autoSaveFns.current = [];
+                setWorkoutLogId(id);
+                router.refresh();
+              }}
+            >
+              Start Building Workout for Later
+            </button>
+          ) : (
+            <button
+              className="px-4 py-2 border rounded"
+              onClick={async () => {
+                const id = await startWorkout(scheduledWorkout.id);
+                autoSaveFns.current = []; // 🧼 CLEAR OLD REGISTRATIONS
+                setWorkoutLogId(id);
+                router.refresh();
+              }}
+            >
+              Start workout
+            </button>
+          )}
+        </>
       ) : (
         <div className="flex flex-col gap-2">
-          <button
-            className="px-4 py-2 border rounded text-red-600"
-            disabled={isFinishing}
-            onClick={async () => {
-              if (!workoutLogId || isFinishing) return;
+          {scheduledWorkout.workout.program?.id?.startsWith("__") &&
+          scheduledWorkout.status == "BUILDING" ? (
+            // CREATE FOR LATER
+            <button
+              className="px-4 py-2 border rounded text-green-600"
+              disabled={isCreatingForLater}
+              onClick={async () => {
+                if (!workoutLogId || isCreatingForLater) return;
 
-              setIsFinishing(true);
-              setFinishingText("Finishing...");
+                setIsCreatingForLater(true);
+                setCreateForLaterText("Saving...");
 
-              // 🔐 Auto-save all unsaved exercises
-              for (const ex of exerciseStates) {
-                await logExercise(
+                // 🔐 Auto-save all unsaved exercises
+                for (const ex of exerciseStates) {
+                  await logExercise(
+                    workoutLogId,
+                    ex.exerciseId,
+                    ex.prescribed,
+                    ex.performed,
+                    ex.note,
+                    ex.sectionId ?? null,
+                  );
+                }
+
+                await saveWorkoutForLater(workoutLogId);
+                await alertTrainerOfCreateForLaterWorkout(
+                  clientId,
                   workoutLogId,
-                  ex.exerciseId,
-                  ex.prescribed,
-                  ex.performed,
-                  ex.note,
-                  ex.sectionId ?? null,
                 );
-              }
+                setWorkoutLogId(null);
+                router.refresh();
+              }}
+            >
+              {createForLaterText}
+            </button>
+          ) : (
+            <button
+              className="px-4 py-2 border rounded text-red-600"
+              disabled={isFinishing}
+              onClick={async () => {
+                if (!workoutLogId || isFinishing) return;
 
-              await stopWorkout(workoutLogId);
-              await alertTrainerOfCompletedWorkout(clientId, workoutLogId);
-              setWorkoutLogId(null);
-              router.refresh();
-            }}
-          >
-            {finishingText}
-          </button>
+                setIsFinishing(true);
+                setFinishingText("Finishing...");
+
+                // 🔐 Auto-save all unsaved exercises
+                for (const ex of exerciseStates) {
+                  await logExercise(
+                    workoutLogId,
+                    ex.exerciseId,
+                    ex.prescribed,
+                    ex.performed,
+                    ex.note,
+                    ex.sectionId ?? null,
+                  );
+                }
+
+                await stopWorkout(workoutLogId);
+                await alertTrainerOfCompletedWorkout(clientId, workoutLogId);
+                setWorkoutLogId(null);
+                router.refresh();
+              }}
+            >
+              {finishingText}
+            </button>
+          )}
         </div>
       )}
 
       {!programId && (
         <p className="text-xs text-gray">
-  You are creating this workout. Log your exercises or add new ones if you don’t see what you need.
-
+          You are creating this workout. Log your exercises or add new ones if
+          you don’t see what you need.
         </p>
       )}
       {/* EXERCISES */}
@@ -182,6 +245,7 @@ export default function WorkoutRunner({
                       sectionId={section.id}
                       disabled={!isActive}
                       notes={we.notes}
+                      status={activeLog?.status}
                       onChange={(data) => {
                         setExerciseStates((prev) => {
                           const existing = prev.find(
@@ -219,6 +283,7 @@ export default function WorkoutRunner({
                     disabled={!isActive}
                     sectionId={section.id}
                     notes={el.substitutionReason}
+                                          status={activeLog?.status}
                     isClientAdded // 👈 ADD THIS FLAG
                     exerciseLogId={el.id} // 👈 PASS LOG ID
                     onChange={(data) => {

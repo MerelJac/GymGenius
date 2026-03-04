@@ -9,6 +9,8 @@ import { buildPerformedFromPrescribed } from "@/app/utils/workoutFunctions";
 import { redirect } from "next/navigation";
 import { sendAdditionalWorkoutEmailToTrainer } from "@/lib/email-templates/additionalWorkoutEmailToTrainer";
 import { sendCompletedWorkoutEmailToTrainer } from "@/lib/email-templates/completedWorkoutToTrainer";
+import { Prisma } from "@prisma/client";
+import { sendCreatedWorkoutForLaterEmailToTrainer } from "@/lib/email-templates/createdWorkoutForLaterEmailToTrainer";
 
 export async function startWorkout(scheduledId: string) {
   const session = await getServerSession(authOptions);
@@ -56,6 +58,53 @@ export async function startWorkout(scheduledId: string) {
   });
 }
 
+export async function startBuildingWorkout(scheduledId: string) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return redirect("/login");
+
+  return await prisma.$transaction(async (tx) => {
+    // 1️⃣ Check for existing ACTIVE log
+    const existingLog = await tx.workoutLog.findFirst({
+      where: {
+        scheduledId,
+        endedAt: null,
+        status: "BUILDING",
+      },
+    });
+
+    if (existingLog) {
+      return existingLog.id;
+    }
+
+    // 2️⃣ Update scheduled workout status
+    await tx.scheduledWorkout.update({
+      where: { id: scheduledId },
+      data: {
+        status: "BUILDING",
+      },
+    });
+
+    // 3️⃣ Create or reactivate workout log
+    const log = await tx.workoutLog.upsert({
+      where: { scheduledId },
+      update: {
+        status: "BUILDING",
+        startedAt: new Date(),
+        endedAt: null,
+      },
+      create: {
+        scheduledId,
+        clientId: session.user.id,
+        status: "BUILDING",
+        startedAt: new Date(),
+      },
+    });
+
+    return log.id;
+  });
+}
+
+
 export async function stopWorkout(workoutLogId: string) {
   await prisma.$transaction(async (tx) => {
     // 1️⃣ Complete the workout log
@@ -72,6 +121,28 @@ export async function stopWorkout(workoutLogId: string) {
       where: { id: log.scheduledId },
       data: {
         status: "COMPLETED",
+      },
+    });
+  });
+}
+
+export async function saveWorkoutForLater(workoutLogId: string) {
+  await prisma.$transaction(async (tx) => {
+    // 1️⃣ SCHEDULE the workout log
+    const log = await tx.workoutLog.update({
+      where: { id: workoutLogId },
+      data: {
+        status: "SCHEDULED",
+        startedAt: null,
+        endedAt: null, // reset timestamps
+      },
+    });
+
+    // 2️⃣ Mark the scheduled workout as SCHEDULED
+    await tx.scheduledWorkout.update({
+      where: { id: log.scheduledId },
+      data: {
+        status: "SCHEDULED",
       },
     });
   });
@@ -128,6 +199,82 @@ export async function alertTrainerOfCompletedWorkout(
       );
     } else {
       await sendAdditionalWorkoutEmailToTrainer(
+        trainer.email,
+        client.profile.firstName,
+        "Strength Training",
+        workoutLog.endedAt!,
+      );
+    }
+  } catch (error) {
+    console.error(
+      "❌ Failed to send completed workout email to trainer",
+      error,
+    );
+  }
+}
+
+export async function alertTrainerOfCreateForLaterWorkout(
+  clientId: string,
+  workoutLogId: string,
+) {
+  const client = await prisma.user.findUnique({
+    where: { id: clientId },
+    include: {
+      profile: true,
+    },
+  });
+
+  const trainer = client?.trainerId
+    ? await prisma.user.findUnique({
+        where: { id: client.trainerId },
+        select: {
+          email: true,
+        },
+      })
+    : null;
+
+  //  workout log id > get program id.
+  const workoutLog = await prisma.workoutLog.findUnique({
+    where: { id: workoutLogId },
+    include: {
+      scheduled: {
+        include: {
+          workout: {
+            include: {
+              program: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!trainer?.email || !client?.profile?.firstName || !workoutLog?.endedAt) {
+    return;
+  }
+
+  try {
+    if (workoutLog?.scheduled?.workout?.program?.id.startsWith("__")) {
+      // CLINET CREATED WORKOUTS FOR LATER
+      await sendCreatedWorkoutForLaterEmailToTrainer(
+        trainer.email,
+        client.profile.firstName,
+        workoutLog.scheduled.workout.name,
+        workoutLog.scheduled.workout.program.name,
+        workoutLog.endedAt!,
+      );
+    } else if (workoutLog?.scheduled?.workout?.program) {
+      await sendCompletedWorkoutEmailToTrainer(
+        // CLIENT COMPLETED SCHEUDELD WORKOUT
+        trainer.email,
+        client.profile.firstName,
+        workoutLog.scheduled.workout.name,
+        workoutLog.scheduled.workout.program.name,
+        workoutLog.endedAt!,
+      );
+    } else {
+      await sendAdditionalWorkoutEmailToTrainer(
+        // CLIENT COMPELTE ADDITIONAL WORKOUT
         trainer.email,
         client.profile.firstName,
         "Strength Training",
@@ -243,6 +390,18 @@ export async function addExerciseToWorkout(
 ) {
   const performed = buildPerformedFromPrescribed(prescribed);
 
+  console.log(
+    "workoutLogId",
+    workoutLogId,
+    "exerciseId",
+    exerciseId,
+    "sectionId",
+    sectionId,
+    "prescribed",
+    prescribed,
+    "performed",
+    performed,
+  );
   await prisma.exerciseLog.create({
     data: {
       workoutLogId,
@@ -285,11 +444,22 @@ export async function removeClientExercise(exerciseLogId: string) {
 export async function rerunWorkout(scheduledWorkoutId: string) {
   const original = await prisma.scheduledWorkout.findUnique({
     where: { id: scheduledWorkoutId },
+    include: {
+      workoutLogs: {
+        orderBy: { startedAt: "desc" },
+        take: 1,
+        include: {
+          exercises: true,
+        },
+      },
+    },
   });
 
   if (!original) {
-    return { success: false, error: "Scheduled workout not founds" };
+    return { success: false, error: "Scheduled workout not found" };
   }
+
+  const lastLog = original.workoutLogs[0];
 
   // 1️⃣ Create new scheduled workout
   const newScheduled = await prisma.scheduledWorkout.create({
@@ -301,8 +471,8 @@ export async function rerunWorkout(scheduledWorkoutId: string) {
     },
   });
 
-  // 2️⃣ Create empty workout log
-  await prisma.workoutLog.create({
+  // 2️⃣ Create new workout log
+  const newLog = await prisma.workoutLog.create({
     data: {
       clientId: original.clientId,
       scheduledId: newScheduled.id,
@@ -310,6 +480,21 @@ export async function rerunWorkout(scheduledWorkoutId: string) {
       startedAt: new Date(),
     },
   });
+
+  // 3️⃣ Copy exercises from previous workout
+  if (lastLog?.exercises?.length) {
+    await prisma.exerciseLog.createMany({
+      data: lastLog.exercises.map((ex) => ({
+        workoutLogId: newLog.id,
+        exerciseId: ex.exerciseId,
+        sectionId: ex.sectionId,
+        prescribed: ex.prescribed as Prisma.InputJsonValue,
+        performed: ex.performed as Performed,
+        substitutedFrom: ex.substitutedFrom,
+        substitutionReason: ex.substitutionReason,
+      })),
+    });
+  }
 
   redirect(`/workouts/${newScheduled.id}`);
 }
