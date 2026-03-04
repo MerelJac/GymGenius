@@ -10,7 +10,7 @@ export default function DashboardLayout({
     <div className="min-h-screen bg-gray-50">
       <ClientHeader />
 
-      <main className="p-6 max-w-6xl mx-auto">{children}</main>
+      <main className="p-6 max-w-6xl mx-auto bg-black">{children}</main>
     </div>
   );
 }

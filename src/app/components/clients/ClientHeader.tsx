@@ -15,7 +15,7 @@ export function ClientHeader() {
   }, []);
   return (
     <header
-      className={`sticky top-0 z-40 bg-white transition-shadow ${
+      className={`sticky top-0 z-40 bg-black transition-shadow ${
         scrolled ? "shadow-sm" : ""
       }`}
     >
@@ -26,7 +26,7 @@ export function ClientHeader() {
             href="/client"
             className="text-sm font-medium text-gray-700 hover:text-gray-900 transition"
           >
-            <h2 className="text-lg font-semibold text-gray-900">Dialed Fitness</h2>
+            <h2 className="nav-logo">Dialed Fitness</h2>
           </Link>
         </div>
 

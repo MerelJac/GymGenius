@@ -13,7 +13,7 @@ export default function DashboardLayout({
 ">
       <ClientHeader />
 
-      <main className="p-6 max-w-6xl mx-auto">{children}</main>
+      <main className="p-6 max-w-6xl mx-auto bg-black">{children}</main>
     </div>
   );
 }

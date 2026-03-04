@@ -134,16 +134,18 @@ export default async function ClientDashboard() {
     (w) => w.status === "COMPLETED",
   );
 
+  const userName = profile.firstName ?? "diehard";
+
   const overdueWorkouts = pastWorkouts.filter((w) => w.status !== "COMPLETED");
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      {/* Header */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold text-gray-900">Client Dashboard</h1>
-        <p className="text-sm text-gray-600">
-          Nice to see you! You’re staying consistent — great work.
-        </p>
+      {/* Greeting */}
+      <div className="greeting">
+        <h1>
+          Hello, <span>{userName}</span>
+        </h1>
+        <p>You are staying consistent — great work.</p>
       </div>
 
       <div className="space-y-6">
@@ -200,44 +202,41 @@ function TodayWorkout({
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold text-gray-900">Today’s Workout</h2>
-        <span className="text-sm text-gray-500">
+    <div className="workout-card">
+      <div className="wc-top">
+        <span className="wc-badge">Today`&apos;s Workout</span>
+        <span className="wc-date">
+          {" "}
           {workout.scheduledDate.toLocaleDateString()}
         </span>
       </div>
-
-      <Link
-        href={`/workouts/${workout.id}`}
-        className="text-blue-700 font-medium hover:underline text-lg"
-      >
-        {workout.workout.name}
-      </Link>
-
-      <ul className="text-sm text-gray-700 list-disc pl-5 space-y-0.5">
-        {workout.workout.workoutSections.flatMap((section) =>
-          section.exercises.map((we) => (
-            <li key={we.id}>{we.exercise?.name}</li>
-          )),
-        )}
-      </ul>
-
-      <div className="pt-2">
-        {workout.status === "COMPLETED" ? (
-          <Link href={`/workouts/${workout.id}`}>
-            <span className="inline-block px-4 py-2 rounded-lg bg-green-100 text-green-700 text-sm font-medium">
-              Workout completed ✅
-            </span>
-          </Link>
-        ) : (
-          <Link href={`/workouts/${workout.id}`}>
-            <button className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
-              View workout
-            </button>
-          </Link>
-        )}
+      <div className="wc-title">
+        {" "}
+        <Link href={`/workouts/${workout.id}`}>{workout.workout.name}</Link>
       </div>
+      <div className="wc-sub">
+        <ul className="text-sm text-gray-700 list-disc pl-5 space-y-0.5">
+          {workout.workout.workoutSections.flatMap((section) =>
+            section.exercises.map((we) => (
+              <li key={we.id}>{we.exercise?.name}</li>
+            )),
+          )}
+        </ul>
+      </div>
+
+      {workout.status === "COMPLETED" ? (
+        <Link href={`/workouts/${workout.id}`}>
+          <button className="btn-primary">
+            Completed <span className="btn-arrow">→</span>
+          </button>
+        </Link>
+      ) : (
+        <Link href={`/workouts/${workout.id}`}>
+          <button className="btn-primary">
+            View Workout <span className="btn-arrow">→</span>
+          </button>
+        </Link>
+      )}
     </div>
   );
 }
@@ -251,7 +250,7 @@ function UpcomingWorkouts({
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
-      <h2 className="font-semibold text-gray-900">Coming up</h2>
+      <h2 className="section-title">Coming up</h2>
 
       <ul className="text-sm space-y-2">
         {workouts.map((w) => (

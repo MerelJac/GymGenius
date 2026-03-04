@@ -26,24 +26,26 @@ export function ClientDashboardStats({
       )}
 
       {/* Weekly Progress */}
-      <div className="bg-white rounded-xl border p-5">
-        <div className="flex items-center gap-2 text-green-600">
-          <CheckCircle size={18} />
-          <span className="font-medium">This Week</span>
+      <div className="stat-card accent-card">
+        <div className="">
+          <span className="label">This Week</span>
         </div>
-        <div className="text-3xl font-bold mt-2">
-          {completed} / {scheduled}
+
+        <div className="big-num">
+          {completed}
+          <span className="small-num">/{scheduled}</span>
         </div>
+
         <p className="text-sm text-gray-500 mt-1">workouts completed</p>
       </div>
 
       {/* Next Workout */}
-      <div className="bg-white rounded-xl border p-5">
-        <div className="flex items-center gap-2 text-blue-600">
-          <Calendar size={18} />
-          <span className="font-medium">Next Workout</span>
-        </div>
-        <div className="text-lg font-semibold mt-2">
+
+
+      <div className="stat-card">
+        <div className="label">Next Workout</div>
+        <div className="big-num">
+          {" "}
           {nextWorkoutDate
             ? formatNextWorkout(nextWorkoutDate)
             : "None scheduled"}

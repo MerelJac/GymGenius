@@ -9,10 +9,10 @@ export default function PublicLayout({
 }) {
   return (
     <>
-      <header className="border-b bg-white">
+      <header className="border-b bg-black">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           {/* Logo / Brand */}
-          <Link href="/" className="text-lg font-semibold text-black">
+          <Link href="/" className="text-lg font-heading font-semibold text-black">
             Dialed Fitness
           </Link>
 
