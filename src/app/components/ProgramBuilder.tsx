@@ -182,7 +182,7 @@ export default function ProgramBuilder({
                 />
               ) : (
                 <h1
-                  className="text-2xl md:text-3xl font-bold text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
+                  className="nav-logo cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
                   onClick={() => setEditingName(true)}
                 >
                   {programName}

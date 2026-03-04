@@ -57,7 +57,7 @@ export default function AddClientForm({ onClientCreated }: Props) {
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-50"
+          className="btn-primary disabled:opacity-50"
         >
           {saving ? "Creating…" : "Add client"}
         </button>

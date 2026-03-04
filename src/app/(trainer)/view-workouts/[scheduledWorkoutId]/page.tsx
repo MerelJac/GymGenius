@@ -53,9 +53,9 @@ export default async function ViewWorkoutPage({
                 <BackButton route="/trainer" />
         
       {isCompleted && (
-        <div className="rounded bg-green-50 border p-3 text-green-700 mb-6">
-          Workout completed 🎉
-        </div>
+          <div className="greeting">
+            <h1>Workout completed!</h1>
+          </div>
       )}
 
       <ExerciseLogViewer logs={logs} />

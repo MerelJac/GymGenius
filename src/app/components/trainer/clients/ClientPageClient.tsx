@@ -23,7 +23,7 @@ export default function ClientPageClient({
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+        <h1 className="nav-logo">
           Clients
         </h1>
 
@@ -80,7 +80,7 @@ export default function ClientPageClient({
 
                 <Link
                   href={`/clients/${c.id}`}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition whitespace-nowrap"
+                  className="btn-primary"
                 >
                   View Profile
                 </Link>

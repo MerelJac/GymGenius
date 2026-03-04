@@ -126,7 +126,7 @@ export default function ClientProfile({
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <BackButton route={"/clients"} />
 
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+        <h1 className="nav-logo">
           {client.profile?.firstName} {client.profile?.lastName}
           <span className="text-gray-500 font-normal text-xl ml-3">
             {client.email}

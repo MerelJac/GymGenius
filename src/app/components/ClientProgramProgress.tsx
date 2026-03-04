@@ -72,7 +72,7 @@ export function ClientProgramProgress({
         {showClientLink && (
           <Link
             href={`/clients/${client.id}`}
-            className="text-xs font-semibold text-muted hover:text-lime-green transition-colors"
+            className="btn-primary"
           >
              View →
           </Link>
@@ -104,7 +104,7 @@ export function ClientProgramProgress({
           return (
             <div key={program.id} className="space-y-2">
               <div className="flex items-center justify-between text-sm gap-4">
-                <span className="font-medium text-foreground">{program.name}
+                <span className="font-medium text-foreground max-w-xl">{program.name}
                   {program.name}
                 </span>
        <div className="flex items-center gap-3">
@@ -116,7 +116,7 @@ export function ClientProgramProgress({
                     <button
                       onClick={() => handleRemoveClientFromProgram(program.id)}
                       disabled={isPending}
-                      className="text-xs font-medium text-danger hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                      className="btn-finish"
 
                     >
                       Remove

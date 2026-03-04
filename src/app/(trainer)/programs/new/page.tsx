@@ -42,7 +42,7 @@ export default function NewProgramPage() {
         <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           {/* Header */}
           <div className="px-6 py-5 border-b bg-gray-50">
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="nav-logo">
               Create New Program
             </h1>
             <p className="mt-1.5 text-sm text-gray-600">

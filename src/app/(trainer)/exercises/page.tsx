@@ -65,13 +65,13 @@ export default async function ExerciseLibraryPage({
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+        <h1 className="nav-logo">
           Exercise Library
         </h1>
 
         <Link
           href="/exercises/new"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition shadow-sm"
+    className="btn-primary"
         >
           <Plus size={18} />{" "}
           {/* optional: import { Plus } from "lucide-react" */}
@@ -142,7 +142,7 @@ export default async function ExerciseLibraryPage({
 
               <Link
                 href={`/exercises/${ex.id}/edit`}
-                className="inline-flex items-center gap-2 px-5 py-2 text-sm font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition whitespace-nowrap flex-shrink-0"
+                className="btn-primary"
               >
                 Edit Exercise
               </Link>
