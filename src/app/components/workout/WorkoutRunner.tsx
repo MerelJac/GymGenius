@@ -313,7 +313,7 @@ export default function WorkoutRunner({
                   />
                 ))}
             </ul>
-            {workoutLogId && (
+            {workoutLogId && isActive && (
               <AddExerciseToWorkout
                 workoutLogId={workoutLogId}
                 sectionId={section.id}
