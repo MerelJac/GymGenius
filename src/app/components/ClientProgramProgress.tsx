@@ -59,28 +59,28 @@ export function ClientProgramProgress({
   if (programs.length === 0) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-4 shadow-sm">
+    <div className="bg-surface border border-surface2 rounded-2xl p-5 space-y-4">
       {/* Client header */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-0.5">
-          <div className="font-semibold text-gray-900">
+          <div className="font-syne font-bold text-sm text-foreground">
             {client.profile?.firstName} {client.profile?.lastName}
           </div>
-          <div className="text-xs text-gray-500">{client.email}</div>
+               <div className="text-xs text-muted">{client.email}</div>
         </div>
 
         {showClientLink && (
           <Link
             href={`/clients/${client.id}`}
-            className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition"
+            className="text-xs font-semibold text-muted hover:text-lime-green transition-colors"
           >
-            View
+             View →
           </Link>
         )}
       </div>
 
       {/* Divider */}
-      <div className="border-t border-gray-100" />
+      <div className="border-t border-surface2" />
 
       {/* Program progress */}
       <div className="space-y-4">
@@ -104,12 +104,11 @@ export function ClientProgramProgress({
           return (
             <div key={program.id} className="space-y-2">
               <div className="flex items-center justify-between text-sm gap-4">
-                <span className="font-medium text-gray-900">
+                <span className="font-medium text-foreground">{program.name}
                   {program.name}
                 </span>
-
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-500">
+       <div className="flex items-center gap-3">
+                  <span className="text-muted text-xs">
                     {statusLabel} · {completed}/{workouts.length}
                   </span>
 
@@ -117,10 +116,8 @@ export function ClientProgramProgress({
                     <button
                       onClick={() => handleRemoveClientFromProgram(program.id)}
                       disabled={isPending}
-                      className="
-      text-xs font-medium text-red-600 hover:text-red-700
-      disabled:opacity-50 disabled:cursor-not-allowed
-    "
+                      className="text-xs font-medium text-danger hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed transition"
+
                     >
                       Remove
                     </button>

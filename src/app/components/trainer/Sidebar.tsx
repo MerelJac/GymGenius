@@ -1,9 +1,10 @@
 "use client";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LogoutButton } from "../Logout";
+import { LucideIcon } from "lucide-react";
+
 import {
   LayoutDashboard,
   Users,
@@ -23,7 +24,7 @@ const navItems = [
 ];
 
 const adminNavLinks = [
-{ href: "/admin/exercises", label: "Review Exercises", icon: GitCompare },
+  { href: "/admin/exercises", label: "Review Exercises", icon: GitCompare },
 ];
 
 export default function SidebarLayout({
@@ -36,79 +37,53 @@ export default function SidebarLayout({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  function NavLinks({ onClick }: { onClick?: () => void }) {
+  function NavLink({
+    href,
+    label,
+    icon: Icon,
+    onClick,
+  }: {
+    href: string;
+    label: string;
+    icon: LucideIcon;
+    onClick?: () => void;
+  }) {
+    const active = pathname === href;
     return (
-      <>
-        {navItems.map((item) => {
-          const active = pathname === item.href;
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClick}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition
-                ${
-                  active
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-            >
-              <Icon className="w-4 h-4 shrink-0" />
-              {item.label}
-            </Link>
-          );
-        })}
-      </>
-    );
-  }
-
-  function AdminNavLinks({ onClick }: { onClick?: () => void }) {
-    return (
-      <>
-        {adminNavLinks.map((item) => {
-          const active = pathname === item.href;
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClick}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition
-                ${
-                  active
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-700 hover:bg-gray-100"
-                }`}
-            >
-              <Icon className="w-4 h-4 shrink-0" />
-              {item.label}
-            </Link>
-          );
-        })}
-      </>
+      <Link
+        href={href}
+        onClick={onClick}
+        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+          active
+            ? "bg-lime-green/10 text-lime-green border border-lime-green/20"
+            : "text-muted hover:text-foreground hover:bg-surface2 border border-transparent"
+        }`}
+      >
+        <Icon className="w-4 h-4 shrink-0" />
+        {label}
+      </Link>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-background">
       {/* Mobile top bar */}
-      <header className="md:hidden fixed top-0 inset-x-0 h-14 bg-white border-b z-40 flex items-center px-4">
+      <header className="md:hidden fixed top-0 inset-x-0 h-14 bg-background/95 backdrop-blur-md border-b border-surface2 z-40 flex items-center px-4">
         <button
           onClick={() => setOpen(true)}
-          className="p-2 rounded-md hover:bg-gray-100"
+          className="w-9 h-9 rounded-xl bg-surface2 flex items-center justify-center text-muted hover:text-foreground transition-colors"
         >
-          <Menu className="w-5 h-5 black" />
+          <Menu className="w-4 h-4" />
         </button>
-        <div className="ml-3 font-semibold text-black">Dialed Fitness</div>
+        <span className="ml-3 font-syne font-bold text-base text-lime-green">
+          Dialed Fitness
+        </span>
       </header>
 
       {/* Mobile overlay */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setOpen(false)}
         />
       )}
@@ -116,58 +91,62 @@ export default function SidebarLayout({
       {/* Sidebar */}
       <aside
         className={`
-    fixed inset-y-0 left-0 z-50
-    w-64 bg-white border-r flex flex-col
-    transform transition-transform duration-200
-    ${open ? "translate-x-0" : "-translate-x-full"}
-
-    md:sticky md:top-0 md:translate-x-0 md:h-screen
-  `}
+        fixed inset-y-0 left-0 z-50
+        w-64 bg-surface border-r border-surface2 flex flex-col
+        transform transition-transform duration-200
+        ${open ? "translate-x-0" : "-translate-x-full"}
+        md:sticky md:top-0 md:translate-x-0 md:h-screen
+      `}
       >
         {/* Brand */}
-        <div className="px-6 py-5 border-b flex items-center justify-between">
+        <div className="px-5 py-5 border-b border-surface2 flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-bold tracking-tight text-gray-900">
+            <h1 className="font-syne font-extrabold text-base text-lime-green tracking-tight">
               Dialed Fitness
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">Trainer Dashboard</p>
+            <p className="text-[10px] font-semibold tracking-widest uppercase text-muted mt-0.5">
+              Trainer Dashboard
+            </p>
           </div>
-
           <button
             onClick={() => setOpen(false)}
-            className="md:hidden p-2 rounded-md hover:bg-gray-100"
+            className="md:hidden w-8 h-8 rounded-xl bg-surface2 flex items-center justify-center text-muted hover:text-foreground transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-1">
-          <NavLinks onClick={() => setOpen(false)} />
+        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+          {navItems.map((item) => (
+            <NavLink key={item.href} {...item} onClick={() => setOpen(false)} />
+          ))}
         </nav>
 
+        {/* Admin section */}
         {role === "ADMIN" && (
-          <div className="px-4 py-6 space-y-1 border-t">
-            <h2 className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700">
+          <div className="px-4 py-4 space-y-1 border-t border-surface2">
+            <p className="text-[10px] font-semibold tracking-widest uppercase text-muted px-3 mb-2">
               Admin
-            </h2>
-
-              <AdminNavLinks onClick={() => setOpen(false)} />
-          
+            </p>
+            {adminNavLinks.map((item) => (
+              <NavLink
+                key={item.href}
+                {...item}
+                onClick={() => setOpen(false)}
+              />
+            ))}
           </div>
         )}
 
         {/* Footer */}
-        <div className="px-4 py-6 space-y-1 border-t">
-          <Link
+        <div className="px-4 py-4 space-y-1 border-t border-surface2">
+          <NavLink
             href="/trainer/profile"
+            label="Profile"
+            icon={User2}
             onClick={() => setOpen(false)}
-            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100"
-          >
-            <User2 size={16} />
-            Profile
-          </Link>
-
+          />
           <LogoutButton />
         </div>
       </aside>
