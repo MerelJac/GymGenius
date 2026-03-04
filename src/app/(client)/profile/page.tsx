@@ -52,8 +52,56 @@ export default async function ClientProfilePage() {
     },
   });
 
-  if (!user) return notFound();
+  const userCreatedWorkouts: ClientProfilePageUser | null =
+    await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        profile: true,
+        bodyMetrics: true,
+        scheduledWorkouts: {
+          where: {
+            status: "COMPLETED",
+          },
+          orderBy: { scheduledDate: "desc" },
+          take: 15,
+          include: {
+            workout: true,
+          },
+        },
+        workoutLogs: {
+          where: { status: "COMPLETED" },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          include: {
+            scheduled: {
+              include: {
+                workout: true,
+              },
+            },
+          },
+        },
+        additionalWorkouts: {
+          orderBy: { performedAt: "desc" },
+          take: 5,
+          include: {
+            type: true,
+          },
+        },
+      },
+    });
 
+  if (!user) return notFound();
+  if (!userCreatedWorkouts) return notFound();
+
+  console.log("Schedueld workouts: ", user.scheduledWorkouts);
+
+  const upcomingWorkouts = user.scheduledWorkouts.filter(
+    (sw) => !sw.workout.programId?.startsWith("__client-workouts-"),
+  );
+
+  const myWorkouts = userCreatedWorkouts.scheduledWorkouts.filter(
+    (sw) => sw.workout.programId === `__client-workouts-${user.id}`,
+  );
   type HistoryItem =
     | {
         kind: "scheduled";
@@ -106,13 +154,42 @@ export default async function ClientProfilePage() {
           Upcoming Workouts
         </h2>
 
-        {user.scheduledWorkouts.length === 0 ? (
+        {upcomingWorkouts.length === 0 ? (
           <p className="text-sm text-gray-500">
             No upcoming workouts scheduled
           </p>
         ) : (
           <ul className="text-sm space-y-2">
-            {user.scheduledWorkouts.map((sw) => (
+            {upcomingWorkouts.map((sw) => (
+              <li key={sw.id} className="flex justify-between items-center">
+                <Link
+                  href={`/workouts/${sw.workout.id}`}
+                  className="text-gray-900 hover:underline flex flex-row items-center gap-2"
+                >
+                  {sw.workout.name}
+                  <ArrowRight size={10} />
+                </Link>
+
+                <span className="text-gray-500">
+                  {sw.scheduledDate.toLocaleDateString()}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* Client Made  Workouts */}
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-3 shadow-sm">
+        <h2 className="text-lg font-semibold text-gray-900">
+          Workouts You Created
+        </h2>
+
+        {myWorkouts.length === 0 ? (
+          <p className="text-sm text-gray-500">No client created workouts</p>
+        ) : (
+          <ul className="text-sm space-y-2">
+            {myWorkouts.map((sw) => (
               <li key={sw.id} className="flex justify-between items-center">
                 <Link
                   href={`/workouts/${sw.id}`}
