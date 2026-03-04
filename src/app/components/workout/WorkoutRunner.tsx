@@ -84,7 +84,7 @@ export default function WorkoutRunner({
           <div className="rounded bg-green-50 border p-3 text-green-700 my-4  min-w-fit">
             Workout completed 🎉
           </div>
-          {programId ? (
+          {/* {programId ? (
             <button onClick={handleRerunWorkout}>
               <RotateCcw size={14} />
             </button>
@@ -92,7 +92,11 @@ export default function WorkoutRunner({
             <p className="text-xs text-gray-500 pb-4 max-w-[140px] break-words">
               You created this workout!
             </p>
-          )}
+          )} */}
+
+          <button onClick={handleRerunWorkout}>
+            <RotateCcw size={14} />
+          </button>
         </div>
 
         <ExerciseLogViewer logs={logs} />
@@ -283,7 +287,7 @@ export default function WorkoutRunner({
                     disabled={!isActive}
                     sectionId={section.id}
                     notes={el.substitutionReason}
-                                          status={activeLog?.status}
+                    status={activeLog?.status}
                     isClientAdded // 👈 ADD THIS FLAG
                     exerciseLogId={el.id} // 👈 PASS LOG ID
                     onChange={(data) => {

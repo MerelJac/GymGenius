@@ -95,7 +95,7 @@ export default async function ClientDashboard() {
     orderBy: {
       scheduledDate: "asc",
     },
-    take: 5, // today + next few
+    take: 8, // today + next few
   });
 
   const pastWorkouts = await prisma.scheduledWorkout.findMany({
@@ -121,7 +121,7 @@ export default async function ClientDashboard() {
       },
     },
     orderBy: { scheduledDate: "desc" },
-    take: 5,
+    take: 8,
   });
 
   const todaysWorkout = upcomingWorkouts.find(

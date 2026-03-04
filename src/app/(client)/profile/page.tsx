@@ -9,6 +9,7 @@ import { LogoutButton } from "@/app/components/Logout";
 import ClientProfileSection from "@/app/components/clients/ClientProfileSection";
 import { ClientProfilePageUser } from "@/types/client";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export default async function ClientProfilePage() {
   const session = await getServerSession(authOptions);
@@ -24,7 +25,7 @@ export default async function ClientProfilePage() {
           status: "SCHEDULED",
         },
         orderBy: { scheduledDate: "asc" },
-        take: 5,
+        take: 15,
         include: {
           workout: true,
         },
@@ -113,7 +114,14 @@ export default async function ClientProfilePage() {
           <ul className="text-sm space-y-2">
             {user.scheduledWorkouts.map((sw) => (
               <li key={sw.id} className="flex justify-between items-center">
-                <span className="text-gray-900">{sw.workout.name}</span>
+                <Link
+                  href={`/workouts/${sw.id}`}
+                  className="text-gray-900 hover:underline flex flex-row items-center gap-2"
+                >
+                  {sw.workout.name}
+                  <ArrowRight size={10} />
+                </Link>
+
                 <span className="text-gray-500">
                   {sw.scheduledDate.toLocaleDateString()}
                 </span>
