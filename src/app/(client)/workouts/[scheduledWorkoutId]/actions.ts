@@ -254,6 +254,7 @@ export async function alertTrainerOfCreateForLaterWorkout(
   }
 
   try {
+    console.log('Workout Program: ', workoutLog?.scheduled?.workout?.program?.id)
     if (workoutLog?.scheduled?.workout?.program?.id.startsWith("__")) {
       // CLINET CREATED WORKOUTS FOR LATER
       await sendCreatedWorkoutForLaterEmailToTrainer(

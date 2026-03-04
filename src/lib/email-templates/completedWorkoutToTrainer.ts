@@ -3,9 +3,14 @@ import { sendEmail } from "./config";
 /**
  * Compelted Workout email
  */
-export async function sendCompletedWorkoutEmailToTrainer(to: string, clientName: string, workoutLogName: string, programName: string, endedAt: Date) {
-  const appUrl =
-    process.env.APP_URL || "${process.env.APP_URL}";
+export async function sendCompletedWorkoutEmailToTrainer(
+  to: string,
+  clientName: string,
+  workoutLogName: string,
+  programName: string,
+  endedAt: Date,
+) {
+  const appUrl = process.env.APP_URL || "${process.env.APP_URL}";
 
   return sendEmail({
     to,
