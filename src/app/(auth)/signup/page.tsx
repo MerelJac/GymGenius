@@ -7,7 +7,7 @@ import { signupAction } from "./actions";
 import { signIn } from "next-auth/react";
 
 const inputCls =
-  "w-full px-4 py-2.5 bg-background border border-surface2 rounded-xl text-black text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
+  "w-full px-4 py-2.5 bg-surface2 border border-white/10 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
 const labelCls =
   "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
 
@@ -36,7 +36,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black px-4">
+    <div className="min-h-screen flex items-center justify-center  px-4">
       <div className="w-full max-w-sm space-y-6">
         {/* Brand */}
         <div className="text-center space-y-1">
@@ -63,7 +63,8 @@ export default function SignupPage() {
                   className="underline text-foreground hover:text-blue-700"
                 >
                   Contact us{" "}
-                </a> for more information.
+                </a>{" "}
+                for more information.
               </p>
             </div>
           )}

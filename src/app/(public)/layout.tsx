@@ -18,7 +18,7 @@ export default function PublicLayout({
           <nav className="flex items-center gap-3">
             <Link
               href="/login"
-              className="px-4 py-2 rounded-xl text-sm font-medium text-muted hover:text-foreground border border-surface2 hover:border-lime-green/30 transition-colors"
+              className="px-4 py-2 rounded-xl text-sm font-medium text-foreground hover:text-foreground border border-surface2 hover:border-lime-green/30 transition-colors"
             >
               Log in
             </Link>

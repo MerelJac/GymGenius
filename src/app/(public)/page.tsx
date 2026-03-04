@@ -1,31 +1,32 @@
-// src/app/(public)/page.tsx
-
 import Link from "next/link";
 
 export default function PublicLandingPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 py-24 text-center">
-          <h1 className="text-4xl md:text-5xl font-semibold mb-6  text-black">
-            Smarter training. Better results.
+      <section className="bg-background">
+        <div className="max-w-3xl mx-auto px-6 py-28 text-center space-y-8">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-lime-green/10 border border-lime-green/20 text-lime-green text-xs font-semibold tracking-widest uppercase">
+            For Trainers & Athletes
+          </div>
+          <h1 className="font-syne font-extrabold text-5xl md:text-6xl text-foreground tracking-tight leading-[1.05]">
+            Smarter training.<br />
+            <span className="text-lime-green">Better results.</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+          <p className="text-lg text-muted max-w-xl mx-auto leading-relaxed">
             Dialed Fitness helps trainers and clients plan workouts, track progress,
             and stay accountable — all in one simple platform.
           </p>
-
-          <div className="flex justify-center gap-4">
+          <div className="flex items-center justify-center gap-3 flex-wrap">
             <Link
               href="/signup"
-              className="px-6 py-3 rounded bg-black text-white hover:bg-gray-800"
+              className="px-6 py-3 rounded-xl bg-lime-green text-black font-syne font-bold text-sm hover:opacity-90 active:scale-[0.98] transition"
             >
-              Get started
+              Get started →
             </Link>
             <Link
               href="/login"
-              className="px-6 py-3 rounded border hover:bg-white"
+              className="px-6 py-3 rounded-xl border border-surface2 text-muted text-sm font-medium hover:text-foreground hover:border-lime-green/30 transition-colors"
             >
               Log in
             </Link>
@@ -33,36 +34,58 @@ export default function PublicLandingPage() {
         </div>
       </section>
 
-      {/* Features */}
-      <section className="max-w-7xl mx-auto px-6 py-20 bg-white">
-        <div className="grid md:grid-cols-3 gap-10">
-          <Feature
-            title="Workout Programming"
-            description="Create, assign, and manage structured training programs with ease."
-          />
-          <Feature
-            title="Progress Tracking"
-            description="Log workouts, monitor progress, and stay consistent over time."
-          />
-          <Feature
-            title="Trainer & Client Tools"
-            description="Built for both coaches and athletes, with clear communication and insights."
-          />
-        </div>
-      </section>
+    {/* Features */}
+<section className="bg-surface border-t border-surface2">
+  <div className="max-w-5xl mx-auto px-6 py-20">
+    <div className="text-center space-y-3 mb-14">
+      <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">
+        Everything you need
+      </p>
+      <h2 className="font-syne font-extrabold text-3xl text-foreground tracking-tight">
+        Built for how you actually train
+      </h2>
+      <p className="text-sm text-muted max-w-md mx-auto leading-relaxed">
+        Everything a coach needs to run their clients, and everything an athlete needs to stay on track.
+      </p>
+    </div>
+
+    <div className="grid md:grid-cols-3 gap-4">
+      <Feature
+        icon="🏋️"
+        title="Workout Programming"
+        description="Create, assign, and manage structured training programs with ease."
+        stat="Unlimited programs"
+      />
+      <Feature
+        icon="📈"
+        title="Progress Tracking"
+        description="Log workouts, monitor 1RM changes, and visualize gains over time."
+        stat="Every set. Every rep."
+        highlight
+      />
+      <Feature
+        icon="🤝"
+        title="Trainer & Client Tools"
+        description="Built for both coaches and athletes, with clear communication and insights."
+        stat="Real-time updates"
+      />
+    </div>
+  </div>
+</section>
 
       {/* CTA */}
-      <section className="bg-black text-white">
-        <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-          <h2 className="text-3xl font-semibold mb-4">
-            Start training smarter today
+      <section className="bg-background border-t border-surface2">
+        <div className="max-w-2xl mx-auto px-6 py-24 text-center space-y-6">
+          <h2 className="font-syne font-extrabold text-4xl text-foreground tracking-tight">
+            Start training<br />
+            <span className="text-lime-green">smarter today.</span>
           </h2>
-          <p className="text-gray-300 mb-6">
+          <p className="text-muted">
             Join Dialed Fitness and take control of your training experience.
           </p>
           <Link
             href="/signup"
-            className="inline-block px-6 py-3 rounded bg-white text-black hover:bg-gray-200"
+            className="inline-block px-8 py-3 rounded-xl bg-lime-green text-black font-syne font-bold text-sm hover:opacity-90 active:scale-[0.98] transition"
           >
             Create an account
           </Link>
@@ -71,18 +94,45 @@ export default function PublicLandingPage() {
     </>
   );
 }
-
 function Feature({
+  icon,
   title,
   description,
+  stat,
+  highlight = false,
 }: {
+  icon: string;
   title: string;
   description: string;
+  stat?: string;
+  highlight?: boolean;
 }) {
   return (
-    <div>
-      <h3 className="text-lg font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+    <div className={`relative rounded-2xl p-6 space-y-4 border transition-colors overflow-hidden ${
+      highlight
+        ? "bg-lime-green/5 border-lime-green/25 hover:border-lime-green/40"
+        : "bg-background border-surface2 hover:border-lime-green/20"
+    }`}>
+      {/* Top accent line on highlighted card */}
+      {highlight && (
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-lime-green to-[#3dffa0]" />
+      )}
+
+      <div className="flex items-start justify-between">
+        <div className="w-10 h-10 rounded-xl bg-lime-green/10 flex items-center justify-center text-lg flex-shrink-0">
+          {icon}
+        </div>
+        {stat && (
+          <span className="text-[10px] font-semibold tracking-widest uppercase text-lime-green/70 bg-lime-green/10 px-2.5 py-1 rounded-full">
+            {stat}
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-1.5">
+        <h3 className="font-syne font-bold text-base text-foreground">{title}</h3>
+        <p className="text-sm text-muted leading-relaxed">{description}</p>
+      </div>
     </div>
   );
 }
