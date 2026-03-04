@@ -146,9 +146,9 @@ export function ClientProfileEditor({
           </div>
 
           {/* Resend invite */}
-          <div className="py-3.5 flex items-center gap-3">
+          <div className="py-3.5">
+             <p className={labelClass}>Resend Invitation Email</p>
             <ResendInviteButton email={email} />
-            <span className="text-sm text-muted">Resend Invitation Email</span>
           </div>
 
           {/* Phone */}

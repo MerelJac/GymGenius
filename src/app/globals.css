@@ -5,7 +5,7 @@
   --foreground: #c8f135;
   --red: #ff5c5c;
   --text: #f0f0f0;
-    --muted: #7a7a85;
+  --muted: #7a7a85;
 }
 
 @theme inline {
@@ -13,7 +13,10 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-dm-sans); /* DM Sans = default body font */
   --font-syne: var(--font-syne); /* Syne = headings */
-  --color-lime-green: #c8f135;
+  --color-lime-green: var(--accent);
+  --color-muted: var(--muted); /* ← add this */
+  --color-danger: var(--orange);
+   --color-soft: var(--red);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -26,18 +29,34 @@
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-up {
   animation: fadeUp 0.6s ease both;
 }
-.animate-fade-up-1 { animation: fadeUp 0.6s 0.1s ease both; }
-.animate-fade-up-2 { animation: fadeUp 0.6s 0.2s ease both; }
-.animate-fade-up-3 { animation: fadeUp 0.6s 0.3s ease both; }
-.animate-fade-up-4 { animation: fadeUp 0.6s 0.4s ease both; }
-.animate-fade-up-5 { animation: fadeUp 0.6s 0.5s ease both; }
+.animate-fade-up-1 {
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+.animate-fade-up-2 {
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+.animate-fade-up-3 {
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+.animate-fade-up-4 {
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+.animate-fade-up-5 {
+  animation: fadeUp 0.6s 0.5s ease both;
+}
 
 body {
   /* background: var(--background);
@@ -706,7 +725,15 @@ body {
   padding: 14px;
   text-align: center;
 }
-.body-stat .bs-label {
+.body-stat-flex {
+  background: var(--surface2);
+  padding: 14px;
+  text-align: center;
+  display: flex;
+}
+
+.body-stat .bs-label,
+.body-stat-flex .bs-label {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.8px;
@@ -714,14 +741,16 @@ body {
   color: var(--muted);
   margin-bottom: 4px;
 }
-.body-stat .bs-val {
+.body-stat .bs-val,
+.body-stat-flex .bs-val {
   font-family: "Syne", sans-serif;
   font-size: 16px;
   font-weight: 700;
   color: var(--muted);
 }
 
-.body-stat .bs-val-sub-label {
+.body-stat .bs-val-sub-label,
+.body-stat-flex .bs-val-sub-label {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 1.2px;
@@ -737,6 +766,12 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 20px;
+}
+
+.gradient-bg {
+
+  background: linear-gradient(135deg, #1a1a1e, #1e1e24);
+
 }
 .trainer-top {
   display: flex;

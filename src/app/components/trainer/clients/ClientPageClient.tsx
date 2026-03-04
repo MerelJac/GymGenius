@@ -23,9 +23,7 @@ export default function ClientPageClient({
     <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="nav-logo">
-          Clients
-        </h1>
+        <h1 className="nav-logo">Clients</h1>
 
         <div className="flex-shrink-0">
           <AddClientForm
@@ -48,46 +46,42 @@ export default function ClientPageClient({
           </p>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden divide-y divide-gray-100">
-          {clients.map((c) => (
-            <div
-              key={c.id}
-              className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-gray-50/70 transition-colors group relative"
-            >
-              <div className="min-w-0">
-                <div className="font-medium text-gray-900 truncate group-hover:text-blue-700 transition-colors">
-                  {c.profile?.firstName} {c.profile?.lastName || ""}
-                  {!c.profile?.firstName && !c.profile?.lastName && (
-                    <span className="text-gray-500">(no name)</span>
-                  )}
-                </div>
-                <div className="text-sm text-gray-500 mt-0.5">{c.email}</div>
-              </div>
-
-              <div className="flex flex-row gap-2 items-center relative">
-                {!c.profile?.waiverSignedAt && (
-                  <div className="relative group">
-                    <AlertCircle
-                      size={16}
-                      className="text-amber-500 cursor-help"
-                    />
-
-                    <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-gray-900 px-2 py-1 text-xs text-white opacity-0 group-hover:opacity-100 pointer-events-none transition z-50">
-                      Waiver has not been signed
-                    </div>
-                  </div>
-                )}
-
-                <Link
-                  href={`/clients/${c.id}`}
-                  className="btn-primary"
-                >
-                  View Profile
-                </Link>
-              </div>
-            </div>
-          ))}
+     <div className="gradient-bg border border-surface2 rounded-2xl overflow-hidden divide-y divide-surface2">
+  {clients.map((c) => (
+    <div
+      key={c.id}
+      className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 
+        hover:bg-surface2/50 hover:pl-6 transition-all duration-150 group
+        border-l-2 border-l-transparent hover:border-l-lime-green/50"
+    >
+      <div className="min-w-0">
+        <div className="font-syne font-bold text-sm text-foreground truncate group-hover:text-lime-green transition-colors">
+          {c.profile?.firstName} {c.profile?.lastName || ""}
+          {!c.profile?.firstName && !c.profile?.lastName && (
+            <span className="text-muted">(no name)</span>
+          )}
         </div>
+        <div className="text-xs text-muted mt-0.5">{c.email}</div>
+      </div>
+      <div className="flex flex-row gap-2 items-center">
+        {!c.profile?.waiverSignedAt && (
+          <div className="relative group/tip">
+            <AlertCircle size={16} className="text-amber-500 cursor-help" />
+            <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-xl bg-surface2 border border-surface2 px-3 py-1.5 text-xs text-foreground opacity-0 group-hover/tip:opacity-100 pointer-events-none transition z-50">
+              Waiver has not been signed
+            </div>
+          </div>
+        )}
+        <Link
+          href={`/clients/${c.id}`}
+          className="px-4 py-2 rounded-xl bg-surface2 border border-white/10 text-foreground text-xs font-semibold hover:border-lime-green/30 hover:text-lime-green transition-all active:scale-[0.97]"
+        >
+          View Profile
+        </Link>
+      </div>
+    </div>
+  ))}
+</div>
       )}
     </div>
   );

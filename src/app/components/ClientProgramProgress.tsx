@@ -57,67 +57,73 @@ export function ClientProgramProgress({
   );
 
   if (programs.length === 0) return null;
+  const initials =
+    [client.profile?.firstName?.[0], client.profile?.lastName?.[0]]
+      .filter(Boolean)
+      .join("")
+      .toUpperCase() || "?";
 
   return (
-    <div className="bg-surface border border-surface2 rounded-2xl p-5 space-y-4">
+    <div className="space-y-3">
       {/* Client header */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-0.5">
-          <div className="font-syne font-bold text-sm text-foreground">
-            {client.profile?.firstName} {client.profile?.lastName}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-lime-green to-[#3dffa0] flex items-center justify-center font-syne font-bold text-black text-xs flex-shrink-0">
+            {initials}
           </div>
-               <div className="text-xs text-muted">{client.email}</div>
+          <div>
+            <p className="font-syne font-bold text-sm text-foreground leading-tight">
+              {client.profile?.firstName} {client.profile?.lastName}
+            </p>
+            <p className="text-xs text-muted">{client.email}</p>
+          </div>
         </div>
-
         {showClientLink && (
           <Link
             href={`/clients/${client.id}`}
-            className="btn-primary"
+            className="text-xs font-semibold text-muted hover:text-lime-green transition-colors px-3 py-1.5 rounded-xl bg-surface2 border border-transparent hover:border-lime-green/20"
           >
-             View →
+            View →
           </Link>
         )}
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-surface2" />
-
-      {/* Program progress */}
-      <div className="space-y-4">
+      {/* Programs */}
+      <div className="space-y-3 pl-11">
         {programs.map(({ program, workouts }) => {
           const completed = workouts.filter(
             (w) => w.status === WorkoutStatus.COMPLETED,
           ).length;
-
           const percent =
             workouts.length > 0
               ? Math.round((completed / workouts.length) * 100)
               : 0;
-
-          const statusLabel =
-            percent === 0
-              ? "Not started"
-              : percent === 100
-                ? "Completed"
-                : "In progress";
+          const isComplete = percent === 100;
+          const isStarted = percent > 0;
 
           return (
-            <div key={program.id} className="space-y-2">
-              <div className="flex items-center justify-between text-sm gap-4">
-                <span className="font-medium text-foreground max-w-xl">{program.name}
+            <div key={program.id} className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm font-medium text-foreground truncate">
                   {program.name}
                 </span>
-       <div className="flex items-center gap-3">
-                  <span className="text-muted text-xs">
-                    {statusLabel} · {completed}/{workouts.length}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span
+                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                      isComplete
+                        ? "text-[#3dffa0] bg-[#3dffa0]/10"
+                        : isStarted
+                          ? "text-lime-green bg-lime-green/10"
+                          : "text-muted bg-surface2"
+                    }`}
+                  >
+                    {completed}/{workouts.length}
                   </span>
-
                   {hasRemovableWorkouts && (
                     <button
                       onClick={() => handleRemoveClientFromProgram(program.id)}
                       disabled={isPending}
-                      className="btn-finish"
-
+                      className="text-[11px] font-semibold text-danger hover:opacity-80 disabled:opacity-40 transition"
                     >
                       Remove
                     </button>
@@ -126,16 +132,17 @@ export function ClientProgramProgress({
               </div>
 
               {/* Progress bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div className="w-full bg-surface2 rounded-full h-1 overflow-hidden">
                 <div
-                  className={`h-2 rounded-full transition-all duration-500 ${
-                    percent === 100
-                      ? "bg-green-600"
-                      : percent > 0
-                        ? "bg-green-500"
-                        : "bg-gray-300"
-                  }`}
-                  style={{ width: `${percent}%` }}
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{
+                    width: `${percent}%`,
+                    background: isComplete
+                      ? "#3dffa0"
+                      : isStarted
+                        ? "linear-gradient(90deg, #c8f135, #3dffa0)"
+                        : "transparent",
+                  }}
                 />
               </div>
             </div>

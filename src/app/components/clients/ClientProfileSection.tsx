@@ -29,7 +29,7 @@ export default function ClientProfileSection({
   return (
     <>
       {/* Profile Card */}
-      <section className="mx-5 mb-4 bg-surface border border-surface2 rounded-2xl overflow-hidden">
+      <section className="mx-5 mb-4 bg-muted border border-surface2 rounded-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-surface2">
           <div className="flex items-center gap-3">

@@ -33,6 +33,8 @@ export default function ClientProfile({
     };
     workouts: ScheduledWorkoutWithProgram[];
   };
+  const labelClass =
+    "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
 
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
@@ -147,22 +149,23 @@ export default function ClientProfile({
       />
 
       {/* Basic info */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 text-sm">
+      <div className="space-y-0 divide-y divide-surface2 p-5 space-y-5">
         <dl className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div>
-            <dt className="text-gray-500 font-medium">Joined</dt>
-            <dd className="mt-1 text-gray-900">
+          <div className="py-3.5">
+            <p className={labelClass}>Joined</p>
+            <p className="text-sm font-medium text-foreground">
               {new Date(client.createdAt).toLocaleDateString(undefined, {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
               })}
-            </dd>
+            </p>
           </div>
 
-          <div>
-            <dt className="text-gray-500 font-medium">Waiver Signed</dt>
-            <dd className="mt-1 text-gray-900">
+          <div className="py-3.5">
+            <p className={labelClass}>Waiver Signed</p>
+            <p className="text-sm font-medium text-foreground">
+              {" "}
               {client.profile?.waiverSignedAt ? (
                 new Date(client.profile.waiverSignedAt).toLocaleDateString(
                   undefined,
@@ -196,19 +199,19 @@ export default function ClientProfile({
                   </div>
                 </>
               )}
-            </dd>
+            </p>
           </div>
         </dl>
       </div>
 
       {/* Add metric form */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="gradient-bg border border-surface2 rounded-2xl p-5 space-y-4 body-stats">
+        <h2 className="font-syne font-bold text-base text-foreground">
           Log New Measurement
         </h2>
-        <div className="flex flex-wrap gap-4 items-end">
+        <div className="flex flex-wrap gap-3 items-end">
           <div className="min-w-[140px]">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5">
               Weight (lb)
             </label>
             <input
@@ -217,12 +220,11 @@ export default function ClientProfile({
               placeholder="e.g. 172.5"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-base"
+              className="w-full px-4 py-2.5 bg-background border border-surface2 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition"
             />
           </div>
-
           <div className="min-w-[140px]">
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            <label className="block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5">
               Body Fat %
             </label>
             <input
@@ -231,14 +233,13 @@ export default function ClientProfile({
               placeholder="e.g. 18.4"
               value={bodyFat}
               onChange={(e) => setBodyFat(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition text-base"
+              className="w-full px-4 py-2.5 bg-background border border-surface2 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition"
             />
           </div>
-
           <button
             onClick={handleAddMetric}
-            className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!weight.trim() && !bodyFat.trim()}
+            className="px-5 py-2.5 bg-lime-green text-black font-syne font-bold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition disabled:opacity-30 disabled:cursor-not-allowed"
           >
             Add Measurement
           </button>
@@ -246,140 +247,181 @@ export default function ClientProfile({
       </div>
 
       {/* Metrics history */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Progress History
-        </h2>
-
+      <div className="gradient-bg border border-surface2 rounded-2xl overflow-hidden body-stats">
+        <div className="px-5 py-4 border-b border-surface2 body-stat-flex ">
+          <h2 className="font-syne font-bold text-base text-foreground">
+            Progress History
+          </h2>
+        </div>
         {client.bodyMetrics.length === 0 ? (
-          <p className="text-gray-500 italic py-4">
+          <p className="text-muted italic text-sm px-5 py-8 text-center">
             No measurements recorded yet.
           </p>
         ) : (
-          <div className="space-y-3">
+          <ul className="divide-y divide-surface2">
             {client.bodyMetrics.map((m) => (
-              <div
-                key={m.id}
-                className="flex justify-between items-center py-3 border-b border-gray-100 last:border-0 text-sm"
-              >
-                <div className="text-gray-600">
-                  {new Date(m.recordedAt).toLocaleDateString(undefined, {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+              <li key={m.id} className="body-stat-flex ">
+                <div className="body-stat-flex ">
+                  <div>
+                    <p className="bs-label">Weight</p>
+                    <p className="bs-val">
+                      {m.weight ? `${m.weight} lb` : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="bs-label">Body Fat</p>
+                    <p className="bs-val">
+                      {m.bodyFat ? `${m.bodyFat}%` : "—"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="bs-label">Logged</p>
+                    <p className="bs-val-sub-label">
+                      {new Date(m.recordedAt).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                <div className="font-medium text-gray-900">
-                  {m.weight ? `${m.weight} lb` : "–"} •{" "}
-                  {m.bodyFat ? `${m.bodyFat}%` : "–"}
-                </div>
-              </div>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
-
       {/* Assigned Programs */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Assigned Programs
-        </h2>
-
+      <div className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-surface2">
+          <h2 className="font-syne font-bold text-base text-foreground">
+            Assigned Programs
+          </h2>
+        </div>
         {programs.length === 0 ? (
-          <p className="text-gray-500 italic py-4">No programs assigned yet.</p>
+          <p className="text-muted italic text-sm px-5 py-8 text-center">
+            No programs assigned yet.
+          </p>
         ) : (
-          <div className="space-y-5">
+          <div className="divide-y divide-surface2">
             {programs.map(({ program, workouts }) => {
               const completed = workouts.filter(
                 (w) => w.status === "COMPLETED",
               ).length;
               const total = workouts.length;
               const progress = total ? (completed / total) * 100 : 0;
-
+              const isComplete = progress === 100;
               return (
-                <div
-                  key={program.id}
-                  className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-4"
-                >
+                <div key={program.id} className="p-5 space-y-4">
                   <WorkoutCalendarWeek scheduledWorkouts={scheduledWorkouts} />
-
                   <SyncProgramButton
                     clientId={client.id}
                     programId={program.id}
                   />
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <h3 className="font-semibold text-lg text-gray-900">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <h3 className="font-syne font-bold text-sm text-foreground">
                       {program.name}
                     </h3>
-                    <span className="text-sm font-medium text-gray-600">
+                    <span className="text-xs text-muted">
                       {completed} / {total} completed
                     </span>
                   </div>
-
                   {/* Progress bar */}
-                  <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                  <div className="w-full gradient-bg2 rounded-full h-1.5 overflow-hidden">
                     <div
-                      className="bg-green-500 h-2.5 rounded-full transition-all duration-500"
-                      style={{ width: `${progress}%` }}
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{
+                        width: `${progress}%`,
+                        background: isComplete
+                          ? "#3dffa0"
+                          : "linear-gradient(90deg, #c8f135, #3dffa0)",
+                      }}
                     />
                   </div>
-
                   {/* Workout list */}
-                  <ul className="space-y-3 text-sm text-gray-700">
-                    {workouts.map((w) => (
-                      <li
-                        key={w.id}
-                        className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 py-2 border-b border-gray-100 last:border-0 last:pb-0"
-                      >
-                        <Link
-                          href={`/view-workouts/${w.id}`}
-                          className="flex justify-between items-start hover:bg-gray-50 p-2 rounded transition"
+                  <ul className="space-y-1">
+                    {workouts.map((w) => {
+                      const isDone = w.status === "COMPLETED";
+                      const isSkipped = w.status === "SKIPPED";
+                      const isInProgress = w.status === "IN_PROGRESS";
+
+                      const icon = isDone
+                        ? "✅"
+                        : isSkipped
+                          ? "⚠️"
+                          : isInProgress
+                            ? "🔄"
+                            : "📅";
+                      const iconBg = isDone
+                        ? "bg-[#3dffa0]/10"
+                        : isSkipped
+                          ? "bg-danger/10"
+                          : isInProgress
+                            ? "bg-lime-green/10"
+                            : "bg-surface2";
+                      const badgeClass = isDone
+                        ? "text-[#3dffa0] bg-[#3dffa0]/10"
+                        : isSkipped
+                          ? "text-danger bg-danger/10"
+                          : isInProgress
+                            ? "text-lime-green bg-lime-green/10"
+                            : "text-muted bg-surface2";
+
+                      return (
+                        <li
+                          key={w.id}
+                          className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 transition-all active:scale-[0.98]"
                         >
-                          <span className="font-medium">{w.workout.name}</span>
-                          <span className="text-gray-500 ml-2">
-                            • {formatDateFromInputReturnString(w.scheduledDate)}
-                          </span>
-                        </Link>
-                        <div className="flex flex-row gap-2 items-center">
-                          <span
-                            className={`inline-block px-3 py-1 text-xs font-medium rounded-full uppercase tracking-wide ${
-                              w.status === "COMPLETED"
-                                ? "bg-green-100 text-green-800"
-                                : w.status === "SKIPPED"
-                                  ? "bg-red-100 text-red-800"
-                                  : w.status === "IN_PROGRESS"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : "bg-amber-100 text-amber-800"
-                            }`}
+                          {/* Icon */}
+                          <div
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center text-base flex-shrink-0 ${iconBg}`}
                           >
-                            {w.status}
-                          </span>
-                          <RotateCcw
-                            size={14}
-                            className="cursor-pointer"
-                            onClick={() =>
-                              setActiveStatusId(
-                                activeStatusId === w.id ? null : w.id,
-                              )
-                            }
-                          />
-                          {activeStatusId === w.id && (
-                            <select
-                              onChange={(e) => {
-                                handleChangeStatus(w.id, e.target.value);
-                                setActiveStatusId(null);
-                              }}
-                              defaultValue={w.status}
-                              className="border rounded px-3 py-2"
+                            {icon}
+                          </div>
+
+                          {/* Info — links to workout */}
+                          <Link
+                            href={`/view-workouts/${w.id}`}
+                            className="flex-1 min-w-0 hover:text-lime-green transition-colors"
+                          >
+                            <p className="text-sm font-medium text-foreground truncate">
+                              {w.workout.name}
+                            </p>
+                            <p className="text-xs text-muted mt-0.5">
+                              {formatDateFromInputReturnString(w.scheduledDate)}
+                            </p>
+                          </Link>
+
+                          {/* Right side */}
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span
+                              className={`text-[11px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wide ${badgeClass}`}
                             >
-                              <option value="SCHEDULED">Scheduled</option>
-                              <option value="COMPLETED">Completed</option>
-                              <option value="SKIPPED">Skipped</option>
-                            </select>
-                          )}
-                        </div>
-                      </li>
-                    ))}
+                              {w.status.replace("_", " ")}
+                            </span>
+                            <button
+                              onClick={() =>
+                                setActiveStatusId(
+                                  activeStatusId === w.id ? null : w.id,
+                                )
+                              }
+                              className="w-7 h-7 rounded-lg bg-surface2 flex items-center justify-center text-muted hover:text-foreground transition-colors"
+                            >
+                              <RotateCcw size={12} />
+                            </button>
+                            {activeStatusId === w.id && (
+                              <select
+                                onChange={(e) => {
+                                  handleChangeStatus(w.id, e.target.value);
+                                  setActiveStatusId(null);
+                                }}
+                                defaultValue={w.status}
+                                className="bg-background border border-surface2 rounded-xl px-3 py-1.5 text-sm text-foreground focus:border-lime-green/50 outline-none"
+                              >
+                                <option value="SCHEDULED">Scheduled</option>
+                                <option value="COMPLETED">Completed</option>
+                                <option value="SKIPPED">Skipped</option>
+                              </select>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               );
@@ -387,43 +429,42 @@ export default function ClientProfile({
           </div>
         )}
       </div>
-      {/* Additional Workouts */}
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Additional Activity
-        </h2>
 
+      {/* Additional Activity */}
+      <div className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-surface2">
+          <h2 className="font-syne font-bold text-base text-foreground">
+            Additional Activity
+          </h2>
+        </div>
         {client.additionalWorkouts.length === 0 ? (
-          <p className="text-gray-500 italic py-4">
+          <p className="text-muted italic text-sm px-5 py-8 text-center">
             No additional activity logged.
           </p>
         ) : (
-          <ul className="space-y-3 text-sm">
+          <ul className="divide-y divide-surface2">
             {client.additionalWorkouts.map((w) => (
               <li
                 key={w.id}
-                className="flex justify-between items-center border-b border-gray-100 pb-3 last:border-0 last:pb-0"
+                className="flex justify-between items-center px-5 py-3.5"
               >
                 <div className="space-y-0.5">
-                  <div className="font-medium text-gray-900">{w.type.name}</div>
-
-                  <div className="text-gray-500 text-xs">
+                  <p className="text-sm font-medium text-foreground">
+                    {w.type.name}
+                  </p>
+                  <p className="text-xs text-muted">
                     {w.duration
                       ? `${w.duration} min`
                       : "Duration not specified"}
-                    {w.distance != null && ` • ${w.distance} mi`}
-                  </div>
-
+                    {w.distance != null && ` · ${w.distance} mi`}
+                  </p>
                   {w.notes && (
-                    <div className="text-gray-500 italic py-4 text-xs">
-                      “{w.notes}”
-                    </div>
+                    <p className="text-xs text-muted italic">{w.notes}</p>
                   )}
                 </div>
-
-                <div className="text-gray-500 text-sm">
+                <span className="text-xs text-muted">
                   {formatDateFromInputReturnString(w.performedAt)}
-                </div>
+                </span>
               </li>
             ))}
           </ul>
@@ -431,26 +472,25 @@ export default function ClientProfile({
       </div>
 
       {/* Danger zone */}
-      <div className="border border-red-200 bg-red-50 rounded-xl p-6 space-y-3">
-        <h2 className="text-sm font-semibold text-red-800 uppercase tracking-wide">
+      <div className="border border-danger/20 bg-danger/5 rounded-2xl p-5 space-y-3">
+        <h2 className="text-[10px] font-semibold tracking-widest uppercase text-danger">
           Danger Zone
         </h2>
-
-        <p className="text-sm text-red-700">
+        <p className="text-sm text-muted">
           Deleting a client will permanently remove all workouts, metrics, and
           activity associated with this client.
         </p>
-
         <button
           onClick={handleDeleteClient}
           disabled={deleting}
-          className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-xl bg-danger/10 border border-danger/20 px-4 py-2.5 text-sm font-semibold text-danger hover:bg-danger/20 transition active:scale-[0.98] disabled:opacity-50"
         >
-          <Trash size={16} />
+          <Trash size={14} />
           {deleting ? "Deleting…" : "Delete Client"}
         </button>
       </div>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      {error && <p className="text-danger text-sm">{error}</p>}
     </div>
   );
 }

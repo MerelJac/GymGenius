@@ -54,7 +54,7 @@ export default async function TrainerHomePage() {
     .slice(0, 5);
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-8 max-w-4xl">
 
       {/* Page header */}
       <div>
@@ -66,13 +66,29 @@ export default async function TrainerHomePage() {
         </p>
       </div>
 
+      {/* Quick stats row */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="bg-surface border border-surface2 rounded-2xl px-4 py-4 space-y-1">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">Clients</p>
+          <p className="font-syne font-extrabold text-2xl text-foreground">{clients.length}</p>
+        </div>
+        <div className="bg-surface border border-surface2 rounded-2xl px-4 py-4 space-y-1">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">Missed</p>
+          <p className="font-syne font-extrabold text-2xl text-danger">{recentMissedWorkouts.length}</p>
+        </div>
+        <div className="bg-surface border border-surface2 rounded-2xl px-4 py-4 space-y-1">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">Completed</p>
+          <p className="font-syne font-extrabold text-2xl text-[#3dffa0]">{recentCompletedWorkouts.length}</p>
+        </div>
+      </div>
+
       {/* CLIENT PROGRESS */}
       <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-surface2">
-          <h2 className="font-syne font-bold text-base text-foreground">
-            Client Program Progress
-          </h2>
-          <span className="text-xs text-muted">{clients.length} clients</span>
+          <h2 className="font-syne font-bold text-base text-foreground">Client Program Progress</h2>
+          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-surface2 text-muted">
+            {clients.length} clients
+          </span>
         </div>
         <div className="divide-y divide-surface2">
           {clients.map((client) => (
@@ -88,30 +104,30 @@ export default async function TrainerHomePage() {
         </div>
       </section>
 
-      {/* MISSED + COMPLETED side by side on larger screens */}
-      <div className="grid md:grid-cols-2 gap-6">
+      {/* MISSED + COMPLETED */}
+      <div className="grid md:grid-cols-2 gap-4">
 
-        {/* MISSED WORKOUTS */}
+        {/* MISSED */}
         <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
-            <div className="w-2 h-2 rounded-full bg-danger flex-shrink-0" />
-            <h2 className="font-syne font-bold text-base text-foreground">Missed Workouts</h2>
+           
+            <h2 className="font-syne font-bold text-sm text-foreground">⚠️ Missed Workouts</h2>
           </div>
           {recentMissedWorkouts.length === 0 ? (
             <div className="px-5 py-8 text-center">
-              <p className="text-sm text-muted italic">No missed workouts 🎉</p>
+              <p className="text-sm text-muted">No missed workouts 🎉</p>
             </div>
           ) : (
             <ul className="divide-y divide-surface2">
               {recentMissedWorkouts.map((w) => (
-                <li key={w.id} className="flex items-start justify-between px-5 py-3.5">
+                <li
+                  key={w.id}
+                  className="flex items-start justify-between px-5 py-3.5 border-l-2 border-l-transparent hover:border-l-danger/50 hover:bg-surface2/40 transition-all duration-150"
+                >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
-                      {w.clientName}
-                    </p>
+                    <p className="text-sm font-medium text-foreground truncate">{w.clientName}</p>
                     <p className="text-xs text-muted mt-0.5 truncate">
-                      {w.workoutName}
-                      {w.programName && ` · ${w.programName}`}
+                      {w.workoutName}{w.programName && ` · ${w.programName}`}
                     </p>
                   </div>
                   <span className="text-[11px] text-muted flex-shrink-0 ml-3 mt-0.5">
@@ -123,15 +139,14 @@ export default async function TrainerHomePage() {
           )}
         </section>
 
-        {/* RECENTLY COMPLETED */}
+        {/* COMPLETED */}
         <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
-            <div className="w-2 h-2 rounded-full bg-[#3dffa0] flex-shrink-0" />
-            <h2 className="font-syne font-bold text-base text-foreground">Recently Completed</h2>
+            <h2 className="font-syne font-bold text-sm text-foreground">✅ Recently Completed</h2>
           </div>
           {recentCompletedWorkouts.length === 0 ? (
             <div className="px-5 py-8 text-center">
-              <p className="text-sm text-muted italic">No completed workouts yet.</p>
+              <p className="text-sm text-muted">No completed workouts yet.</p>
             </div>
           ) : (
             <ul className="divide-y divide-surface2">
@@ -139,15 +154,14 @@ export default async function TrainerHomePage() {
                 <li key={w.id}>
                   <Link
                     href={`/view-workouts/${w.id}`}
-                    className="flex items-start justify-between px-5 py-3.5 hover:bg-surface2 transition-colors"
+                    className="flex items-start justify-between px-5 py-3.5 border-l-2 border-l-transparent hover:border-l-[#3dffa0]/50 hover:bg-surface2/40 transition-all duration-150 group"
                   >
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
+                      <p className="text-sm font-medium text-foreground group-hover:text-[#3dffa0] transition-colors truncate">
                         {w.clientName}
                       </p>
                       <p className="text-xs text-muted mt-0.5 truncate">
-                        {w.workoutName}
-                        {w.programName && ` · ${w.programName}`}
+                        {w.workoutName}{w.programName && ` · ${w.programName}`}
                       </p>
                     </div>
                     <span className="text-[11px] text-muted flex-shrink-0 ml-3 mt-0.5">
