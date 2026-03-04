@@ -12,7 +12,13 @@ import {
 export type CalendarScheduledWorkout = {
   id: string;
   scheduledDate: string | Date;
-  status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED";
+  status:
+    | "SCHEDULED"
+    | "IN_PROGRESS"
+    | "COMPLETED"
+    | "SKIPPED"
+    | "READY_TO_BUILD"
+    | "BUILDING";
   workout: {
     id: string;
     name: string;
