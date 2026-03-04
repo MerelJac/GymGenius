@@ -241,6 +241,7 @@ function TodayWorkout({
   );
 }
 
+
 function UpcomingWorkouts({
   workouts,
 }: {
@@ -249,23 +250,47 @@ function UpcomingWorkouts({
   if (workouts.length === 0) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
-      <h2 className="section-title">Coming up</h2>
+    <div>
+      <div className="flex items-center justify-between px-5 py-3">
+        <h2 className="section-title">Coming Up</h2>
+        {/* <span className="text-xs text-muted">See all</span> */}
+      </div>
 
-      <ul className="text-sm space-y-2">
-        {workouts.map((w) => (
-          <li key={w.id} className="flex justify-between items-center">
-            <Link
-              href={`/workouts/${w.id}`}
-              className="text-gray-900 hover:underline"
-            >
-              {w.workout.name}
-            </Link>
-            <span className="text-gray-500">
-              {w.scheduledDate.toLocaleDateString()}
-            </span>
-          </li>
-        ))}
+      <ul className="feed">
+        {workouts.map((w) => {
+          const done = w.status === "COMPLETED";
+
+          return (
+            <li key={w.id}>
+              <Link
+                href={`/workouts/${w.id}`}
+                className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
+              >
+                {/* Icon */}
+                <div
+                  className={`feed-icon ${
+                    done ? "bg-mint/10" : "bg-danger/10"
+                  }`}
+                >
+                  {done ? "✅" : "⚠️"}
+                </div>
+
+                {/* Info */}
+                <div className="feed-info">
+                  <p className="feed-name">{w.workout.name}</p>
+                  <p className="feed-date">
+                    {w.scheduledDate.toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Status badge */}
+                <span className={`feed-status ${done ? "done" : "missed"}`}>
+                  {done ? "Done" : "Missed"}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -277,58 +302,98 @@ function OverdueWorkouts({
   workouts: ScheduledWorkoutDashboard[];
 }) {
   console.log("overdue workouts", workouts.slice(0, 2));
-
-  if (workouts.length === 0) return null;
-
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
-      <h2 className="font-semibold text-gray-900">Missed</h2>
+    <div>
+      <div className="flex items-center justify-between px-5 py-3">
+        <h2 className="section-title">Missed</h2>
+        {/* <span className="text-xs text-muted">See all</span> */}
+      </div>
 
-      <ul className="text-sm space-y-2">
-        {workouts.map((w) => (
-          <li key={w.id} className="flex justify-between items-center flex-row">
-            <Link
-              href={`/workouts/${w.id}`}
-              className="text-gray-900 hover:underline flex flex-row items-center gap-2"
-            >
-              {w.workout.name}
-              <ArrowRight size={10} />
-            </Link>
-            <span className="text-gray-500">
-              {w.scheduledDate.toLocaleDateString()}
-            </span>
-          </li>
-        ))}
+      <ul className="feed">
+        {workouts.map((w) => {
+          const done = w.status === "COMPLETED";
+
+          return (
+            <li key={w.id}>
+              <Link
+                href={`/workouts/${w.id}`}
+                className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
+              >
+                {/* Icon */}
+                <div
+                  className={`feed-icon ${
+                    done ? "bg-mint/10" : "bg-danger/10"
+                  }`}
+                >
+                  {done ? "✅" : "⚠️"}
+                </div>
+
+                {/* Info */}
+                <div className="feed-info">
+                  <p className="feed-name">{w.workout.name}</p>
+                  <p className="feed-date">
+                    {w.scheduledDate.toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Status badge */}
+                <span className={`feed-status ${done ? "done" : "missed"}`}>
+                  {done ? "Done" : "Missed"}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
 }
 
 function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
-  console.log("past workouts", workouts);
-
   if (workouts.length === 0) return null;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
-      <h2 className="font-semibold text-gray-900">Completed</h2>
+    <div>
+      <div className="flex items-center justify-between px-5 py-3">
+        <h2 className="section-title">Recent Activity</h2>
+        {/* <span className="text-xs text-muted">See all</span> */}
+      </div>
 
-      <ul className="text-sm space-y-2">
-        {workouts.map((w) => (
-          <li key={w.id} className="flex justify-between items-center flex-row">
-            <Link
-              href={`/workouts/${w.id}`}
-              className="text-gray-900 hover:underline flex flex-row items-center gap-2"
-            >
-              {w.workout.name}
-              <ArrowRight size={10} />
-            </Link>
+      <ul className="feed">
+        {workouts.map((w) => {
+          const done = w.status === "COMPLETED";
 
-            <span className="text-gray-500">
-              {w.scheduledDate.toLocaleDateString()}
-            </span>
-          </li>
-        ))}
+          return (
+            <li key={w.id}>
+              <Link
+                href={`/workouts/${w.id}`}
+                className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
+              >
+                {/* Icon */}
+                <div
+                  className={`feed-icon ${
+                    done ? "bg-mint/10" : "bg-danger/10"
+                  }`}
+                >
+                  {done ? "✅" : "⚠️"}
+                </div>
+
+                {/* Info */}
+                <div className="feed-info">
+                  <p className="feed-name">{w.workout.name}</p>
+                  <p className="feed-date">
+                    {w.scheduledDate.toLocaleDateString()}
+                  </p>
+                </div>
+
+                {/* Status badge */}
+                <span className={`feed-status ${done ? "done" : "missed"}`}>
+                  {done ? "Done" : "Missed"}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
