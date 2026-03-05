@@ -17,7 +17,7 @@ export function ClientDashboardStats({
       {streak > 0 && (
         <div className="stat-card streak-card">
           <div className="">
-            <span className="label">On-Plan Streak</span>
+            <span className="label-light">On-Plan Streak</span>
           </div>
 
           <div className="big-num">

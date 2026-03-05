@@ -189,8 +189,12 @@ function TodayWorkout({
 }) {
   if (!workout) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-xl p-6 text-sm text-green-800">
-        🎉 No workout scheduled for today — enjoy the rest day!
+      <div className="stat-card accent-card">
+        <div className="big-num">
+         Rest day!
+        </div>
+
+        <p className="text-sm text-gray-500 mt-1">No workouts scheduled today.</p>
       </div>
     );
   }

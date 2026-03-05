@@ -147,6 +147,7 @@ export default function ClientProfile({
         injuryNotes={client.profile?.injuryNotes}
         phone={client.profile?.phone}
         email={client.email}
+        role={client.role}
       />
 
       {/* Basic info */}
@@ -389,35 +390,41 @@ export default function ClientProfile({
                           </Link>
 
                           {/* Right side */}
+                          {/* Right side */}
                           <div className="flex items-center gap-2 flex-shrink-0">
                             <span
                               className={`text-[11px] font-semibold px-2.5 py-1 rounded-full uppercase tracking-wide ${badgeClass}`}
                             >
-                              {w.status.replace("_", " ")}
+                              {w.status.replace(/_/g, " ")}
                             </span>
-                            <button
-                              onClick={() =>
-                                setActiveStatusId(
-                                  activeStatusId === w.id ? null : w.id,
-                                )
-                              }
-                              className="w-7 h-7 rounded-lg bg-surface2 flex items-center justify-center text-muted hover:text-foreground transition-colors"
-                            >
-                              <RotateCcw size={12} />
-                            </button>
-                            {activeStatusId === w.id && (
+
+                            {activeStatusId === w.id ? (
                               <select
+                                autoFocus
                                 onChange={(e) => {
                                   handleChangeStatus(w.id, e.target.value);
                                   setActiveStatusId(null);
                                 }}
+                                onBlur={() => setActiveStatusId(null)}
                                 defaultValue={w.status}
-                                className="bg-background border border-surface2 rounded-xl px-3 py-1.5 text-sm text-foreground focus:border-lime-green/50 outline-none"
+                                className="bg-surface border border-lime-green/30 rounded-xl px-3 py-1.5 text-xs text-foreground focus:border-lime-green/50 outline-none transition"
                               >
                                 <option value="SCHEDULED">Scheduled</option>
                                 <option value="COMPLETED">Completed</option>
                                 <option value="SKIPPED">Skipped</option>
                               </select>
+                            ) : (
+                              <button
+                                onClick={() =>
+                                  setActiveStatusId(
+                                    activeStatusId === w.id ? null : w.id,
+                                  )
+                                }
+                                className="w-7 h-7 rounded-lg bg-surface2 flex items-center justify-center text-muted hover:text-lime-green hover:bg-lime-green/10 hover:border-lime-green/20 border border-transparent transition-all"
+                                title="Change status"
+                              >
+                                <RotateCcw size={11} />
+                              </button>
                             )}
                           </div>
                         </li>

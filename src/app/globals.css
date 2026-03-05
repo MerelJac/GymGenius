@@ -16,7 +16,8 @@
   --color-lime-green: var(--accent);
   --color-muted: var(--muted); /* ← add this */
   --color-danger: var(--orange);
-   --color-soft: var(--red);
+  --color-soft: var(--red);
+    --color-text: var(--text);  
 }
 
 @media (prefers-color-scheme: dark) {
@@ -422,6 +423,16 @@ body {
   color: var(--muted);
   margin-bottom: 10px;
 }
+
+.stat-card .label-light {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+
 .stat-card.accent-card .label {
   color: rgba(0, 0, 0, 0.5);
 }
@@ -769,9 +780,7 @@ body {
 }
 
 .gradient-bg {
-
   background: linear-gradient(135deg, #1a1a1e, #1e1e24);
-
 }
 .trainer-top {
   display: flex;

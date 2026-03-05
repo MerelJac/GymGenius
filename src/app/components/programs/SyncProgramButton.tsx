@@ -21,10 +21,7 @@ export function SyncProgramButton({
     setLoading(true);
     setAdded(null);
 
-    const result = await appendProgramWorkoutsToClient(
-      programId,
-      clientId,
-    );
+    const result = await appendProgramWorkoutsToClient(programId, clientId);
 
     if (result.ok) {
       setAdded(result.added);
@@ -35,28 +32,29 @@ export function SyncProgramButton({
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 justify-end">
       <button
         onClick={handleClick}
         disabled={loading}
-        className="
-          inline-flex items-center gap-2
-          px-4 py-2 text-sm font-medium
-          rounded-lg border border-gray-300
-          bg-white text-gray-700
-          hover:bg-gray-50
-          disabled:opacity-50
-        "
+        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-surface2 border border-surface2 hover:border-lime-green/30 hover:text-lime-green text-muted text-sm font-medium transition-all active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed"
+                                      title="Update with new workouts in the program."
       >
-        <RefreshCcw size={16} />
+        <RefreshCcw size={14} className={loading ? "animate-spin" : ""} />
         {loading ? "Syncing…" : "Add new workouts"}
+        
       </button>
 
       {added !== null && (
-        <span className="text-sm text-gray-500">
+        <span
+          className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+            added === 0
+              ? "text-muted bg-surface2"
+              : "text-[#3dffa0] bg-[#3dffa0]/10"
+          }`}
+        >
           {added === 0
-            ? "No new workouts to add"
-            : `${added} workout${added > 1 ? "s" : ""} added`}
+            ? "Nothing new"
+            : `+${added} workout${added > 1 ? "s" : ""}`}
         </span>
       )}
     </div>

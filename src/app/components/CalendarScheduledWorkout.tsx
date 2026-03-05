@@ -1,33 +1,20 @@
 "use client";
-
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { RescheduleWorkoutModal } from "./workout/RescheduleWorkoutModal";
-import {
-  formatDateFromInput,
-  normalizeDate,
-} from "../utils/format/formatDateFromInput";
+import { formatDateFromInput, normalizeDate } from "../utils/format/formatDateFromInput";
 
-// Minimal shape based on your existing schema
 export type CalendarScheduledWorkout = {
   id: string;
   scheduledDate: string | Date;
-  status:
-    | "SCHEDULED"
-    | "IN_PROGRESS"
-    | "COMPLETED"
-    | "SKIPPED"
-    | "READY_TO_BUILD"
-    | "BUILDING";
-  workout: {
-    id: string;
-    name: string;
-  };
+  status: "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED" | "READY_TO_BUILD" | "BUILDING";
+  workout: { id: string; name: string };
 };
+
 function startOfWeek(date: Date) {
   const d = new Date(date);
-  const day = d.getDay(); // 0 Sun - 6 Sat
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Monday start
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
   d.setDate(diff);
   d.setHours(0, 0, 0, 0);
   return d;
@@ -40,12 +27,19 @@ function addDays(date: Date, days: number) {
 }
 
 function sameDay(a: Date, b: Date) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
+  return a.getFullYear() === b.getFullYear() &&
     a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
+    a.getDate() === b.getDate();
 }
+
+const statusStyles: Record<string, { card: string; badge: string; label: string }> = {
+  COMPLETED:      { card: "bg-[#3dffa0]/5 border-[#3dffa0]/20",  badge: "text-[#3dffa0] bg-[#3dffa0]/10",  label: "Done" },
+  IN_PROGRESS:    { card: "bg-lime-green/5 border-lime-green/20", badge: "text-lime-green bg-lime-green/10", label: "Active" },
+  SKIPPED:        { card: "bg-danger/5 border-danger/20",         badge: "text-danger bg-danger/10",         label: "Skipped" },
+  SCHEDULED:      { card: "bg-surface2 border-surface2",          badge: "text-muted bg-surface2",           label: "Scheduled" },
+  READY_TO_BUILD: { card: "bg-surface2 border-surface2",          badge: "text-muted bg-surface2",           label: "Pending" },
+  BUILDING:       { card: "bg-surface2 border-surface2",          badge: "text-muted bg-surface2",           label: "Building" },
+};
 
 export default function WorkoutCalendarWeek({
   scheduledWorkouts,
@@ -59,102 +53,106 @@ export default function WorkoutCalendarWeek({
     return d;
   });
 
+  const today = useMemo(() => { const d = new Date(); d.setHours(0,0,0,0); return d; }, []);
   const weekStart = useMemo(() => startOfWeek(currentDate), [currentDate]);
-
-  const days = useMemo(() => {
-    return Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i));
-  }, [weekStart]);
-
-  const normalized = useMemo(() => {
-    return scheduledWorkouts.map((w) => ({
-      ...w,
-      scheduledDate: normalizeDate(w.scheduledDate),
-    }));
-  }, [scheduledWorkouts]);
+  const days = useMemo(() => Array.from({ length: 7 }).map((_, i) => addDays(weekStart, i)), [weekStart]);
+  const normalized = useMemo(() =>
+    scheduledWorkouts.map((w) => ({ ...w, scheduledDate: normalizeDate(w.scheduledDate) })),
+    [scheduledWorkouts]
+  );
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
+
       {/* Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b bg-gray-50">
-        <div className="font-semibold text-gray-900">
-          Week of {weekStart.toLocaleDateString()}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-surface2">
+        <div>
+          <p className="font-syne font-bold text-sm text-foreground">
+            Week of {weekStart.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
+          </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setCurrentDate((d) => addDays(d, -7))}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600"
+            className="w-8 h-8 rounded-xl bg-surface2 flex items-center justify-center text-muted hover:text-foreground transition-colors"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={15} />
           </button>
-
           <button
             onClick={() => setCurrentDate((d) => addDays(d, 7))}
-            className="p-2 rounded hover:bg-gray-200 text-gray-600"
+            className="w-8 h-8 rounded-xl bg-surface2 flex items-center justify-center text-muted hover:text-foreground transition-colors"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={15} />
           </button>
         </div>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-7 md:divide-x divide-gray-200">
-        {days.map((day) => {
-          const workoutsForDay = normalized.filter((w) =>
-            sameDay(w.scheduledDate as Date, day),
-          );
+      {/* Day columns */}
+      <div className="grid grid-cols-7">
+        {days.map((day, i) => {
+          const workoutsForDay = normalized.filter((w) => sameDay(w.scheduledDate as Date, day));
+          const isToday = sameDay(day, today);
+          const isWeekend = i >= 5;
 
           return (
-            <div key={day.toISOString()} className="min-h-[160px] p-3">
-              <div className="text-xs font-semibold text-gray-600 mb-2">
-                {day.toLocaleDateString(undefined, {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                })}
+            <div
+              key={day.toISOString()}
+              className={`min-h-[140px] p-2.5 border-r border-surface2 last:border-r-0 ${
+                isWeekend ? "bg-background/40" : ""
+              }`}
+            >
+              {/* Day label */}
+              <div className={`text-center mb-2 ${isToday ? "" : ""}`}>
+                <p className={`text-[10px] font-semibold uppercase tracking-widest ${
+                  isToday ? "text-lime-green" : "text-muted"
+                }`}>
+                  {day.toLocaleDateString(undefined, { weekday: "short" })}
+                </p>
+                <p className={`font-syne font-bold text-sm mt-0.5 ${
+                  isToday
+                    ? "text-lime-green bg-lime-green/10 w-6 h-6 rounded-full flex items-center justify-center mx-auto"
+                    : "text-foreground/60"
+                }`}>
+                  {day.getDate()}
+                </p>
               </div>
 
-              {workoutsForDay.length === 0 ? (
-                <div className="text-xs text-gray-400 italic">No workouts</div>
-              ) : (
-                <div className="space-y-2">
-                  {workoutsForDay.map((w) => (
-                    <div
-                      key={w.id}
-                      className={`rounded-lg px-2 py-1.5 text-xs border flex flex-col gap-0.5
-                        ${
-                          w.status === "COMPLETED"
-                            ? "bg-green-50 border-green-200 text-green-800"
-                            : w.status === "IN_PROGRESS"
-                              ? "bg-blue-50 border-blue-200 text-blue-800"
-                              : w.status === "SKIPPED"
-                                ? "bg-gray-100 border-gray-200 text-gray-500"
-                                : "bg-white border-gray-200 text-gray-800"
-                        }
-                      `}
-                    >
-                      <span className="font-medium truncate">
-                        {w.workout.name}
-                      </span>
-                      <span className="text-[10px] opacity-70">{w.status}</span>
-
-                      <button
-                        onClick={() => setRescheduleId(w.id)}
-                        className="text-xs text-blue-600 hover:underline"
+              {/* Workouts */}
+              <div className="space-y-1.5">
+                {workoutsForDay.length === 0 ? (
+                  <p className="text-[10px] text-muted/40 text-center mt-3">—</p>
+                ) : (
+                  workoutsForDay.map((w) => {
+                    const style = statusStyles[w.status] ?? statusStyles.SCHEDULED;
+                    return (
+                      <div
+                        key={w.id}
+                        className={`rounded-xl px-2 py-2 border flex flex-col gap-1 ${style.card}`}
                       >
-                        Reschedule
-                      </button>
-
-                      {rescheduleId === w.id && (
-                        <RescheduleWorkoutModal
-                          scheduledWorkoutId={w.id}
-                          currentDate={w.scheduledDate}
-                          onClose={() => setRescheduleId(null)}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+                        <span className="text-[11px] font-semibold text-foreground truncate leading-tight">
+                          {w.workout.name}
+                        </span>
+                        <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full self-start ${style.badge}`}>
+                          {style.label}
+                        </span>
+                        <button
+                          onClick={() => setRescheduleId(w.id)}
+                          className="text-[10px] text-muted hover:text-lime-green transition-colors text-left"
+                        >
+                          Reschedule →
+                        </button>
+                        {rescheduleId === w.id && (
+                          <RescheduleWorkoutModal
+                            scheduledWorkoutId={w.id}
+                            currentDate={w.scheduledDate}
+                            onClose={() => setRescheduleId(null)}
+                          />
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </div>
           );
         })}

@@ -23,13 +23,14 @@ export default function ClientProfileSection({
   const [isEditing, setIsEditing] = useState(false);
 
   const profile = user.profile;
+  const role = user.role;
   const fullName =
     [profile?.firstName, profile?.lastName].filter(Boolean).join(" ") || "—";
 
   return (
     <>
       {/* Profile Card */}
-      <section className="mx-5 mb-4 bg-muted border border-surface2 rounded-2xl overflow-hidden">
+      <section className="mx-5 mb-4  bg-surface border border-surface2 rounded-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-surface2">
           <div className="flex items-center gap-3">
@@ -118,7 +119,7 @@ export default function ClientProfileSection({
                 <p className="text-[10px] font-semibold tracking-widest uppercase text-danger/80 mb-0.5">
                   Injuries / Limitations
                 </p>
-                <p className="text-sm text-muted/80">{profile.injuryNotes}</p>
+                <p className="text-sm text-muted/80 ">{profile.injuryNotes}</p>
               </div>
             </div>
           )}
@@ -171,6 +172,7 @@ export default function ClientProfileSection({
               phone={profile?.phone}
               email={user.email}
               onSave={() => setIsEditing(false)}
+              role={role}
             />
           </div>
         </div>

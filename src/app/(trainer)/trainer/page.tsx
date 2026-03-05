@@ -2,8 +2,9 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { ClientProgramProgress } from "@/app/components/ClientProgramProgress";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
+import { TrainerStats } from "./profile/components/TrainerStats";
 
 export default async function TrainerHomePage() {
   const session = await getServerSession(authOptions);
@@ -53,10 +54,25 @@ export default async function TrainerHomePage() {
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .slice(0, 5);
 
-    
+  const trainer = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: {
+      profile: true,
+      clients: {
+        include: {
+          profile: true,
+          scheduledWorkouts: {
+            select: { status: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!trainer) return notFound();
+
   return (
     <div className="space-y-8 max-w-4xl">
-
       {/* Page header */}
       <div>
         <h1 className="font-syne font-extrabold text-3xl text-foreground tracking-tight">
@@ -68,25 +84,15 @@ export default async function TrainerHomePage() {
       </div>
 
       {/* Quick stats row */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="bg-surface border border-surface2 rounded-2xl px-4 py-4 space-y-1">
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">Clients</p>
-          <p className="font-syne font-extrabold text-2xl text-foreground">{clients.length}</p>
-        </div>
-        <div className="bg-surface border border-surface2 rounded-2xl px-4 py-4 space-y-1">
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">Missed</p>
-          <p className="font-syne font-extrabold text-2xl text-danger">{recentMissedWorkouts.length}</p>
-        </div>
-        <div className="bg-surface border border-surface2 rounded-2xl px-4 py-4 space-y-1">
-          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">Completed</p>
-          <p className="font-syne font-extrabold text-2xl text-[#3dffa0]">{recentCompletedWorkouts.length}</p>
-        </div>
-      </div>
+
+      <TrainerStats trainer={trainer} />
 
       {/* CLIENT PROGRESS */}
       <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-surface2">
-          <h2 className="font-syne font-bold text-base text-foreground">Client Program Progress</h2>
+          <h2 className="font-syne font-bold text-base text-foreground">
+            Client Program Progress
+          </h2>
           <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-surface2 text-muted">
             {clients.length} clients
           </span>
@@ -99,7 +105,9 @@ export default async function TrainerHomePage() {
           ))}
           {clients.length === 0 && (
             <div className="px-5 py-10 text-center">
-              <p className="text-sm text-muted italic">No clients assigned yet.</p>
+              <p className="text-sm text-muted italic">
+                No clients assigned yet.
+              </p>
             </div>
           )}
         </div>
@@ -107,12 +115,12 @@ export default async function TrainerHomePage() {
 
       {/* MISSED + COMPLETED */}
       <div className="grid md:grid-cols-2 gap-4">
-
         {/* MISSED */}
         <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
-           
-            <h2 className="font-syne font-bold text-sm text-foreground">⚠️ Missed Workouts</h2>
+            <h2 className="font-syne font-bold text-sm text-foreground">
+              ⚠️ Missed Workouts
+            </h2>
           </div>
           {recentMissedWorkouts.length === 0 ? (
             <div className="px-5 py-8 text-center">
@@ -126,9 +134,12 @@ export default async function TrainerHomePage() {
                   className="flex items-start justify-between px-5 py-3.5 border-l-2 border-l-transparent hover:border-l-danger/50 hover:bg-surface2/40 transition-all duration-150"
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{w.clientName}</p>
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {w.clientName}
+                    </p>
                     <p className="text-xs text-muted mt-0.5 truncate">
-                      {w.workoutName}{w.programName && ` · ${w.programName}`}
+                      {w.workoutName}
+                      {w.programName && ` · ${w.programName}`}
                     </p>
                   </div>
                   <span className="text-[11px] text-muted flex-shrink-0 ml-3 mt-0.5">
@@ -143,7 +154,9 @@ export default async function TrainerHomePage() {
         {/* COMPLETED */}
         <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
-            <h2 className="font-syne font-bold text-sm text-foreground">✅ Recently Completed</h2>
+            <h2 className="font-syne font-bold text-sm text-foreground">
+              ✅ Recently Completed
+            </h2>
           </div>
           {recentCompletedWorkouts.length === 0 ? (
             <div className="px-5 py-8 text-center">
@@ -162,7 +175,8 @@ export default async function TrainerHomePage() {
                         {w.clientName}
                       </p>
                       <p className="text-xs text-muted mt-0.5 truncate">
-                        {w.workoutName}{w.programName && ` · ${w.programName}`}
+                        {w.workoutName}
+                        {w.programName && ` · ${w.programName}`}
                       </p>
                     </div>
                     <span className="text-[11px] text-muted flex-shrink-0 ml-3 mt-0.5">
@@ -174,7 +188,6 @@ export default async function TrainerHomePage() {
             </ul>
           )}
         </section>
-
       </div>
     </div>
   );
