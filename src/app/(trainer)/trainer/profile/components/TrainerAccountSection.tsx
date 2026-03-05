@@ -3,6 +3,7 @@
 import { useState, startTransition } from "react";
 import { Pencil, X } from "lucide-react";
 import { updateTrainerProfile } from "../actions";
+import { createPortal } from "react-dom";
 
 type TrainerAccountSectionProps = {
   firstName?: string | null;
@@ -50,115 +51,129 @@ export function TrainerAccountSection({
   return (
     <>
       {/* ACCOUNT INFO CARD */}
-      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Account Info</h2>
-
+      {/* ACCOUNT INFO CARD */}
+      <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-surface2">
+          <h2 className="font-syne font-bold text-base text-foreground">
+            Account Info
+          </h2>
           <button
             onClick={() => setIsEditing(true)}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface2 border border-transparent hover:border-lime-green/30 hover:text-lime-green text-muted text-xs font-semibold transition-all active:scale-[0.97]"
           >
-            <Pencil size={14} />
+            <Pencil size={12} />
             Edit
           </button>
         </div>
 
-        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
-          <div>
-            <dt className="text-gray-500 font-medium">Name</dt>
-            <dd className="mt-1 text-gray-900">
+        <dl className="grid grid-cols-1 sm:grid-cols-2 divide-y sm:divide-y-0 sm:divide-x divide-surface2">
+          <div className="px-5 py-4 space-y-0.5">
+            <dt className="text-[10px] font-semibold tracking-widest uppercase text-muted">
+              Name
+            </dt>
+            <dd className="font-syne font-bold text-sm text-foreground mt-1">
               {initialFirstName ?? "—"} {initialLastName ?? ""}
             </dd>
           </div>
-
-          <div>
-            <dt className="text-gray-500 font-medium">Email</dt>
-            <dd className="mt-1 text-gray-900">{email}</dd>
+          <div className="px-5 py-4 space-y-0.5">
+            <dt className="text-[10px] font-semibold tracking-widest uppercase text-muted">
+              Email
+            </dt>
+            <dd className="font-syne font-bold text-sm text-foreground mt-1">
+              {email}
+            </dd>
           </div>
         </dl>
       </section>
 
       {/* EDIT MODAL */}
-      {isEditing && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 relative">
-            <button
+      {isEditing &&
+        createPortal(
+          <>
+            <div
+              className="fixed inset-0 z-40 gradient-bg backdrop-blur-sm"
               onClick={() => setIsEditing(false)}
-              className="absolute top-3 right-3 p-1 rounded hover:bg-gray-100"
-            >
-              <X size={18} />
-            </button>
+            />
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-5 pointer-events-none">
+              <div className="bg-surface border border-surface2 rounded-2xl w-full max-w-md pointer-events-auto overflow-hidden">
+                {/* Modal header */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-surface2">
+                  <h3 className="font-syne font-bold text-base text-foreground">
+                    Edit Account Info
+                  </h3>
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="w-8 h-8 rounded-xl bg-surface2 flex items-center justify-center text-muted hover:text-foreground transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
 
-            <h3 className="text-lg font-semibold mb-4">Edit Account Info</h3>
+                {/* Fields */}
+                <div className="p-5 space-y-4">
+                  {[
+                    {
+                      label: "First Name",
+                      value: firstName,
+                      onChange: setFirstName,
+                      type: "text",
+                    },
+                    {
+                      label: "Last Name",
+                      value: lastName,
+                      onChange: setLastName,
+                      type: "text",
+                    },
+                    {
+                      label: "Email",
+                      value: email,
+                      onChange: setEmail,
+                      type: "email",
+                    },
+                    {
+                      label: "Phone",
+                      value: phone,
+                      onChange: setPhone,
+                      type: "tel",
+                    },
+                  ].map(({ label, value, onChange, type }) => (
+                    <div key={label}>
+                      <label className="block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5">
+                        {label}
+                      </label>
+                      <input
+                        type={type}
+                        value={value}
+                        onChange={(e) => onChange(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-background border border-surface2 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition"
+                      />
+                    </div>
+                  ))}
+                </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  First Name
-                </label>
-                <input
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full rounded-lg border px-3 py-2 text-base"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name
-                </label>
-                <input
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className="w-full rounded-lg border px-3 py-2 text-base"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  value={email}
-                  type="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-lg border px-3 py-2 text-base"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
-                </label>
-                <input
-                  value={phone}
-                  type="phone"
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full rounded-lg border px-3 py-2 text-base"
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <button
-                  onClick={() => setIsEditing(false)}
-                  className="px-4 py-2 rounded-lg border text-sm"
-                >
-                  Cancel
-                </button>
-
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm disabled:opacity-50"
-                >
-                  {saving ? "Saving…" : "Save"}
-                </button>
+                {/* Actions */}
+                <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-surface2">
+                  <button
+                    onClick={() => setIsEditing(false)}
+                    className="px-4 py-2 rounded-xl bg-surface2 text-muted text-sm font-medium hover:text-foreground transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="px-4 py-2 rounded-xl bg-lime-green text-black font-syne font-bold text-sm hover:opacity-90 active:scale-[0.98] transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {saving ? "Saving…" : "Save changes"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+          </>,
+          document.body,
+        )}
+
+      {error && <p className="text-danger text-sm">{error}</p>}
     </>
   );
 }

@@ -167,8 +167,8 @@ export default function ProgramBuilder({
     <div className="space-y-8 pb-12">
       {/* Header & Program Name */}
       <BackButton route="/programs" />
-      <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-6 py-5 border-b bg-gray-50/70">
+      <div className="program-header">
+ <div>
           <div className="flex items-start justify-between gap-6 flex-wrap flex-col">
             <div className="flex-1 min-w-[300px]">
               {editingName ? (
@@ -182,7 +182,7 @@ export default function ProgramBuilder({
                 />
               ) : (
                 <h1
-                  className="nav-logo cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
+                  className="program-name"
                   onClick={() => setEditingName(true)}
                 >
                   {programName}
@@ -199,12 +199,12 @@ export default function ProgramBuilder({
                   onChange={(e) => setProgramNote(e.target.value)}
                   onBlur={saveProgramNote}
                   onKeyDown={(e) => e.key === "Enter" && saveProgramNote()}
-                  className="w-full px-4 py-2.5 text-xs border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-base"
+                  className="program-desc"
                   autoFocus
                 />
               ) : (
                 <p
-                  className="text-xs text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-3 group"
+                  className="text-xs text-gray-900 cursor-pointer hover:text-foreground-700 transition-colors flex items-center gap-3 group"
                   onClick={() => setEditingNote(true)}
                 >
                   {programNote || "Add program notes"}
@@ -219,17 +219,15 @@ export default function ProgramBuilder({
         </div>
 
         {/* Assignment Area */}
-        <div className="px-6 py-5 border-b">
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="min-w-[240px] flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Assign to Client
-              </label>
+        <div >
+          <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-end">
+            <div className="field-group">
+              <label className="field-label">Assign to Client</label>
               <div className="relative">
                 <select
                   value={clientId}
                   onChange={(e) => setClientId(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 appearance-none"
+                  className="field-input"
                 >
                   <option value="">Select a client…</option>
                   {clients.map((c) => (
@@ -245,16 +243,14 @@ export default function ProgramBuilder({
               </div>
             </div>
 
-            <div className="min-w-[180px]">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Start Date
-              </label>
+           <div className="field-group">
+              <label className="field-label">Start Date</label>
               <div className="relative">
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                  className="field-input"
                 />
               </div>
             </div>
@@ -262,7 +258,7 @@ export default function ProgramBuilder({
             <button
               onClick={handleAssign}
               disabled={!clientId || !startDate}
-              className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="btn-assign"
             >
               Assign Program
             </button>
@@ -271,16 +267,13 @@ export default function ProgramBuilder({
 
         {/* Assigned Clients Progress */}
         {clientsAssignedProgram.length > 0 && (
-          <div className="px-6 py-5 border-b last:border-b-0">
-            <h3 className="text-sm font-semibold text-gray-700 mb-4">
-              Assigned Clients
-            </h3>
-            <p className="text-xs text-gray-500 mb-4 max-w-2xl">
-              <span className="font-medium text-gray-600">Note:</span> Changes
-              to existing workouts (exercises, sets, reps, notes) will
-              automatically update for assigned clients. Adding new workouts to
-              a program requires a manual sync from the client’s page.
-            </p>
+          <div className="assigned-section">
+            <h3 className="assigned-label">Assigned Clients</h3>
+            <div className="note-bar">
+              <strong>Note:</strong> Changes to exercises, sets, reps, and notes
+              update automatically for assigned clients. Adding new workouts
+              requires a manual sync from the client&apos;s page.
+            </div>
             <div className="space-y-4">
               {clientsAssignedProgram.map((client) => (
                 <ClientProgramProgress key={client.id} client={client} />
@@ -293,7 +286,7 @@ export default function ProgramBuilder({
       {/* Workouts Section */}
       <div className="space-y-5">
         <div className="flex items-center justify-between flex-col md:flex-row">
-          <h2 className="text-xl font-semibold text-gray-900">Workouts</h2>
+          <h2 className="workouts-title">Workouts</h2>
           <div className=" flex flex-row gap-2">
             <ExerciseQuickAdd
               onCreated={(exercise) => {
@@ -304,10 +297,7 @@ export default function ProgramBuilder({
                 });
               }}
             />
-            <button
-              onClick={handleAddWorkout}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition"
-            >
+            <button onClick={handleAddWorkout} className="btn-secondary">
               <Plus size={18} />
               Add Workout
             </button>
@@ -319,10 +309,7 @@ export default function ProgramBuilder({
             <p className="text-gray-600 mb-4">
               No workouts in this program yet
             </p>
-            <button
-              onClick={handleAddWorkout}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
+            <button onClick={handleAddWorkout} className="btn-secondary">
               <Plus size={18} />
               Create your first workout
             </button>
@@ -343,6 +330,24 @@ export default function ProgramBuilder({
         )}
       </div>
       {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      <div className="flex items-center justify-end flex-col md:flex-row">
+        <div className=" flex flex-row  justify-end gap-2">
+          <ExerciseQuickAdd
+            onCreated={(exercise) => {
+              setExerciseList((prev) => {
+                // prevent duplicates just in case
+                if (prev.some((e) => e.id === exercise.id)) return prev;
+                return [...prev, exercise];
+              });
+            }}
+          />
+          <button onClick={handleAddWorkout} className="btn-secondary">
+            <Plus size={18} />
+            Add Workout
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

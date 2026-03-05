@@ -37,12 +37,11 @@ export default async function TrainerProfilePage() {
     orderBy: { createdAt: "desc" },
   });
 
-
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
       <div className="space-y-1">
-        <h1 className="text-3xl font-bold text-gray-900">Trainer Profile</h1>
+        <h1 className="nav-logo">Trainer Profile</h1>
         <p className="text-sm text-gray-500">
           Your account details and clients
         </p>
@@ -65,13 +64,13 @@ export default async function TrainerProfilePage() {
         phone={trainer.profile?.phone}
       />
       {/* Clients */}
-      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Clients</h2>
+      <section className="border border-gray-200 rounded-xl shadow-sm p-6 gradient-bg">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="nav-logo">Clients</h1>
         </div>
 
         {trainer.clients.length === 0 ? (
-          <p className="text-sm text-gray-500 italic">
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
             No clients assigned yet.
           </p>
         ) : (
@@ -79,10 +78,12 @@ export default async function TrainerProfilePage() {
             {trainer.clients.map((client) => (
               <li
                 key={client.id}
-                className="py-3 flex items-center justify-between"
+                className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 
+        hover:bg-surface2/50 hover:pl-6 transition-all duration-150 group
+        border-l-2 border-l-transparent hover:border-l-lime-green/50"
               >
                 <div>
-                  <div className="font-medium text-gray-900">
+                  <div className="font-syne font-bold text-sm text-foreground truncate group-hover:text-lime-green transition-colors">
                     {client.profile?.firstName ?? "Unnamed"}{" "}
                     {client.profile?.lastName ?? "Client"}
                   </div>
@@ -91,7 +92,7 @@ export default async function TrainerProfilePage() {
 
                 <Link
                   href={`/clients/${client.id}`}
-                  className="text-sm font-medium text-blue-600 hover:underline"
+                  className="px-4 py-2 rounded-xl bg-surface2 border border-white/10 text-foreground text-xs font-semibold hover:border-lime-green/30 hover:text-lime-green transition-all active:scale-[0.97]"
                 >
                   View
                 </Link>
@@ -102,23 +103,32 @@ export default async function TrainerProfilePage() {
       </section>
 
       {/* Plan & Billing */}
-      <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <h3 className="font-semibold text-gray-900">Plan & Billing</h3>
+      <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-surface2">
+          <h3 className="font-syne font-bold text-base text-foreground">
+            Plan & Billing
+          </h3>
+        </div>
 
-        <div className="text-sm text-gray-600">
-          <div className="flex justify-between">
-            <span>Current Plan</span>
-            <span className="font-medium">Trainer (Beta)</span>
+        <div className="px-5 py-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted">Current Plan</span>
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-lime-green/10 text-lime-green">
+              Trainer (Beta)
+            </span>
           </div>
-
-          <div className="flex justify-between">
-            <span>Status</span>
-            <span className="text-green-600 font-medium">Active</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-muted">Status</span>
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#3dffa0]/10 text-[#3dffa0]">
+              Active
+            </span>
           </div>
         </div>
 
-        <div className="pt-3 text-sm text-gray-500 italic">
-          Billing controls coming soon.
+        <div className="px-5 py-3 border-t border-surface2 bg-surface2/30">
+          <p className="text-xs text-muted italic">
+            Billing controls coming soon.
+          </p>
         </div>
       </section>
 
@@ -156,18 +166,20 @@ export default async function TrainerProfilePage() {
       )}
 
       {/* Danger Zone */}
-      <section className="border border-red-200 bg-red-50 rounded-xl p-6 space-y-3">
-        <h3 className="font-semibold text-red-700">Danger Zone</h3>
+      <div className="border border-danger/20 bg-danger/5 rounded-2xl p-5 space-y-3">
+        <h2 className="text-[10px] font-semibold tracking-widest uppercase text-danger">
+          Danger Zone
+        </h2>
 
-        <p className="text-sm text-red-600">These actions are irreversible.</p>
+        <p className="text-sm text-muted">These actions are irreversible.</p>
 
         <button
           disabled
-          className="px-4 py-2 rounded-lg bg-red-600 text-white text-sm opacity-50 cursor-not-allowed"
+          className="inline-flex items-center gap-2 rounded-xl bg-danger/10 border border-danger/20 px-4 py-2.5 text-sm font-semibold text-danger hover:bg-danger/20 transition active:scale-[0.98] disabled:opacity-50"
         >
           Delete Trainer Account (Coming Soon)
         </button>
-      </section>
+      </div>
     </div>
   );
 }

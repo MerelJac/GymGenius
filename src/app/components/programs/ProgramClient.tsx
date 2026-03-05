@@ -99,9 +99,9 @@ export default function ProgramsPageClient({
                   {program.name}
                 </div>
                 {/* Optional: show more info if you have it */}
-                {/* <div className="text-sm text-gray-500 mt-0.5">
-                  {program.workouts?.length || 0} workouts • Last edited ...
-                </div> */}
+                <div className="text-sm text-gray-500 mt-0.5">
+                  {program.notes}
+                </div>
               </Link>
 
               <div className="flex items-center gap-3 opacity-70 group-hover:opacity-100 transition-opacity">

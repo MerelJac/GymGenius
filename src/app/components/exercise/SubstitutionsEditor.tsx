@@ -1,5 +1,4 @@
 "use client";
-
 import {
   addSubstitution,
   removeSubstitution,
@@ -7,9 +6,13 @@ import {
 import { Exercise, ExerciseSubstitution } from "@prisma/client";
 import { useState } from "react";
 import { ExerciseSearch } from "../workout/ExerciseSearch";
+import { ArrowLeftRight, Plus, X } from "lucide-react";
+
+const inputCls = "w-full px-4 py-2.5 bg-background border border-surface2 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
+const labelCls = "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
 
 export default function SubstitutionsEditor({
-  exercise
+  exercise,
 }: {
   exercise: Exercise & {
     substitutionsFrom: (ExerciseSubstitution & {
@@ -18,161 +21,141 @@ export default function SubstitutionsEditor({
   };
 }) {
   const EMPTY_EXERCISE: Exercise = {
-    id: "",
-    name: "",
-    type: "STRENGTH",
-    equipment: null,
-    muscleGroup: null,
-    videoUrl: null,
-    notes: null,
-    trainerId: null,
+    id: "", name: "", type: "STRENGTH",
+    equipment: null, muscleGroup: null, videoUrl: null, notes: null, trainerId: null,
   };
 
   const [showSearch, setShowSearch] = useState(false);
-  const [selectedExercise, setSelectedExercise] =
-    useState<Exercise>(EMPTY_EXERCISE);
+  const [selectedExercise, setSelectedExercise] = useState<Exercise>(EMPTY_EXERCISE);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">Substitutions</h2>
+    <div className="bg-surface border border-surface2 rounded-2xl">
 
-      {/* Existing substitutions */}
-      {exercise.substitutionsFrom.length > 0 ? (
-        <div className="space-y-4">
-          {exercise.substitutionsFrom.map((sub) => (
-            <div
-              key={sub.id}
-              className="border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <div>
-                  <div className="font-medium text-gray-900">
-                    {sub.substituteExercise.name}
+      {/* Header */}
+      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
+        <div className="w-8 h-8 rounded-xl bg-lime-green/10 flex items-center justify-center">
+          <ArrowLeftRight size={14} className="text-lime-green" />
+        </div>
+        <h2 className="font-syne font-bold text-base text-foreground">Substitutions</h2>
+      </div>
+
+      <div className="p-5 space-y-5">
+
+        {/* Existing substitutions */}
+        {exercise.substitutionsFrom.length === 0 ? (
+          <p className="text-sm text-muted italic text-center py-4">No substitutions added yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {exercise.substitutionsFrom.map((sub) => (
+              <li
+                key={sub.id}
+                className="flex items-start justify-between gap-4 bg-background border border-surface2 rounded-xl px-4 py-3"
+              >
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-lime-green mt-2 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {sub.substituteExercise.name}
+                    </p>
+                    {sub.note && (
+                      <p className="text-xs text-muted mt-0.5">{sub.note}</p>
+                    )}
                   </div>
-                  {sub.note && (
-                    <div className="text-sm text-gray-600 mt-1">{sub.note}</div>
-                  )}
                 </div>
-
-                <form action={removeSubstitution} className="mt-2 sm:mt-0">
+                <form action={removeSubstitution}>
                   <input type="hidden" name="id" value={sub.id} />
                   <input type="hidden" name="exerciseId" value={exercise.id} />
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md border border-red-200 transition focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                    className="w-7 h-7 rounded-lg bg-danger/10 flex items-center justify-center text-danger hover:bg-danger/20 transition flex-shrink-0"
                   >
-                    Remove
+                    <X size={12} />
                   </button>
                 </form>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-gray-500 italic py-4">No substitutions added yet.</p>
-      )}
+              </li>
+            ))}
+          </ul>
+        )}
 
-      {/* Add new substitution */}
-      <div className="border-t pt-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Add Substitution
-        </h3>
+        {/* Divider */}
+        <div className="border-t border-surface2" />
 
-        <form action={addSubstitution} className="space-y-5">
-          <input type="hidden" name="exerciseId" value={exercise.id} />
+        {/* Add new substitution */}
+        <div className="space-y-4">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">
+            Add Substitution
+          </p>
 
-          <div className="relative">
-            <label
-              htmlFor="substituteId"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
-            >
-              Substitute Exercise
-            </label>
+          <form action={addSubstitution} className="space-y-4">
+            <input type="hidden" name="exerciseId" value={exercise.id} />
 
-            {/* Hidden value sent to server */}
-            <input
-              type="hidden"
-              name="substituteId"
-              value={selectedExercise?.id ?? ""}
-              required
-            />
+            <div className="relative">
+              <label className={labelCls}>Substitute Exercise</label>
+              <input type="hidden" name="substituteId" value={selectedExercise?.id ?? ""} required />
 
-            {/* Trigger */}
-            {!selectedExercise.id ? (
-              <button
-                type="button"
-                onClick={() => setShowSearch(true)}
-                className="w-full flex justify-between items-center px-4 py-2.5 border border-gray-300 rounded-lg bg-white hover:border-blue-500 transition"
-              >
-                <span className="text-gray-500">Search for an exercise…</span>
-                <span className="text-sm text-blue-600">Browse</span>
-              </button>
-            ) : (
-              <div className="flex justify-between items-center px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50">
-                <div>
-                  <div className="font-medium">{selectedExercise.name}</div>
-                  <div className="text-xs text-gray-500">
-                    {selectedExercise.type} • {selectedExercise.muscleGroup}
-                  </div>
-                </div>
+              {!selectedExercise.id ? (
                 <button
                   type="button"
-                  onClick={() => setSelectedExercise(EMPTY_EXERCISE)}
-                  className="text-sm text-red-600 hover:underline"
+                  onClick={() => setShowSearch(true)}
+                  className="w-full flex justify-between items-center px-4 py-2.5 bg-background border border-surface2 rounded-xl hover:border-lime-green/30 transition text-left"
                 >
-                  Change
+                  <span className="text-sm text-muted">Search for an exercise…</span>
+                  <span className="text-xs font-semibold text-lime-green">Browse →</span>
                 </button>
-              </div>
-            )}
+              ) : (
+                <div className="flex justify-between items-center px-4 py-3 bg-lime-green/5 border border-lime-green/20 rounded-xl">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{selectedExercise.name}</p>
+                    <p className="text-xs text-muted mt-0.5">
+                      {selectedExercise.type}{selectedExercise.muscleGroup && ` · ${selectedExercise.muscleGroup}`}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedExercise(EMPTY_EXERCISE)}
+                    className="text-xs font-semibold text-danger hover:opacity-80 transition"
+                  >
+                    Change
+                  </button>
+                </div>
+              )}
 
-            {/* Search dropdown */}
-            {showSearch && (
-              <div className="absolute z-50 mt-2 w-full bg-white border rounded-md shadow-lg p-4">
-                <ExerciseSearch
-                  onSelect={(ex) => {
-                    if (ex.id === exercise.id) return; // prevent self-substitution
+              {showSearch && (
+                <div className="absolute z-50 mt-2 w-full bg-black border border-surface2 rounded-2xl shadow-xl p-4">
+                  <ExerciseSearch
+                    onSelect={(ex) => {
+                      if (ex.id === exercise.id) return;
+                      setSelectedExercise({
+                        id: ex.id, name: ex.name, type: ex.type,
+                        equipment: ex.equipment ?? null, muscleGroup: ex.muscleGroup ?? null,
+                        videoUrl: ex.videoUrl ?? null, notes: ex.notes ?? null, trainerId: ex.trainerId ?? null,
+                      });
+                      setShowSearch(false);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
 
-                    setSelectedExercise({
-                      id: ex.id,
-                      name: ex.name,
-                      type: ex.type,
-                      equipment: ex.equipment ?? null,
-                      muscleGroup: ex.muscleGroup ?? null,
-                      videoUrl: ex.videoUrl ?? null,
-                      notes: ex.notes ?? null,
-                      trainerId: ex.trainerId ?? null,
-                    });
+            {/* <div>
+              <label className={labelCls}>Note <span className="normal-case tracking-normal font-normal">(optional)</span></label>
+              <textarea
+                id="note" name="note"
+                placeholder="e.g. Use dumbbells if no barbell available"
+                className={`${inputCls} resize-y`}
+                rows={3}
+              />
+            </div> */}
 
-                    setShowSearch(false);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-
-          <div>
-            <label
-              htmlFor="note"
-              className="block text-sm font-medium text-gray-700 mb-1.5"
+            <button
+              type="submit"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-lime-green text-black font-syne font-bold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition"
             >
-              Note (optional)
-            </label>
-            <textarea
-              id="note"
-              name="note"
-              placeholder="e.g. Use dumbbells if no barbell available"
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition shadow-sm resize-y"
-              rows={3}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full sm:w-auto px-6 py-2.5 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition shadow-sm"
-          >
-            Add Substitution
-          </button>
-        </form>
+              <Plus size={14} />
+              Add Substitution
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

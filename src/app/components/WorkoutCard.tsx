@@ -53,6 +53,11 @@ export default function WorkoutCard({
   onDelete: () => void;
   onDuplicate: () => void;
 }) {
+  const inputCls =
+    "w-full px-3 py-2 bg-background border border-surface2 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
+  const labelCls =
+    "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
+
   const router = useRouter();
   const [exerciseId, setExerciseId] = useState(exercises[0]?.id || "");
   const [showSearch, setShowSearch] = useState(false);
@@ -591,17 +596,12 @@ export default function WorkoutCard({
   }
 
   return (
-    <div className="bg-white border border-blue-200 rounded-xl shadow-sm overflow-hidden">
+    <div className="workout-block">
       {/* Header Bar */}
-      <div className="px-5 py-4 border-b bg-gray-50/70 flex flex-wrap items-center justify-between gap-4">
+      <div className="workout-block-header">
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="
-    inline-flex items-center gap-1.5
-    text-sm text-gray-600
-    hover:text-gray-900
-    transition
-  "
+          className="collapse-btn"
           title={collapsed ? "Expand workout" : "Collapse workout"}
         >
           <ChevronDown
@@ -621,20 +621,23 @@ export default function WorkoutCard({
             />
           ) : (
             <h2
-              className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-2 group"
+              className="workout-block-name flex items-center gap-2 cursor-pointer group"
               onClick={() => setEditing(true)}
             >
               {name}
-              <Pencil size={16} className="opacity-0 group-hover:opacity-60" />
+              <Pencil
+                size={13}
+                className="text-muted group-hover:text-lime-green transition-colors opacity-0 group-hover:opacity-100"
+              />
             </h2>
           )}
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="workout-block-actions">
           <select
             value={day}
             onChange={(e) => saveDay(e.target.value as WorkoutDay)}
-            className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="section-tag"
           >
             <option value="MONDAY">Mon</option>
             <option value="TUESDAY">Tue</option>
@@ -646,16 +649,10 @@ export default function WorkoutCard({
           </select>
 
           <div className="flex gap-3 text-sm">
-            <button
-              onClick={onDuplicate}
-              className="inline-flex items-center gap-1.5 text-gray-700 hover:text-blue-700 transition"
-            >
+            <button onClick={onDuplicate} className="wba-btn wba-duplicate">
               <Copy size={16} /> Duplicate
             </button>
-            <button
-              onClick={onDelete}
-              className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 transition"
-            >
+            <button onClick={onDelete} className="wba-btn wba-delete">
               <Trash2 size={16} /> Delete
             </button>
           </div>
@@ -674,10 +671,10 @@ export default function WorkoutCard({
               optimisticSections.map((section) => (
                 <div
                   key={section.id}
-                  className="border border-gray-200 rounded-lg bg-white overflow-hidden transition-shadow hover:shadow-md m-2"
+                  className="border border-dashed border-muted rounded-lg bg-surface overflow-hidden transition-shadow hover:shadow-md m-2 p-2"
                 >
                   {/* Section title – either editable input or clickable h3 */}
-                  <div className="px-4 py-3 bg-gray-50 border-b flex items-center justify-between gap-4 group">
+                  <div className="section-header">
                     {" "}
                     {editingSectionId === section.id ? (
                       <input
@@ -709,12 +706,12 @@ export default function WorkoutCard({
                             // setSectionTitles((prev) => ({ ...prev, [section.id]: section.title }));
                           }
                         }}
-                        className="flex-1 px-2 py-1 font-medium text-gray-900 bg-white border border-gray-300 rounded focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none text-base"
+                        className="section-tag"
                         autoFocus
                       />
                     ) : (
                       <h3
-                        className="font-medium text-gray-800 cursor-pointer hover:text-blue-700 transition-colors flex items-center gap-2"
+                        className="section-header-label"
                         onClick={() => startEditSection(section.id)}
                       >
                         {section.title}
@@ -724,25 +721,26 @@ export default function WorkoutCard({
                         />
                       </h3>
                     )}
+                    <div className="section-header-line"></div>
                     {/* section controls */}
-                    <div className="flex items-center gap-1 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity">
+                    <div className="reorder-btns-section flex flex-row">
                       <button
                         onClick={() => moveSectionUp(section.id)}
-                        className="p-1 text-gray-500 hover:text-gray-900 rounded hover:bg-gray-200 transition"
+                        className="reorder-btn"
                         title="Move up"
                       >
                         <ChevronUp size={16} />
                       </button>
                       <button
                         onClick={() => moveSectionDown(section.id)}
-                        className="p-1 text-gray-500 hover:text-gray-900 rounded hover:bg-gray-200 transition"
+                        className="reorder-btn"
                         title="Move down"
                       >
                         <ChevronDown size={16} />
                       </button>
                       <button
                         onClick={() => handleDeleteSection(section.id)}
-                        className="p-1 text-red-500 hover:text-red-700 rounded hover:bg-red-50 transition"
+                        className="del-btn"
                         title="Delete section"
                       >
                         <Trash2 size={16} />
@@ -758,15 +756,7 @@ export default function WorkoutCard({
                       </div>
                     ) : (
                       section.exercises.map((we) => (
-                        <div
-                          key={we.id}
-                          className="
-    px-4 py-3
-    flex flex-col gap-3
-    md:flex-row md:items-center md:gap-4
-    hover:bg-gray-50/70 transition-colors
-  "
-                        >
+                        <div key={we.id} className="exercise-row">
                           {/* TOP ROW (mobile): reorder + section select */}
                           <div className="flex items-center justify-between gap-3 md:hidden">
                             <div className="flex items-center gap-2 text-gray-400">
@@ -816,10 +806,7 @@ export default function WorkoutCard({
                                   target,
                                 );
                               }}
-                              className="
-        text-sm border border-gray-200 rounded-lg px-3 py-2
-        focus:border-blue-500 focus:ring-1 focus:ring-blue-500
-      "
+                              className="section-tag"
                             >
                               {optimisticSections.map((s) => (
                                 <option key={s.id} value={s.id}>
@@ -876,11 +863,7 @@ export default function WorkoutCard({
                                 target,
                               );
                             }}
-                            className="
-      hidden md:block min-w-[120px]
-      text-sm border border-gray-200 rounded px-2 py-1
-      focus:border-blue-500 focus:ring-1 focus:ring-blue-500
-    "
+                            className="section-tag "
                           >
                             {optimisticSections.map((s) => (
                               <option key={s.id} value={s.id}>
@@ -890,13 +873,12 @@ export default function WorkoutCard({
                           </select>
 
                           {/* MAIN CONTENT */}
-                          <div className="flex-1 min-w-0">
+                          <div className="exercise-info">
                             <button
                               type="button"
                               onClick={() => setOpenExerciseId(we.exercise!.id)}
                               className="
-                                      font-medium text-blue-700 hover:text-blue-900
-                                      truncate text-left block
+                                  exercise-name
                                     "
                             >
                               <div className="flex flex-col md:flex-row gap-2 items-center">
@@ -905,7 +887,7 @@ export default function WorkoutCard({
                               </div>
                             </button>
 
-                            <div className="text-sm text-gray-600 mt-0.5">
+                            <div className="exercise-sets">
                               {formatPrescribed(we.prescribed as Prescribed)}
                             </div>
 
@@ -919,11 +901,7 @@ export default function WorkoutCard({
                           {/* DELETE */}
                           <button
                             onClick={() => handleDeleteExercise(we.id)}
-                            className="
-      self-start md:self-center
-      p-2 text-red-600 hover:text-red-800
-      rounded-lg hover:bg-red-50 transition
-    "
+                            className="del-btn"
                             title="Remove exercise"
                           >
                             <Trash2 size={18} />
@@ -938,50 +916,54 @@ export default function WorkoutCard({
           </div>
 
           {/* Add Exercise Form */}
-          <div className="px-5 py-5 border-t bg-gray-50/40">
-            <div>
-              <h4 className="text-sm font-semibold text-gray-900">
-                Add exercise
-              </h4>
-              <p className="text-xs text-gray-500">
-                Choose a section and configure the exercise
-              </p>
-            </div>
-            <div className="flex justify-between items-center">
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="font-syne font-bold text-sm text-foreground">
+                  Add Exercise
+                </h4>
+                <p className="text-xs text-muted mt-0.5">
+                  Choose a section and configure the exercise
+                </p>
+              </div>
               <button
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted hover:text-lime-green transition-colors px-3 py-1.5 rounded-xl bg-surface2 border border-transparent hover:border-lime-green/20"
                 onClick={handleAddSection}
               >
-                <Plus size={16} /> New section
+                <Plus size={13} /> New section
               </button>
             </div>
-            <select
-              value={sectionId}
-              onChange={(e) => setSectionId(e.target.value)}
-              className="min-w-[140px] px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-            >
-              {optimisticSections.map((section) => (
-                <option key={section.id} value={section.id}>
-                  {section.title}
-                </option>
-              ))}
-            </select>
-            <div ref={containerRef} className="flex flex-wrap gap-3 items-end">
+
+            {/* Section selector */}
+            <div>
+              <label className={labelCls}>Section</label>
+              <select
+                value={sectionId}
+                onChange={(e) => setSectionId(e.target.value)}
+                className={inputCls}
+              >
+                {optimisticSections.map((section) => (
+                  <option key={section.id} value={section.id}>
+                    {section.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div ref={containerRef} className="flex flex-wrap gap-3 items-end pt-4">
               <div className="min-w-[220px] flex-1">
-                <label className="block text-xs font-medium text-gray-700 mb-1">
-                  Exercise
-                </label>
+                <label className={labelCls}>Exercise</label>
                 <button
                   type="button"
                   onClick={() => setShowSearch(true)}
-                  className="w-full text-left px-3 py-2 border border-gray-300 rounded-md bg-white hover:bg-gray-50 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  className="w-full text-left px-3 py-2 bg-background border border-surface2 rounded-xl text-sm hover:border-lime-green/30 transition-colors"
                 >
                   {exercises.find((e) => e.id === exerciseId)?.name ??
                     "Select exercise"}
                 </button>
 
                 {showSearch && (
-                  <div className="absolute z-50 mt-2 bg-white border rounded-md shadow-lg p-4">
+                  <div className="absolute z-50 mt-2 w-fit bg-black border border-surface2 rounded-2xl shadow-xl p-4">
                     <ExerciseSearch
                       onSelect={(exercise) => {
                         setExerciseId(exercise.id);
@@ -991,34 +973,35 @@ export default function WorkoutCard({
                   </div>
                 )}
               </div>
+              {/* ADD FIELDS */}
 
               {showStrengthFields && (
                 <>
                   <div className="w-20">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className={labelCls}>
                       Sets
                     </label>
                     <input
                       type="number"
                       value={sets}
                       onChange={(e) => setSets(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      className={inputCls}
                     />
                   </div>
                   <div className="w-20">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className={labelCls}>
                       Reps
                     </label>
                     <input
                       type="number"
                       value={reps}
                       onChange={(e) => setReps(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      className={inputCls}
                     />
                   </div>
                   {selectedExercise?.type !== "BODYWEIGHT" && (
                     <div className="w-24">
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className={labelCls}>
                         Weight
                       </label>
                       <input
@@ -1029,7 +1012,7 @@ export default function WorkoutCard({
                             e.target.value ? Number(e.target.value) : null,
                           )
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                        className={inputCls}
                       />
                     </div>
                   )}
@@ -1039,30 +1022,30 @@ export default function WorkoutCard({
               {showHybridFields && (
                 <>
                   <div className="w-20">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className={labelCls}>
                       Sets
                     </label>
                     <input
                       type="number"
                       value={sets}
                       onChange={(e) => setSets(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      className={inputCls}
                     />
                   </div>
                   <div className="w-20">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className={labelCls}>
                       Reps
                     </label>
                     <input
                       type="number"
                       value={reps}
                       onChange={(e) => setReps(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      className={inputCls}
                     />
                   </div>
                   {selectedExercise?.type !== "BODYWEIGHT" && (
                     <div className="w-24">
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className={labelCls}>
                         Weight
                       </label>
                       <input
@@ -1073,12 +1056,12 @@ export default function WorkoutCard({
                             e.target.value ? Number(e.target.value) : null,
                           )
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                        className={inputCls}
                       />
                     </div>
                   )}
                   <div className="w-20">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className={labelCls}>
                       Duration
                     </label>
                     <input
@@ -1087,7 +1070,7 @@ export default function WorkoutCard({
                       onChange={(e) =>
                         setTime(e.target.value ? Number(e.target.value) : null)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      className={inputCls}
                     />
                   </div>
                 </>
@@ -1096,30 +1079,30 @@ export default function WorkoutCard({
               {showCoreMobilityFields && (
                 <>
                   <div className="w-20">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className={labelCls}>
                       Sets
                     </label>
                     <input
                       type="number"
                       value={sets}
                       onChange={(e) => setSets(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      className={inputCls}
                     />
                   </div>
                   <div className="w-20">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className={labelCls}>
                       Reps
                     </label>
                     <input
                       type="number"
                       value={reps}
                       onChange={(e) => setReps(Number(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      className={inputCls}
                     />
                   </div>
                   {selectedExercise?.type !== "BODYWEIGHT" && (
                     <div className="w-24">
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                      <label className={labelCls}>
                         Weight
                       </label>
                       <input
@@ -1130,12 +1113,12 @@ export default function WorkoutCard({
                             e.target.value ? Number(e.target.value) : null,
                           )
                         }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                        className={inputCls}
                       />
                     </div>
                   )}
                   <div className="w-28">
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className={labelCls}>
                       Duration (s)
                     </label>
                     <input
@@ -1144,7 +1127,7 @@ export default function WorkoutCard({
                       onChange={(e) =>
                         setTime(e.target.value ? Number(e.target.value) : null)
                       }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-base"
+                      className={inputCls}
                     />
                   </div>
                 </>
@@ -1152,7 +1135,7 @@ export default function WorkoutCard({
 
               {showTimedFields && (
                 <div className="w-28">
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className={labelCls}>
                     Duration (s)
                   </label>
                   <input
@@ -1167,14 +1150,14 @@ export default function WorkoutCard({
               )}
 
               <div className="flex-1 min-w-[260px]">
-                <label className="block text-xs font-medium text-gray-700 mb-1">
+                <label className={labelCls}>
                   Notes / tempo / rest
                 </label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="e.g. 3-0-1-0 tempo, 90s rest"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none text-base"
+                  className={`${inputCls} resize-none`}
                   rows={2}
                 />
               </div>
@@ -1182,7 +1165,7 @@ export default function WorkoutCard({
               <button
                 onClick={handleAddExercise}
                 disabled={!exerciseId || !sectionId}
-                className="px-6 py-2.5 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none  focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-lime-green text-black font-syne font-bold text-sm rounded-xl hover:opacity-90 active:scale-[0.97] transition disabled:opacity-30 disabled:cursor-not-allowed self-end"
               >
                 Add Exercise
               </button>

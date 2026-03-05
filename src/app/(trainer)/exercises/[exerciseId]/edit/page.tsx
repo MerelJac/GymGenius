@@ -61,8 +61,11 @@ export default async function EditExercisePage({
       <SubstitutionsEditor exercise={exercise} />
       <form action={deleteExercise}>
         <input type="hidden" name="exerciseId" value={exercise.id} />
+        <div className="text-end">
         <DeleteExerciseButton />
+        </div>
       </form>
+
     </div>
   );
 }

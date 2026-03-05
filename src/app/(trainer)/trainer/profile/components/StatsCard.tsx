@@ -8,7 +8,7 @@ export function StatCard({
   color?: string;
 }) {
   return (
-    <div className="bg-surface border border-surface2 rounded-2xl px-4 py-4 space-y-1">
+    <div className="gradient-bg border border-surface2 rounded-2xl px-4 py-4 space-y-1">
       <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">
         {label}
       </p>
