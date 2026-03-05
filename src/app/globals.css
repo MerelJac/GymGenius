@@ -9,7 +9,7 @@
   --orange: #ff751f;       /* ← add */
   --red: #ff5c5c;
   --text: #f0f0f0;
-  --muted: #7a7a85;
+  --muted: #9a9aa8;
   --border: rgba(255, 255, 255, 0.07);
 
 }
@@ -36,7 +36,7 @@
   --orange: #ff751f;       /* ← add */
   --red: #ff5c5c;
   --text: #f0f0f0;
-  --muted: #7a7a85;
+  --muted: #9a9aa8;
   --border: rgba(255, 255, 255, 0.07);
   }
 }
@@ -560,7 +560,7 @@ body {
   --accent2: #3dffa0;
   --red: #ff5c5c;
   --text: #f0f0f0;
-  --muted: #7a7a85;
+  --muted: #9a9aa8;
   --radius: 20px;
   --orange: #ff751f;
 }

@@ -100,7 +100,7 @@ export function OneRMLineChart({ data }: { data: OneRMPoint[] }) {
                 x={pad.left - 6} y={y + 3.5}
                 textAnchor="end"
                 fontSize="8"
-                fill="#7a7a85"
+                fill="#9a9aa8"
                 fontFamily="sans-serif"
               >
                 {tick}
@@ -134,11 +134,11 @@ export function OneRMLineChart({ data }: { data: OneRMPoint[] }) {
         ))}
 
         {/* X labels: first and last only */}
-        <text x={pad.left} y={H - 8} fontSize="8" fill="#7a7a85"
+        <text x={pad.left} y={H - 8} fontSize="8" fill="#9a9aa8"
           textAnchor="start" fontFamily="sans-serif">
           {fmtDate(normalized[0].date)}
         </text>
-        <text x={W - pad.right} y={H - 8} fontSize="8" fill="#7a7a85"
+        <text x={W - pad.right} y={H - 8} fontSize="8" fill="#9a9aa8"
           textAnchor="end" fontFamily="sans-serif">
           {fmtDate(normalized[normalized.length - 1].date)}
         </text>
