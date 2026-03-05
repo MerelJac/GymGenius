@@ -1,18 +1,20 @@
 export function StatCard({
   label,
   value,
+  color = "text-foreground",
 }: {
   label: string;
   value: string | number;
+  color?: string;
 }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-      <div className="text-xs uppercase tracking-wide text-gray-500">
+    <div className="bg-surface border border-surface2 rounded-2xl px-4 py-4 space-y-1">
+      <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">
         {label}
-      </div>
-      <div className="mt-1 text-2xl font-bold text-gray-900">
+      </p>
+      <p className={`font-syne font-extrabold text-2xl ${color}`}>
         {value}
-      </div>
+      </p>
     </div>
   );
 }

@@ -53,6 +53,7 @@ export default async function TrainerHomePage() {
     .sort((a, b) => b.date.getTime() - a.date.getTime())
     .slice(0, 5);
 
+    
   return (
     <div className="space-y-8 max-w-4xl">
 
