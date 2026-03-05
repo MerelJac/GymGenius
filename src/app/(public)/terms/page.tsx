@@ -2,7 +2,7 @@
 
 export default function TermsConditions() {
   return (
-    <div className="prose prose-sm max-w-3xl mx-auto py-10">
+    <div className="prose prose-sm max-w-3xl mx-auto p-10">
       <strong>Terms of Service</strong>
       <p>
         <strong>Effective Date:</strong> January 27, 2026{" "}

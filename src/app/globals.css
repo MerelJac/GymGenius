@@ -916,6 +916,15 @@ body {
 }
 .stat-card .big-num {
   font-family: "Syne", sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+
+.stat-card .big-text {
+  font-family: "Syne", sans-serif;
   font-size: clamp(16px, 5cqi, 36px);
   font-weight: 800;
   line-height: 1.1;

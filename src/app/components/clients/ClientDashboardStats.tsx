@@ -45,7 +45,7 @@ export function ClientDashboardStats({
 
       <div className="stat-card">
         <div className="label">Next Workout</div>
-        <div className="big-num">
+        <div className="big-text">
           {" "}
           {nextWorkoutDate
             ? formatNextWorkout(nextWorkoutDate)
