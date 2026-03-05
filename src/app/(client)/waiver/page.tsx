@@ -29,7 +29,7 @@ export default function WaiverPage() {
       <form action={signWaiver}>
         <button
           type="submit"
-          className="w-full py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700"
+          className="btn-primary"
         >
           I Agree & Sign Waiver
         </button>

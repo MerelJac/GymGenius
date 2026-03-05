@@ -127,13 +127,14 @@ export default function ClientProfile({
       {/* Header with back + name */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <BackButton route={"/clients"} />
-
-        <h1 className="nav-logo">
-          {client.profile?.firstName} {client.profile?.lastName}
-          <span className="text-gray-500 font-normal text-xl ml-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="nav-logo">
+            {client.profile?.firstName} {client.profile?.lastName}
+          </h1>
+          <span className="text-gray-500 font-normal text-xl md:ml-3">
             {client.email}
           </span>
-        </h1>
+        </div>
       </div>
 
       {/* Profile editor */}
