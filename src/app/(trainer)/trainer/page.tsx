@@ -88,12 +88,12 @@ export default async function TrainerHomePage() {
       <TrainerStats trainer={trainer} />
 
       {/* CLIENT PROGRESS */}
-      <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
+      <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-surface2">
           <h2 className="font-syne font-bold text-base text-foreground">
             Client Program Progress
           </h2>
-          <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-surface2 text-muted">
+          <span className="text-sm font-semibold px-2.5 py-1 rounded-full bg-surface2 text-muted">
             {clients.length} clients
           </span>
         </div>
@@ -116,7 +116,7 @@ export default async function TrainerHomePage() {
       {/* MISSED + COMPLETED */}
       <div className="grid md:grid-cols-2 gap-4">
         {/* MISSED */}
-        <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
+        <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
             <h2 className="font-syne font-bold text-sm text-foreground">
               ⚠️ Missed Workouts
@@ -142,7 +142,7 @@ export default async function TrainerHomePage() {
                       {w.programName && ` · ${w.programName}`}
                     </p>
                   </div>
-                  <span className="text-[11px] text-muted flex-shrink-0 ml-3 mt-0.5">
+                  <span className="text-sm text-muted flex-shrink-0 ml-3 mt-0.5">
                     {w.date.toLocaleDateString()}
                   </span>
                 </li>
@@ -152,7 +152,7 @@ export default async function TrainerHomePage() {
         </section>
 
         {/* COMPLETED */}
-        <section className="bg-surface border border-surface2 rounded-2xl overflow-hidden">
+        <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
           <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
             <h2 className="font-syne font-bold text-sm text-foreground">
               ✅ Recently Completed
@@ -179,7 +179,7 @@ export default async function TrainerHomePage() {
                         {w.programName && ` · ${w.programName}`}
                       </p>
                     </div>
-                    <span className="text-[11px] text-muted flex-shrink-0 ml-3 mt-0.5">
+                    <span className="text-sm text-muted flex-shrink-0 ml-3 mt-0.5">
                       {w.date.toLocaleDateString()}
                     </span>
                   </Link>
