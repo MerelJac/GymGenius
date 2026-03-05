@@ -1,6 +1,9 @@
 "use client";
-
 import { useState } from "react";
+import Link from "next/link";
+
+const inputCls = "w-full px-4 py-2.5 bg-surface2 border border-white/10 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
+const labelCls = "block text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -13,47 +16,87 @@ export default function ForgotPasswordPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
-    setSubmitted(true); // always show success to prevent email enumeration
+    setSubmitted(true);
   }
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="bg-white shadow p-6 rounded max-w-sm text-center space-y-3">
-          <h2 className="text-lg font-semibold">Check your email</h2>
-          <p>
-            If an account with <strong>{email}</strong> exists, we’ve sent a
-            password reset link.
-          </p>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="w-full max-w-sm space-y-6 text-center">
+          <h1 className="font-syne font-extrabold text-3xl text-lime-green tracking-tight">
+            Dialed Fitness
+          </h1>
+          <div className="bg-surface border border-surface2 rounded-2xl p-6 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-[#3dffa0]/10 flex items-center justify-center mx-auto text-xl">
+              ✉️
+            </div>
+            <h2 className="font-syne font-bold text-base text-foreground">Check your email</h2>
+            <p className="text-sm text-muted leading-relaxed">
+              If an account with <span className="text-foreground font-medium">{email}</span> exists, we&apos;ve sent a password reset link.
+            </p>
+            <Link
+              href="/login"
+              className="block text-center text-xs text-muted hover:text-lime-green transition-colors pt-1"
+            >
+              Back to sign in
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form
-        onSubmit={onSubmit}
-        className="bg-white shadow p-6 rounded-xl w-80 space-y-3"
-      >
-        <h1 className="text-xl font-semibold text-center">
-          Forgot your password?
-        </h1>
-        <p className="text-sm text-gray-500 text-center">
-          Enter your email and we’ll send you a reset link.
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="w-full max-w-sm space-y-6">
+
+        {/* Brand */}
+        <div className="text-center space-y-1">
+          <h1 className="font-syne font-extrabold text-3xl text-lime-green tracking-tight">
+            Dialed Fitness
+          </h1>
+          <p className="text-sm text-muted">Reset your password</p>
+        </div>
+
+        <form
+          onSubmit={onSubmit}
+          className="bg-surface border border-surface2 rounded-2xl p-6 space-y-4"
+        >
+          <p className="text-xs text-muted leading-relaxed">
+            Enter your email and we&apos;ll send you a reset link.
+          </p>
+
+          <div>
+            <label className={labelCls}>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              className={inputCls}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-2.5 bg-lime-green text-black font-syne font-bold text-sm rounded-xl hover:opacity-90 active:scale-[0.98] transition"
+          >
+            Send reset link
+          </button>
+
+          <Link
+            href="/login"
+            className="block text-center text-xs text-muted hover:text-lime-green transition-colors"
+          >
+            Back to sign in
+          </Link>
+        </form>
+
+        <p className="text-xs text-center text-muted">
+          © {new Date().getFullYear()} Dialed Fitness
         </p>
-        <input
-          className="w-full border-2 rounded p-2"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          required
-        />
-        <button className="w-full px-4 py-2 rounded bg-black text-white hover:bg-gray-800">
-          Send reset link
-        </button>
-      </form>
-    </section>
+      </div>
+    </div>
   );
 }

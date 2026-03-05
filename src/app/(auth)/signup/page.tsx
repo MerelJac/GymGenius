@@ -134,7 +134,8 @@ export default function SignupPage() {
             Create account
           </button>
 
-          <Link href="/login" className="text-sm text-center block underline">
+          <Link href="/login"   className="block text-center text-xs text-muted hover:text-lime-green transition-colors"
+>
             Already have an account?
           </Link>
         </form>
