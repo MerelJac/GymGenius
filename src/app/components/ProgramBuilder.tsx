@@ -20,6 +20,7 @@ import { ClientProgramProgress } from "./ClientProgramProgress";
 import { ClientWithWorkouts } from "@/types/client";
 import { Plus, Users } from "lucide-react";
 import { ExerciseQuickAdd } from "../(trainer)/exercises/components/ExerciseQuickAdd";
+import { SyncProgramButton } from "./programs/SyncProgramButton";
 
 export default function ProgramBuilder({
   program,
@@ -168,7 +169,7 @@ export default function ProgramBuilder({
       {/* Header & Program Name */}
       <BackButton route="/programs" />
       <div className="program-header">
- <div>
+        <div>
           <div className="flex items-start justify-between gap-6 flex-wrap flex-col">
             <div className="flex-1 min-w-[300px]">
               {editingName ? (
@@ -219,7 +220,7 @@ export default function ProgramBuilder({
         </div>
 
         {/* Assignment Area */}
-        <div >
+        <div>
           <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-end">
             <div className="field-group">
               <label className="field-label">Assign to Client</label>
@@ -243,7 +244,7 @@ export default function ProgramBuilder({
               </div>
             </div>
 
-           <div className="field-group">
+            <div className="field-group">
               <label className="field-label">Start Date</label>
               <div className="relative">
                 <input
@@ -272,11 +273,17 @@ export default function ProgramBuilder({
             <div className="note-bar">
               <strong>Note:</strong> Changes to exercises, sets, reps, and notes
               update automatically for assigned clients. Adding new workouts
-              requires a manual sync from the client&apos;s page.
+              requires a manual sync from here or the client&apos;s page.
             </div>
             <div className="space-y-4">
               {clientsAssignedProgram.map((client) => (
-                <ClientProgramProgress key={client.id} client={client} />
+                <div key={client.id}>
+                  <ClientProgramProgress key={client.id} client={client} />
+                  <SyncProgramButton
+                    clientId={client.id}
+                    programId={program.id}
+                  />
+                </div>
               ))}
             </div>
           </div>
