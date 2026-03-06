@@ -22,6 +22,10 @@ export default async function ClientDashboard() {
   const clientId = session?.user?.id;
   const access = await getUserAccess(clientId);
   console.log("access: ", access);
+  // 👇 Add this block
+  if (!access.hasAccess) {
+    redirect("/billing");
+  }
   const progress = await getClientProgressSummary(clientId);
   const stats = await getClientDashboardStats(clientId);
   const now = new Date();
