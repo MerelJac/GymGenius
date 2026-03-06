@@ -18,6 +18,7 @@ import WorkoutCalendarWeek from "../CalendarScheduledWorkout";
 import { SyncProgramButton } from "../programs/SyncProgramButton";
 import { formatDateFromInputReturnString } from "@/app/utils/format/formatDateFromInput";
 import Link from "next/link";
+import { BillingManagerServer } from "../billing/BillingManagerServer";
 
 export default function ClientProfile({
   client,

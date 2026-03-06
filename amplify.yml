@@ -19,6 +19,13 @@ frontend:
         - echo "INVITE_PASS=$INVITE_PASS" >> .env
         - echo "CRON_SECRET=$CRON_SECRET" >> .env
 
+        - echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> .env        
+        - echo "STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET" >> .env        
+        - echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" >> .env        
+        - echo "STRIPE_TRAINER_PRICE_ID=$STRIPE_TRAINER_PRICE_ID" >> .env        
+        - echo "STRIPE_CLIENT_PRICE_ID=$STRIPE_CLIENT_PRICE_ID" >> .env
+        - echo "STRIPE_SIGNING_SECRET=$STRIPE_SIGNING_SECRET" >> .env
+
   artifacts:
     baseDirectory: .next
     files:
