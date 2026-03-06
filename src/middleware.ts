@@ -25,6 +25,7 @@ export async function middleware(req: NextRequest) {
     headers: { cookie: req.headers.get("cookie") ?? "" },
   });
   const { hasAccess } = await res.json();
+  console.log("has access: ", hasAccess)
 
   if (!hasAccess) return NextResponse.redirect(new URL("/billing", req.url));
 

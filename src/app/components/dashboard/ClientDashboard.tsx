@@ -21,6 +21,7 @@ export default async function ClientDashboard() {
 
   const clientId = session?.user?.id;
   const access = await getUserAccess(clientId);
+  console.log("access: ", access);
   const progress = await getClientProgressSummary(clientId);
   const stats = await getClientDashboardStats(clientId);
   const now = new Date();
@@ -159,16 +160,16 @@ export default async function ClientDashboard() {
               (1000 * 60 * 60 * 24),
           );
           return (
-            <div className="rounded-xl border border-yellow-300 bg-yellow-50 px-5 py-4 flex items-center justify-between gap-4">
+            <div className="rounded-xl border border-yellow-400/20 bg-yellow-400/5 px-5 py-4 flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <span className="text-yellow-500 text-xl">⏳</span>
+                <span className="text-lg">⏳</span>
                 <div>
-                  <p className="font-semibold text-yellow-800 text-sm">
-                    You&apos;re on a free trial
+                  <p className="text-yellow-400 text-sm font-semibold tracking-wide">
+                    Free Trial
                   </p>
-                  <p className="text-yellow-700 text-xs mt-0.5">
+                  <p className="text-white/40 text-xs mt-0.5">
                     {daysLeft} day{daysLeft !== 1 ? "s" : ""} remaining —
-                    upgrade to keep full access.
+                    upgrade to keep access.
                   </p>
                 </div>
               </div>
@@ -178,31 +179,35 @@ export default async function ClientDashboard() {
         })()}
 
       {access.reason === "grandfathered" && (
-        <div className="rounded-xl border border-green-200 bg-green-50 px-5 py-4 flex items-center gap-3">
-          <span className="text-green-500 text-xl">🎁</span>
-          <p className="text-green-800 text-sm font-medium">
-            You&apos;re on a complimentary plan — enjoy full access, on us.
-          </p>
+        <div className="rounded-xl border border-lime-400/20 bg-lime-400/5 px-5 py-4 flex items-center gap-3">
+          <span className="text-lg">🎁</span>
+          <div>
+            <p className="text-lime-400 text-sm font-semibold tracking-wide">
+              Complimentary Access
+            </p>
+            <p className="text-white/40 text-xs mt-0.5">
+              Full access, on us — forever.
+            </p>
+          </div>
         </div>
       )}
 
       {access.reason === "CANCELED" && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 flex items-center justify-between gap-4">
+        <div className="rounded-xl border border-red-400/20 bg-red-400/5 px-5 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-red-500 text-xl">⚠️</span>
+            <span className="text-lg">⚠️</span>
             <div>
-              <p className="font-semibold text-red-800 text-sm">
-                Your subscription has ended
+              <p className="text-red-400 text-sm font-semibold tracking-wide">
+                Subscription Ended
               </p>
-              <p className="text-red-700 text-xs mt-0.5">
+              <p className="text-white/40 text-xs mt-0.5">
                 Reactivate to regain full access.
               </p>
             </div>
           </div>
-
           <Link
             href="/billing/reactivate"
-            className="shrink-0 text-xs font-semibold bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+            className="shrink-0 text-xs font-semibold bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-400/20 px-4 py-2 rounded-lg transition-colors"
           >
             Reactivate
           </Link>

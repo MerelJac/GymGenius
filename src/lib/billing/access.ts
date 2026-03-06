@@ -16,6 +16,7 @@ export async function getUserAccess(userId: string) {
 
   if (!sub) return { hasAccess: false, reason: "no_subscription" };
 
+  console.log('sub: ', sub)
   // Grandfathered users always have access
   if (sub.grandfathered) return { hasAccess: true, reason: "grandfathered" };
 
