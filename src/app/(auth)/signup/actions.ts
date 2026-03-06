@@ -1,5 +1,6 @@
 "use server";
 
+import { createInitialSubscription } from "@/lib/billing/createSubscription";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
@@ -33,6 +34,7 @@ export async function signupAction(formData: FormData): Promise<SignupResult> {
   }
 
   if (user.password === INVITE_PASS) {
+    console.log(INVITE_PASS, "invite pass");
     // if placeholder password, fill in with new password
     const hashed = await bcrypt.hash(password, 10);
 
@@ -54,6 +56,8 @@ export async function signupAction(formData: FormData): Promise<SignupResult> {
         },
       }),
     ]);
+    // 👇 Create their 14-day trial
+    await createInitialSubscription(user.id, user.role);
 
     return { success: true };
   } else {

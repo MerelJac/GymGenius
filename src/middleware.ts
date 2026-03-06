@@ -20,6 +20,14 @@ export async function middleware(req: NextRequest) {
     req.nextUrl.pathname.startsWith(path),
   );
 
+  // Check access via API (or duplicate logic here for edge-compatible check)
+  const res = await fetch(`${process.env.NEXTAUTH_URL}/api/billing/access`, {
+    headers: { cookie: req.headers.get("cookie") ?? "" },
+  });
+  const { hasAccess } = await res.json();
+
+  if (!hasAccess) return NextResponse.redirect(new URL("/billing", req.url));
+
   // 🔒 Role guard
   if (
     isTrainerRoute &&
@@ -35,5 +43,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/exercises/:path*", "/programs/:path*", "/trainer/:path*"],
+  matcher: ["/exercises/:path*", "/programs/:path*", "/trainer/:path*",  "/client/:path*",],
 };

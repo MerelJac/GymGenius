@@ -12,12 +12,15 @@ import { ProgressChanges } from "../clients/ProgressChanges";
 import { redirect } from "next/navigation";
 import { ContactTrainer } from "../clients/ContactTrainer";
 import { CreateWorkoutForLater } from "../workout/CreateWorkoutForLater";
+import { getUserAccess } from "@/lib/billing/access";
+import { UpgradeButton } from "../billing/UpgradeButton";
 
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
 
   const clientId = session?.user?.id;
+  const access = await getUserAccess(clientId);
   const progress = await getClientProgressSummary(clientId);
   const stats = await getClientDashboardStats(clientId);
   const now = new Date();
@@ -142,10 +145,69 @@ export default async function ClientDashboard() {
       {/* Greeting */}
       <div className="greeting">
         <h1>
-          Hello, <span>{userName}</span>
+          Hello, <span className="break-words">{userName}</span>
         </h1>
         <p>You are staying consistent — great work.</p>
       </div>
+
+      {/* Trial / Billing Banner */}
+      {access.reason === "trial" &&
+        access.trialEndsAt &&
+        (() => {
+          const daysLeft = Math.ceil(
+            (new Date(access.trialEndsAt).getTime() - Date.now()) /
+              (1000 * 60 * 60 * 24),
+          );
+          return (
+            <div className="rounded-xl border border-yellow-300 bg-yellow-50 px-5 py-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="text-yellow-500 text-xl">⏳</span>
+                <div>
+                  <p className="font-semibold text-yellow-800 text-sm">
+                    You&apos;re on a free trial
+                  </p>
+                  <p className="text-yellow-700 text-xs mt-0.5">
+                    {daysLeft} day{daysLeft !== 1 ? "s" : ""} remaining —
+                    upgrade to keep full access.
+                  </p>
+                </div>
+              </div>
+              <UpgradeButton />
+            </div>
+          );
+        })()}
+
+      {access.reason === "grandfathered" && (
+        <div className="rounded-xl border border-green-200 bg-green-50 px-5 py-4 flex items-center gap-3">
+          <span className="text-green-500 text-xl">🎁</span>
+          <p className="text-green-800 text-sm font-medium">
+            You&apos;re on a complimentary plan — enjoy full access, on us.
+          </p>
+        </div>
+      )}
+
+      {access.reason === "CANCELED" && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-5 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-red-500 text-xl">⚠️</span>
+            <div>
+              <p className="font-semibold text-red-800 text-sm">
+                Your subscription has ended
+              </p>
+              <p className="text-red-700 text-xs mt-0.5">
+                Reactivate to regain full access.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            href="/billing/reactivate"
+            className="shrink-0 text-xs font-semibold bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Reactivate
+          </Link>
+        </div>
+      )}
 
       <div className="space-y-6">
         <ClientDashboardStats
@@ -190,11 +252,11 @@ function TodayWorkout({
   if (!workout) {
     return (
       <div className="stat-card accent-card">
-        <div className="big-num">
-         Rest day!
-        </div>
+        <div className="big-num">Rest day!</div>
 
-        <p className="text-sm text-gray-500 mt-1">No workouts scheduled today.</p>
+        <p className="text-sm text-gray-500 mt-1">
+          No workouts scheduled today.
+        </p>
       </div>
     );
   }
@@ -299,6 +361,7 @@ function OverdueWorkouts({
   workouts: ScheduledWorkoutDashboard[];
 }) {
   console.log("overdue workouts", workouts.slice(0, 2));
+  if (workouts.length === 0) return null;
   return (
     <div>
       <div className="flex items-center justify-between px-5 py-3">

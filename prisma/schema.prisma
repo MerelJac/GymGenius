@@ -64,6 +64,7 @@ model User {
   additionalWorkouts  AdditionalWorkout[]
   exerciseOneRepMaxes ExerciseOneRepMax[]
   passwordResetTokens PasswordResetToken[]
+  subscription        Subscription?
 }
 
 model Profile {
@@ -323,4 +324,34 @@ model PasswordResetToken {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+enum BillingStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  GRANDFATHERED
+}
+
+enum BillingPlan {
+  FREE
+  TRAINER_MONTHLY
+  CLIENT_MONTHLY
+}
+
+model Subscription {
+  id                   String        @id @default(cuid())
+  userId               String        @unique
+  user                 User          @relation(fields: [userId], references: [id])
+  status               BillingStatus @default(TRIALING)
+  plan                 BillingPlan   @default(FREE)
+  stripeCustomerId     String?       @unique
+  stripeSubscriptionId String?       @unique
+  stripePriceId        String?
+  trialEndsAt          DateTime?
+  currentPeriodEnd     DateTime?
+  grandfathered        Boolean       @default(false)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 }

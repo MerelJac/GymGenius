@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { LogoutButton } from "../Logout";
-import { LucideIcon } from "lucide-react";
+import { CreditCard, LucideIcon } from "lucide-react";
 
 import {
   LayoutDashboard,
@@ -25,6 +25,7 @@ const navItems = [
 
 const adminNavLinks = [
   { href: "/admin/exercises", label: "Review Exercises", icon: GitCompare },
+    { href: "/admin/billing", label: "Billing", icon: CreditCard },
 ];
 
 export default function SidebarLayout({

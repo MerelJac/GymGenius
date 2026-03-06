@@ -7,6 +7,7 @@ import { TrainerStats } from "./components/TrainerStats";
 import { TrainerAccountSection } from "./components/TrainerAccountSection";
 import InviteTrainer from "./components/InviteTrainer";
 import { ResendInviteButton } from "@/app/components/ResendEmailButton";
+import { BillingManagerServer } from "@/app/components/billing/BillingManagerServer";
 
 export default async function TrainerProfilePage() {
   const session = await getServerSession(authOptions);
@@ -165,6 +166,7 @@ export default async function TrainerProfilePage() {
         </section>
       )}
 
+      <BillingManagerServer />
       {/* Danger Zone */}
       <div className="border border-danger/20 bg-danger/5 rounded-2xl p-5 space-y-3">
         <h2 className="text-[10px] font-semibold tracking-widest uppercase text-danger">

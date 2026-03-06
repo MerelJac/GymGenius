@@ -10,6 +10,7 @@ import ClientProfileSection from "@/app/components/clients/ClientProfileSection"
 import { ClientProfilePageUser } from "@/types/client";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { BillingManagerServer } from "@/app/components/billing/BillingManagerServer";
 
 export default async function ClientProfilePage() {
   const session = await getServerSession(authOptions);
@@ -341,6 +342,7 @@ export default async function ClientProfilePage() {
         )}
       </div>
 
+      <BillingManagerServer />
       {/* Logout */}
       <div className="pt-2 flex justify-center">
         <LogoutButton />
