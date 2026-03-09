@@ -117,10 +117,16 @@ export default async function TrainerHomePage() {
       <div className="grid md:grid-cols-2 gap-4">
         {/* MISSED */}
         <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-surface2">
             <h2 className="font-syne font-bold text-sm text-foreground">
               ⚠️ Missed Workouts
-            </h2>
+            </h2>{" "}
+            <Link
+              href="/missed-workouts"
+              className="text-xs text-muted hover:text-orange-500 transition-colors"
+            >
+              See all →
+            </Link>
           </div>
           {recentMissedWorkouts.length === 0 ? (
             <div className="px-5 py-8 text-center">
@@ -153,10 +159,16 @@ export default async function TrainerHomePage() {
 
         {/* COMPLETED */}
         <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
-          <div className="flex items-center gap-2.5 px-5 py-4 border-b border-surface2">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-surface2">
             <h2 className="font-syne font-bold text-sm text-foreground">
               ✅ Recently Completed
             </h2>
+            <Link
+              href="/trainer/completed-workouts"
+              className="text-xs text-muted hover:text-orange-500 transition-colors"
+            >
+              See all →
+            </Link>
           </div>
           {recentCompletedWorkouts.length === 0 ? (
             <div className="px-5 py-8 text-center">
