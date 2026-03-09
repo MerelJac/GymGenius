@@ -63,8 +63,7 @@ export async function sendTrialWarnings() {
       trialEndsAt: {
         gt: now,      // not expired yet
         lte: in3Days, // but expiring within 3 days
-      },
-      trialWarningSentAt: null, // 👈 don't send twice
+      }
     },
     include: { user: { include: { profile: true } } },
   });
