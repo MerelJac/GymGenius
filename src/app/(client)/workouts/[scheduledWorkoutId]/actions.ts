@@ -468,7 +468,7 @@ export async function rerunWorkout(scheduledWorkoutId: string) {
       workoutId: original.workoutId,
       clientId: original.clientId,
       scheduledDate: new Date(),
-      status: "SCHEDULED",
+      status: "IN_PROGRESS",
     },
   });
 

@@ -155,6 +155,21 @@ export default function WorkoutRunner({
 
                 // 🔐 Auto-save all unsaved exercises
                 for (const ex of exerciseStates) {
+                  console.log(
+                    "Logging exercise:",
+                    "workoutLogId",
+                    workoutLogId,
+                    " ex.exerciseId",
+                    ex.exerciseId,
+                    " ex.prescribed",
+                    ex.prescribed,
+                    "ex.performed",
+                    ex.performed,
+                    "ex.note",
+                    ex.note,
+                    " ex.sectionId",
+                    ex.sectionId ?? null,
+                  );
                   await logExercise(
                     workoutLogId,
                     ex.exerciseId,
