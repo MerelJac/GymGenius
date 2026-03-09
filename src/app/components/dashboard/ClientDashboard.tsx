@@ -439,7 +439,12 @@ function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
     <div>
       <div className="flex items-center justify-between px-5 py-3">
         <h2 className="section-title">Recent Activity</h2>
-        {/* <span className="text-xs text-muted">See all</span> */}
+        <Link
+          href="/workouts/history"
+          className="text-xs text-muted hover:text-orange-500 transition-colors"
+        >
+          See all →
+        </Link>
       </div>
 
       <ul className="feed">
