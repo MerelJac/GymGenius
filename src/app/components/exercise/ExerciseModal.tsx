@@ -4,6 +4,7 @@ import { X, Dumbbell, TrendingUp } from "lucide-react";
 import { ExerciseDetail, OneRMPoint } from "@/types/exercise";
 import { getEmbedUrl } from "@/lib/video";
 import { OneRMLineChart } from "../clients/OneRmLineChart";
+import { createPortal } from "react-dom";
 
 export default function ExerciseModal({
   exerciseId,
@@ -37,7 +38,7 @@ export default function ExerciseModal({
 
   const embedUrl = exercise?.videoUrl ? getEmbedUrl(exercise.videoUrl) : null;
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -155,6 +156,7 @@ export default function ExerciseModal({
           )}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
