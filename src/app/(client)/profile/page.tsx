@@ -9,7 +9,6 @@ import { LogoutButton } from "@/app/components/Logout";
 import ClientProfileSection from "@/app/components/clients/ClientProfileSection";
 import { ClientProfilePageUser } from "@/types/client";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { BillingManagerServer } from "@/app/components/billing/BillingManagerServer";
 
 export default async function ClientProfilePage() {
@@ -196,7 +195,12 @@ export default async function ClientProfilePage() {
       <div>
         <div className="flex items-center justify-between px-5 py-3">
           <h2 className="section-title"> Workouts You Created</h2>
-          {/* <span className="text-xs text-muted">See all</span> */}
+          <Link
+            href="/workouts/my"
+            className="text-xs text-muted hover:text-orange-500 transition-colors"
+          >
+            See all →
+          </Link>
         </div>
         {myWorkouts.length === 0 ? (
           <p className="text-sm text-gray-500">No client created workouts</p>
@@ -279,6 +283,12 @@ export default async function ClientProfilePage() {
       <div>
         <div className="flex items-center justify-between px-5 py-3">
           <h2 className="section-header">Recent Activity</h2>
+                    <Link
+            href="/workouts/history"
+            className="text-xs text-muted hover:text-orange-500 transition-colors"
+          >
+            See all →
+          </Link>
         </div>
 
         {historyItems.length === 0 ? (

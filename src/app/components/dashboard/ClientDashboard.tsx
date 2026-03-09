@@ -15,6 +15,39 @@ import { CreateWorkoutForLater } from "../workout/CreateWorkoutForLater";
 import { getUserAccess } from "@/lib/billing/access";
 import { UpgradeButton } from "../billing/UpgradeButton";
 
+export function getStatusDisplay(status: string) {
+  switch (status) {
+    case "COMPLETED":
+      return {
+        icon: "✅",
+        label: "Done",
+        className: "done",
+        bgClass: "bg-mint/10",
+      };
+    case "IN_PROGRESS":
+      return {
+        icon: "🔥",
+        label: "In Progress",
+        className: "in-progress",
+        bgClass: "bg-yellow-400/10",
+      };
+    case "SKIPPED":
+      return {
+        icon: "⏭️",
+        label: "Skipped",
+        className: "skipped",
+        bgClass: "bg-surface2",
+      };
+    default:
+      return {
+        icon: "⚠️",
+        label: "Missed",
+        className: "missed",
+        bgClass: "bg-danger/10",
+      };
+  }
+}
+
 export default async function ClientDashboard() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return null;
@@ -326,35 +359,23 @@ function UpcomingWorkouts({
 
       <ul className="feed">
         {workouts.map((w) => {
-          const done = w.status === "COMPLETED";
-
+          const { icon, label, className, bgClass } = getStatusDisplay(
+            w.status,
+          );
           return (
             <li key={w.id}>
               <Link
                 href={`/workouts/${w.id}`}
                 className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
               >
-                {/* Icon */}
-                <div
-                  className={`feed-icon ${
-                    done ? "bg-mint/10" : "bg-danger/10"
-                  }`}
-                >
-                  {done ? "✅" : "⚠️"}
-                </div>
-
-                {/* Info */}
+                <div className={`feed-icon ${bgClass}`}>{icon}</div>
                 <div className="feed-info">
                   <p className="feed-name">{w.workout.name}</p>
                   <p className="feed-date">
                     {w.scheduledDate.toLocaleDateString()}
                   </p>
                 </div>
-
-                {/* Status badge */}
-                <span className={`feed-status ${done ? "done" : "missed"}`}>
-                  {done ? "Done" : "Missed"}
-                </span>
+                <span className={`feed-status ${className}`}>{label}</span>
               </Link>
             </li>
           );
@@ -375,40 +396,33 @@ function OverdueWorkouts({
     <div>
       <div className="flex items-center justify-between px-5 py-3">
         <h2 className="section-title">Missed</h2>
-        {/* <span className="text-xs text-muted">See all</span> */}
+        <Link
+          href="/workouts/missed"
+          className="text-xs text-muted hover:text-orange-500 transition-colors"
+        >
+          See all →
+        </Link>
       </div>
 
       <ul className="feed">
         {workouts.map((w) => {
-          const done = w.status === "COMPLETED";
-
+          const { icon, label, className, bgClass } = getStatusDisplay(
+            w.status,
+          );
           return (
             <li key={w.id}>
               <Link
                 href={`/workouts/${w.id}`}
                 className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
               >
-                {/* Icon */}
-                <div
-                  className={`feed-icon ${
-                    done ? "bg-mint/10" : "bg-danger/10"
-                  }`}
-                >
-                  {done ? "✅" : "⚠️"}
-                </div>
-
-                {/* Info */}
+                <div className={`feed-icon ${bgClass}`}>{icon}</div>
                 <div className="feed-info">
                   <p className="feed-name">{w.workout.name}</p>
                   <p className="feed-date">
                     {w.scheduledDate.toLocaleDateString()}
                   </p>
                 </div>
-
-                {/* Status badge */}
-                <span className={`feed-status ${done ? "done" : "missed"}`}>
-                  {done ? "Done" : "Missed"}
-                </span>
+                <span className={`feed-status ${className}`}>{label}</span>
               </Link>
             </li>
           );
@@ -430,35 +444,23 @@ function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
 
       <ul className="feed">
         {workouts.map((w) => {
-          const done = w.status === "COMPLETED";
-
+          const { icon, label, className, bgClass } = getStatusDisplay(
+            w.status,
+          );
           return (
             <li key={w.id}>
               <Link
                 href={`/workouts/${w.id}`}
                 className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
               >
-                {/* Icon */}
-                <div
-                  className={`feed-icon ${
-                    done ? "bg-mint/10" : "bg-danger/10"
-                  }`}
-                >
-                  {done ? "✅" : "⚠️"}
-                </div>
-
-                {/* Info */}
+                <div className={`feed-icon ${bgClass}`}>{icon}</div>
                 <div className="feed-info">
                   <p className="feed-name">{w.workout.name}</p>
                   <p className="feed-date">
                     {w.scheduledDate.toLocaleDateString()}
                   </p>
                 </div>
-
-                {/* Status badge */}
-                <span className={`feed-status ${done ? "done" : "missed"}`}>
-                  {done ? "Done" : "Missed"}
-                </span>
+                <span className={`feed-status ${className}`}>{label}</span>
               </Link>
             </li>
           );
