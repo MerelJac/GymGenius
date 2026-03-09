@@ -7,18 +7,21 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     include: { subscription: true },
   });
 
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (!user)
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-  const priceId = user.role === "TRAINER"
-    ? process.env.STRIPE_TRAINER_PRICE_ID!
-    : process.env.STRIPE_CLIENT_PRICE_ID!;
+  const priceId =
+    user.role === "TRAINER"
+      ? process.env.STRIPE_TRAINER_PRICE_ID!
+      : process.env.STRIPE_CLIENT_PRICE_ID!;
 
   // Create or reuse Stripe customer
   let customerId = user.subscription?.stripeCustomerId;
@@ -38,6 +41,9 @@ export async function POST(req: Request) {
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${process.env.NEXTAUTH_URL}/dashboard?billing=success`,
     cancel_url: `${process.env.NEXTAUTH_URL}/billing`,
+    metadata: {
+      userId: user.id, 
+    },
   });
 
   return NextResponse.json({ url: checkoutSession.url });

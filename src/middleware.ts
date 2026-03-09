@@ -3,7 +3,25 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
+const PUBLIC_PATHS = [
+  "/login",
+  "/register",
+  "/billing",
+  "/api/billing/access",
+  "/api/auth",
+  "/_next",
+  "/favicon.ico",
+];
+
 export async function middleware(req: NextRequest) {
+
+    const { pathname } = req.nextUrl;
+
+  // ✅ Skip middleware for public paths
+  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
+    return NextResponse.next();
+  }
+
   const token = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,

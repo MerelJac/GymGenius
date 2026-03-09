@@ -29,7 +29,7 @@ export async function sendEmail({
     Destination: {
       ToAddresses: [to],
       BccAddresses: ["coachmerel.training@gmail.com"],
-    }, // Removed BccAddresses: ["mjacobs@calloneonline.com"]
+    },
     Message: {
       Subject: { Data: subject },
       Body: {

@@ -18,7 +18,7 @@ frontend:
         - echo "APP_URL=$APP_URL" >> .env
         - echo "INVITE_PASS=$INVITE_PASS" >> .env
         - echo "CRON_SECRET=$CRON_SECRET" >> .env
-
+        - echo "ADMIN_EMAIL=$ADMIN_EMAIL" >> .env
         - echo "STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY" >> .env        
         - echo "STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET" >> .env        
         - echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY" >> .env        

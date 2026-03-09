@@ -17,7 +17,10 @@ export async function POST() {
   });
 
   if (!subscription) {
-    return NextResponse.json({ error: "No subscription found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "No subscription found" },
+      { status: 404 },
+    );
   }
 
   const priceId =
@@ -57,12 +60,18 @@ export async function POST() {
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: successUrl,
       cancel_url: cancelUrl,
+      metadata: {
+        userId: session.user.id,
+      },
     });
 
     console.log("🔁 Created new checkout session for", session.user.id);
     return NextResponse.json({ url: checkoutSession.url });
   } catch (err) {
     console.error("❌ Reactivation error:", err);
-    return NextResponse.json({ error: "Failed to reactivate" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to reactivate" },
+      { status: 500 },
+    );
   }
 }
