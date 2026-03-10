@@ -10,16 +10,19 @@ export async function createAdditionalStrengthWorkout(
   // 1. Get client
   const client = await prisma.user.findUnique({
     where: { id: clientId },
+    include: {
+      profile: true,
+    },
   });
 
   if (!client || !client.trainerId) {
     return null;
   }
 
+  const clientName = client.profile?.firstName || "Client";
   // 2. Find or create program
   let program = await prisma.program.findFirst({
     where: {
-      name: `__client-workouts-${clientId}`,
       id: `__client-workouts-${clientId}`,
       trainerId: client.trainerId,
     },
@@ -28,14 +31,15 @@ export async function createAdditionalStrengthWorkout(
   //   filter it out later with
   //   where: {
   //   NOT: {
-  //     name: { startsWith: "__" }
+  //     id: { startsWith: "__" }
   //   }
   // }
 
+  // IF NOT FOUND, CREATE
   if (!program) {
     program = await prisma.program.create({
       data: {
-        name: `__client-workouts-${clientId}`,
+        name: `${clientName}'s Workouts'`,
         id: `__client-workouts-${clientId}`,
         trainer: {
           connect: { id: client.trainerId },
@@ -79,16 +83,18 @@ export async function createWorkoutForLater(clientId: string, name: string) {
   // 1. Get client
   const client = await prisma.user.findUnique({
     where: { id: clientId },
+    include: {
+      profile: true
+    }
   });
 
   if (!client || !client.trainerId) {
     return null;
   }
-
+  const clientName = client.profile?.firstName || "Client";
   // 2. Find or create program
   let program = await prisma.program.findFirst({
     where: {
-      name: `__client-workouts-${clientId}`,
       id: `__client-workouts-${clientId}`,
       trainerId: client.trainerId,
     },
@@ -97,14 +103,14 @@ export async function createWorkoutForLater(clientId: string, name: string) {
   //   filter it out later with
   //   where: {
   //   NOT: {
-  //     name: { startsWith: "__" }
+  //     id: { startsWith: "__" }
   //   }
   // }
 
   if (!program) {
     program = await prisma.program.create({
       data: {
-        name: `__client-workouts-${clientId}`,
+        name: `${clientName}'s Workouts'`,
         id: `__client-workouts-${clientId}`,
         trainer: {
           connect: { id: client.trainerId },
