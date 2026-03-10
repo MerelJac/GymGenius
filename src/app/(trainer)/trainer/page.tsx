@@ -5,10 +5,19 @@ import { ClientProgramProgress } from "@/app/components/ClientProgramProgress";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { TrainerStats } from "./profile/components/TrainerStats";
+import { getUserAccess } from "@/lib/billing/access";
+import BillingStatusNotice from "@/app/components/billing/BillingStatusNotice";
 
 export default async function TrainerHomePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/");
+
+  const access = await getUserAccess(session?.user?.id);
+  console.log("access: ", access);
+  // 👇 Add this block
+  if (!access.hasAccess) {
+    redirect("/billing");
+  }
 
   const trainerId = session.user.id;
   const clients = await prisma.user.findMany({
@@ -83,6 +92,7 @@ export default async function TrainerHomePage() {
         </p>
       </div>
 
+        <BillingStatusNotice access={access} />
       {/* Quick stats row */}
 
       <TrainerStats trainer={trainer} />
@@ -99,9 +109,12 @@ export default async function TrainerHomePage() {
         </div>
         <div className="divide-y divide-surface2">
           {clients.map((client) => (
-            <div key={client.id} className="px-5 py-4 gap-4 
+            <div
+              key={client.id}
+              className="px-5 py-4 gap-4 
         hover:bg-surface2/50 hover:pl-6 transition-all duration-150 group
-        border-l-2 border-l-transparent hover:border-l-lime-green/50">
+        border-l-2 border-l-transparent hover:border-l-lime-green/50"
+            >
               <ClientProgramProgress client={client} />
             </div>
           ))}

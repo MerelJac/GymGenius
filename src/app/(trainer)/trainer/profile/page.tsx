@@ -1,17 +1,26 @@
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { TrainerStats } from "./components/TrainerStats";
 import { TrainerAccountSection } from "./components/TrainerAccountSection";
 import InviteTrainer from "./components/InviteTrainer";
 import { ResendInviteButton } from "@/app/components/ResendEmailButton";
 import { BillingManagerServer } from "@/app/components/billing/BillingManagerServer";
+import BillingStatusNotice from "@/app/components/billing/BillingStatusNotice";
+import { getUserAccess } from "@/lib/billing/access";
 
 export default async function TrainerProfilePage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) return notFound();
+
+  const access = await getUserAccess(session?.user?.id);
+  console.log("access: ", access);
+  // 👇 Add this block
+  if (!access.hasAccess) {
+    redirect("/billing");
+  }
 
   const trainer = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -52,6 +61,7 @@ export default async function TrainerProfilePage() {
           </span>
         )}
       </div>
+      <BillingStatusNotice access={access} />
 
       {/* Stats */}
       <TrainerStats trainer={trainer} />
@@ -103,35 +113,6 @@ export default async function TrainerProfilePage() {
         )}
       </section>
 
-      {/* Plan & Billing */}
-      <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-surface2">
-          <h3 className="font-syne font-bold text-base text-foreground">
-            Plan & Billing
-          </h3>
-        </div>
-
-        <div className="px-5 py-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted">Current Plan</span>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-lime-green/10 text-lime-green">
-              Trainer (Beta)
-            </span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted">Status</span>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[#3dffa0]/10 text-[#3dffa0]">
-              Active
-            </span>
-          </div>
-        </div>
-
-        <div className="px-5 py-3 border-t border-surface2 bg-surface2/30">
-          <p className="text-xs text-muted italic">
-            Billing controls coming soon.
-          </p>
-        </div>
-      </section>
 
       {/* Invite Trainer */}
       {trainer.role === "ADMIN" && (
