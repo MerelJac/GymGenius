@@ -44,6 +44,7 @@ export async function createAdditionalStrengthWorkout(
         trainer: {
           connect: { id: client.trainerId },
         },
+        notes: "Client made workouts.",
       },
     });
   }
@@ -84,8 +85,8 @@ export async function createWorkoutForLater(clientId: string, name: string) {
   const client = await prisma.user.findUnique({
     where: { id: clientId },
     include: {
-      profile: true
-    }
+      profile: true,
+    },
   });
 
   if (!client || !client.trainerId) {
@@ -115,6 +116,7 @@ export async function createWorkoutForLater(clientId: string, name: string) {
         trainer: {
           connect: { id: client.trainerId },
         },
+        notes: "Client made workouts.",
       },
     });
   }
