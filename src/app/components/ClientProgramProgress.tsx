@@ -4,7 +4,7 @@ import Link from "next/link";
 import { WorkoutStatus } from "@prisma/client";
 import { ClientWithWorkouts } from "@/types/client";
 import { ScheduledWorkout } from "@/types/workout";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { removeProgramFromClient } from "../(trainer)/programs/[programId]/actions";
 
 export function ClientProgramProgress({
@@ -14,13 +14,18 @@ export function ClientProgramProgress({
   client: ClientWithWorkouts;
   showClientLink?: boolean;
 }) {
-  const [isPending, startTransition] = useTransition();
+  const [pendingProgramId, setPendingProgramId] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
 
   const handleRemoveClientFromProgram = (programId: string) => {
-    if (!confirm("Remove this client from the program?")) return;
-
+    if (!confirm("Remove this client from the program? This will permanently remove non-completed workouts from this client.")) return;
+    setPendingProgramId(programId);
     startTransition(async () => {
-      await removeProgramFromClient(programId, client.id);
+      const result = await removeProgramFromClient(programId, client.id);
+      if (!result.ok) {
+        alert(result.error ?? "Failed to remove client from program");
+      }
+      setPendingProgramId(null);
     });
   };
 
@@ -49,11 +54,6 @@ export function ClientProgramProgress({
       acc[program.id].workouts.push(sw);
       return acc;
     }, {}),
-  );
-  const hasRemovableWorkouts = client.scheduledWorkouts.some(
-    (w) =>
-      w.status === WorkoutStatus.SCHEDULED ||
-      w.status === WorkoutStatus.IN_PROGRESS,
   );
 
   if (programs.length === 0) return null;
@@ -100,7 +100,7 @@ export function ClientProgramProgress({
               : 0;
           const isComplete = percent === 100;
           const isStarted = percent > 0;
-
+          const isRemoving = pendingProgramId === program.id;
           return (
             <div key={program.id} className="space-y-1.5">
               <div className="flex items-center justify-between gap-3">
@@ -119,15 +119,14 @@ export function ClientProgramProgress({
                   >
                     {completed}/{workouts.length}
                   </span>
-                  {hasRemovableWorkouts && (
-                    <button
-                      onClick={() => handleRemoveClientFromProgram(program.id)}
-                      disabled={isPending}
-                      className="text-[11px] font-semibold text-danger hover:opacity-80 disabled:opacity-40 transition"
-                    >
-                      Remove
-                    </button>
-                  )}
+
+                  <button
+                    onClick={() => handleRemoveClientFromProgram(program.id)}
+                    disabled={isRemoving}
+                    className="text-[11px] font-semibold text-danger hover:opacity-80 disabled:opacity-40 transition"
+                  >
+                    {isRemoving ? "Removing…" : "Remove"}
+                  </button>
                 </div>
               </div>
 

@@ -201,10 +201,12 @@ export async function removeProgramFromClient(
   programId: string,
   clientId: string,
 ) {
+  console.log("Hitting removeProgramFromClient ");
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return { ok: false, error: "Unauthorized" };
   }
+  console.log("authorized");
 
   // 1️⃣ Get workout template IDs for this program
   const workouts = await prisma.workoutTemplate.findMany({
@@ -212,19 +214,22 @@ export async function removeProgramFromClient(
     select: { id: true },
   });
 
+  console.log("found workouts: ", workouts);
+
   if (workouts.length === 0) {
+    console.log("No workouts found, returning.");
     return { ok: true, removed: 0 };
   }
 
   const workoutIds = workouts.map((w) => w.id);
-
+  console.log("workout Ids ", workoutIds);
   // 2️⃣ Find scheduled workouts that are safe to remove
   const scheduledToRemove = await prisma.scheduledWorkout.findMany({
     where: {
       clientId,
       workoutId: { in: workoutIds },
       status: {
-        in: ["SCHEDULED", "IN_PROGRESS"],
+        in: ["SCHEDULED", "IN_PROGRESS", "SKIPPED"],
       },
     },
     select: { id: true },
@@ -234,27 +239,56 @@ export async function removeProgramFromClient(
     return { ok: true, removed: 0 };
   }
 
+  console.log("📋 scheduledToRemove count:", scheduledToRemove.length);
+  console.log("📋 scheduledToRemove:", scheduledToRemove);
+
+  if (scheduledToRemove.length === 0) {
+    // Also fetch WITHOUT status filter to see what's actually there
+    const allScheduled = await prisma.scheduledWorkout.findMany({
+      where: { clientId, workoutId: { in: workoutIds } },
+      select: { id: true, status: true, workoutId: true },
+    });
+    console.log(
+      "⚠️ No removable workouts found. All scheduled workouts for this client+program:",
+      allScheduled,
+    );
+    return { ok: true, removed: 0 };
+  }
+
   const scheduledIds = scheduledToRemove.map((s) => s.id);
 
   // 3️⃣ Transaction: delete logs first, then scheduled workouts
   const result = await prisma.$transaction(async (tx) => {
-    // Delete workout logs
-    await tx.workoutLog.deleteMany({
-      where: {
-        scheduledId: { in: scheduledIds },
-      },
+    // 1. Find workout log IDs first
+    const workoutLogs = await tx.workoutLog.findMany({
+      where: { scheduledId: { in: scheduledIds } },
+      select: { id: true },
     });
+    const workoutLogIds = workoutLogs.map((l) => l.id);
+    console.log("🗑️ workoutLogIds to delete:", workoutLogIds);
 
-    // Delete scheduled workouts
-    const deleted = await tx.scheduledWorkout.deleteMany({
-      where: {
-        id: { in: scheduledIds },
-      },
+    // 2. Delete exercise logs first (child of workoutLog)
+    const deletedExerciseLogs = await tx.exerciseLog.deleteMany({
+      where: { workoutLogId: { in: workoutLogIds } },
     });
+    console.log("🗑️ deleted exerciseLogs:", deletedExerciseLogs.count);
+
+    // 3. Delete workout logs
+    const deletedWorkoutLogs = await tx.workoutLog.deleteMany({
+      where: { id: { in: workoutLogIds } },
+    });
+    console.log("🗑️ deleted workoutLogs:", deletedWorkoutLogs.count);
+
+    // 4. Delete scheduled workouts
+    const deleted = await tx.scheduledWorkout.deleteMany({
+      where: { id: { in: scheduledIds } },
+    });
+    console.log("🗑️ deleted scheduledWorkouts:", deleted.count);
 
     return deleted.count;
   });
 
+  console.log("result ", result);
   revalidatePath(`/trainer/programs/${programId}`);
 
   return {
@@ -262,7 +296,6 @@ export async function removeProgramFromClient(
     removed: result,
   };
 }
-
 
 export async function assignProgramToClient(
   programId: string,
