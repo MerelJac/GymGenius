@@ -6,12 +6,20 @@ import SubstitutionsEditor from "@/app/components/exercise/SubstitutionsEditor";
 import { BackButton } from "@/app/components/BackButton";
 import { deleteExercise } from "./actions";
 import { DeleteExerciseButton } from "@/app/components/ui/DeleteButton";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
 export default async function EditExercisePage({
   params,
 }: {
   params: Promise<{ exerciseId: string }>;
 }) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    console.log("Not allowed to access page: EditExercisePage");
+    redirect("/");
+  }
+
   const { exerciseId } = await params;
   const exercise = await prisma.exercise.findUnique({
     where: { id: exerciseId },
@@ -26,6 +34,14 @@ export default async function EditExercisePage({
 
   if (!exercise) {
     return <div>Exercise not found</div>;
+  }
+
+  if (
+    session.user?.role === "ADMIN" ||
+    session.user?.id === exercise.trainerId
+  ) {
+    console.log("Not allowed to edit exercsie");
+    redirect("/");
   }
 
   async function updateExercise(formData: FormData) {
@@ -62,10 +78,9 @@ export default async function EditExercisePage({
       <form action={deleteExercise}>
         <input type="hidden" name="exerciseId" value={exercise.id} />
         <div className="text-end">
-        <DeleteExerciseButton />
+          <DeleteExerciseButton />
         </div>
       </form>
-
     </div>
   );
 }

@@ -59,7 +59,7 @@ export default function AddClientForm({ onClientCreated }: Props) {
           disabled={saving}
           className="btn-primary disabled:opacity-50"
         >
-          {saving ? "Creating…" : "Add client"}
+          {saving ? "Creating…" : "Invite client"}
         </button>
       </form>
       {error && <p className="text-sm text-red-600">{error}</p>}
