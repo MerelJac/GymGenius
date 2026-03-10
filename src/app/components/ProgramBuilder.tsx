@@ -314,8 +314,8 @@ export default function ProgramBuilder({
         </div>
 
         {optimisticWorkouts.length === 0 ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-10 text-center">
-            <p className="text-gray-600 mb-4">
+          <div className="gradient-bg border border-gray-200 rounded-xl p-10 text-center">
+            <p className="text-text mb-4">
               No workouts in this program yet
             </p>
             <button onClick={handleAddWorkout} className="btn-secondary">
