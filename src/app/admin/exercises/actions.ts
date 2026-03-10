@@ -7,7 +7,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 export async function approveExercise(id: string) {
-     const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
   if (!session?.user) redirect("/login");
 
