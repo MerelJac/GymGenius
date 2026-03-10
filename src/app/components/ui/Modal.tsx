@@ -42,7 +42,7 @@ export function Modal({
               <X size={15} />
             </button>
           </div>
-          <div className="p-5">{children}</div>
+          <div className="p-5 bg-black">{children}</div>
         </div>
       </div>
     </>,
