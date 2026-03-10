@@ -7,8 +7,8 @@ import {
   deleteProgram,
   duplicateProgram,
 } from "@/app/(trainer)/programs/actions";
-import { Copy, Plus, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Copy, Dumbbell, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 export default function ProgramsPageClient({
   initialPrograms,
@@ -69,18 +69,18 @@ export default function ProgramsPageClient({
 
       {/* Programs List */}
       {programs.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-10 text-center">
-          <h3 className="text-lg font-medium text-gray-700 mb-3">
+        <div className="gradient-bg border border-surface2 rounded-2xl p-10 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-surface2 flex items-center justify-center mx-auto mb-4">
+            <Dumbbell size={20} className="text-muted" />
+          </div>
+          <h3 className="font-syne font-bold text-base text-foreground mb-2">
             No programs yet
           </h3>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+          <p className="text-sm text-muted max-w-sm mx-auto mb-6">
             Create your first training program to get started.
           </p>
-          <Link
-            href="/programs/new"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            <Plus size={18} />
+          <Link href="/programs/new" className="btn-primary inline-flex">
+            <Plus size={16} />
             Create Program
           </Link>
         </div>
