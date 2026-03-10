@@ -56,7 +56,7 @@ export function ClientProgramProgress({
     }, {}),
   );
 
-  if (programs.length === 0) return null;
+
   const initials =
     [client.profile?.firstName?.[0], client.profile?.lastName?.[0]]
       .filter(Boolean)
