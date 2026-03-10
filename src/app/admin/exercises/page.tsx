@@ -24,7 +24,12 @@ export default async function AdminExercisesPage() {
       trainerId: {
         not: null,
       },
-    }
+    },
+    include: {
+      trainer: {
+        include: { profile: true },
+      },
+    },
   });
 
   return <AdminExerciseReview exercises={exercises} />;

@@ -4,12 +4,16 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { approveExercise } from "./actions";
 import Link from "next/link";
-import { Exercise } from "@prisma/client";
+import { Exercise, User, Profile } from "@prisma/client";
+
+type ExerciseWithTrainer = Exercise & {
+  trainer: (User & { profile: Profile | null }) | null;
+};
 
 export default function AdminExerciseReview({
   exercises,
 }: {
-  exercises: Exercise[];
+  exercises: ExerciseWithTrainer[];
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -35,6 +39,9 @@ export default function AdminExerciseReview({
                 <h2 className="font-syne font-bold text-sm text-foreground truncate group-hover:text-lime-green transition-colors">
                   {exercise.name}
                 </h2>
+                <p className="mt-0.5 text-xs text-muted/60">
+                  By {exercise.trainer?.profile?.firstName ?? "Unknown trainer"}
+                </p>
                 <p className="mt-0.5 text-sm text-muted">
                   {exercise.notes || "No notes"}
                 </p>
