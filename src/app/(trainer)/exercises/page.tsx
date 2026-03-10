@@ -6,6 +6,7 @@ import { Plus, Search, Video } from "lucide-react";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import ExerciseList from "./ExerciseList";
 
 export default async function ExerciseLibraryPage({
   searchParams,
@@ -125,53 +126,11 @@ export default async function ExerciseLibraryPage({
           </Link>
         </div>
       ) : (
-        <div className="gradient-bg border border-surface2 rounded-2xl overflow-hidden divide-y divide-surface2">
-          {" "}
-          {exercises.map((ex: Exercise) => {
-            const canEdit = userRole === "ADMIN" || ex.trainerId === userId;
-            console.log('can edit? ', canEdit)
-            return (
-              <div
-                key={ex.id}
-                className="px-5 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 
-        hover:bg-surface2/50 hover:pl-6 transition-all duration-150 group
-        border-l-2 border-l-transparent hover:border-l-lime-green/50"
-              >
-                <div className="min-w-0">
-                  <div className="font-syne font-bold text-sm text-foreground truncate group-hover:text-lime-green transition-colors">
-                    {ex.name}
-                  </div>
-                  <div className="text-sm text-muted mt-0.5 flex flex-row flex-wrap items-center gap-1">
-                    {ex.type} • {ex.muscleGroup}
-                    {ex.trainerId === null && (
-                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-surface2 text-muted ml-1">
-                        Global
-                      </span>
-                    )}
-                    {ex.videoUrl && (
-                      <>
-                        {" • "}
-                        <Video size={12} />
-                      </>
-                    )}
-                  </div>
-                </div>
-                {canEdit ? (
-                  <Link
-                    href={`/exercises/${ex.id}/edit`}
-                    className="btn-primary"
-                  >
-                    Edit
-                  </Link>
-                ) : (
-                  <span className="text-xs text-muted px-3 py-1.5 rounded-xl bg-surface2 border border-surface2">
-                    View only
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <ExerciseList
+          exercises={exercises}
+          userId={userId}
+          userRole={userRole}
+        />
       )}
 
       {totalPages > 1 && (

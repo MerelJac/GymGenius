@@ -34,18 +34,15 @@ export default function NewProgramPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 flex flex-col items-center px-4 py-12">
+    <div className="min-h-screen bg-background flex flex-col items-center px-4 py-12">
       <div className="w-full max-w-md">
-        {/* Back button – assuming your component */}
         <BackButton route="/programs" />
 
-        <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="mt-8 gradient-bg rounded-2xl border border-surface2 overflow-hidden">
           {/* Header */}
-          <div className="px-6 py-5 border-b bg-gray-50">
-            <h1 className="nav-logo">
-              Create New Program
-            </h1>
-            <p className="mt-1.5 text-sm text-gray-600">
+          <div className="px-6 py-5 border-b border-surface2">
+            <h1 className="nav-logo">Create New Program</h1>
+            <p className="mt-1.5 text-sm text-muted">
               Give your training program a clear name to get started.
             </p>
           </div>
@@ -55,7 +52,7 @@ export default function NewProgramPage() {
             <div className="space-y-2">
               <label
                 htmlFor="program-name"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-xs font-semibold uppercase tracking-widest text-muted"
               >
                 Name
               </label>
@@ -68,14 +65,11 @@ export default function NewProgramPage() {
                 maxLength={80}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. 5/3/1 Beginner, Push-Pull-Legs, Upper/Lower..."
-                className={`
-                  w-full px-4 py-3 rounded-lg border border-gray-300 
-                  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
-                  focus:outline-none transition-all
-                  placeholder:text-gray-400
-                  disabled:opacity-60 disabled:cursor-not-allowed text-base
-                `}
+                placeholder="e.g. 5/3/1 Beginner, Push-Pull-Legs..."
+                className="w-full px-4 py-3 rounded-xl border border-surface2 bg-surface2/50
+              text-foreground placeholder:text-muted text-sm
+              focus:outline-none focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30
+              disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                 disabled={isSubmitting}
                 autoFocus
               />
@@ -84,10 +78,12 @@ export default function NewProgramPage() {
             <div className="space-y-2">
               <label
                 htmlFor="program-description"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-xs font-semibold uppercase tracking-widest text-muted"
               >
                 Description{" "}
-                <small>(optional)</small>
+                <span className="normal-case font-normal tracking-normal">
+                  (optional)
+                </span>
               </label>
               <input
                 id="program-description"
@@ -97,36 +93,27 @@ export default function NewProgramPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Focus on full body strength, mobility, etc..."
-                className={`
-                  w-full px-4 py-3 rounded-lg border border-gray-300 
-                  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
-                  focus:outline-none transition-all
-                  placeholder:text-gray-400
-                  disabled:opacity-60 disabled:cursor-not-allowed text-base
-                `}
+                className="w-full px-4 py-3 rounded-xl border border-surface2 bg-surface2/50
+              text-foreground placeholder:text-muted text-sm
+              focus:outline-none focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30
+              disabled:opacity-60 disabled:cursor-not-allowed transition-all"
                 disabled={isSubmitting}
-                autoFocus
               />
             </div>
 
-            {/* Submit button */}
             <button
               type="submit"
               disabled={isSubmitting || !name.trim()}
-              className={`
-                w-full px-6 py-3.5 font-medium rounded-lg
-                bg-black text-white shadow-sm
-                hover:bg-gray-900 focus:outline-none focus:ring-2 
-                focus:ring-black focus:ring-offset-2
-                disabled:opacity-50 disabled:cursor-not-allowed
-                transition-all duration-200
-                flex items-center justify-center gap-2
-              `}
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5
+            bg-lime-green text-black font-syne font-bold rounded-xl
+            hover:opacity-90 active:scale-[0.98]
+            disabled:opacity-50 disabled:cursor-not-allowed
+            transition-all duration-200"
             >
               {isSubmitting ? (
                 <>
                   <svg
-                    className="animate-spin h-5 w-5 text-white"
+                    className="animate-spin h-4 w-4"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
@@ -154,8 +141,7 @@ export default function NewProgramPage() {
           </form>
         </div>
 
-        {/* Optional helpful footer note */}
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-muted">
           You can add workouts and assign clients after creation.
         </p>
       </div>
