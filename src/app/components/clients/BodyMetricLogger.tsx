@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { addMyBodyMetric } from "@/app/(client)/profile/actions";
+import { useRouter } from "next/navigation";
 
 export function BodyMetricLogger() {
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   async function handleAdd() {
     setLoading(true);
@@ -22,7 +24,7 @@ export function BodyMetricLogger() {
     setWeight("");
     setBodyFat("");
     setLoading(false);
-
+    router.refresh();
   }
 
   return (
