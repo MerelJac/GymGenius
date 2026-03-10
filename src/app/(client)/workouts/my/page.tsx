@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Pagination } from "@/app/components/Pagination";
+import MyWorkoutsList from "./MyWorkoutsList";
 
 const PAGE_SIZE = 20;
 
@@ -16,7 +17,6 @@ export default async function MyWorkoutsPage({
   if (!session?.user?.id) return notFound();
   const userId = session.user.id;
   const page = Math.max(1, parseInt(searchParams.page ?? "1"));
-
   const [workouts, total] = await Promise.all([
     prisma.scheduledWorkout.findMany({
       where: {
@@ -41,7 +41,10 @@ export default async function MyWorkoutsPage({
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
       <div className="flex items-center gap-3">
-        <Link href="/profile" className="text-muted text-sm hover:text-orange-500 transition-colors">
+        <Link
+          href="/profile"
+          className="text-muted text-sm hover:text-orange-500 transition-colors"
+        >
           ← Back
         </Link>
         <h1 className="section-title">Workouts You Created</h1>
@@ -50,22 +53,7 @@ export default async function MyWorkoutsPage({
       {workouts.length === 0 ? (
         <p className="text-sm text-gray-500">No workouts found.</p>
       ) : (
-        <ul className="feed">
-          {workouts.map((sw) => (
-            <li key={sw.id}>
-              <Link
-                href={`/workouts/${sw.id}`}
-                className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
-              >
-                <div className="feed-info">
-                  <p className="feed-name">{sw.workout.name}</p>
-                  <p className="feed-date">{sw.scheduledDate.toLocaleDateString()}</p>
-                </div>
-                <span className="btn-arrow">→</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
+          <MyWorkoutsList workouts={workouts} />
       )}
 
       <Pagination page={page} totalPages={totalPages} basePath="/workouts/my" />

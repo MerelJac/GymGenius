@@ -24,7 +24,7 @@ export default async function ClientProfilePage() {
         where: {
           status: "SCHEDULED",
         },
-        orderBy: { scheduledDate: "asc" },
+        orderBy: { scheduledDate: "desc" },
         take: 15,
         include: {
           workout: true,
