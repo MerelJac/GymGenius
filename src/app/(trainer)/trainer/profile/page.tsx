@@ -135,34 +135,40 @@ export default async function TrainerProfilePage() {
 
       {/* Invite Trainer */}
       {trainer.role === "ADMIN" && (
-        <section className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-          <h3 className="font-semibold text-gray-900">Invite Trainers</h3>
+        <section className="gradient-bg border border-surface2 rounded-2xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-surface2">
+            <h3 className="font-syne font-bold text-base text-foreground">
+              Invite Trainers
+            </h3>
+          </div>
 
-          <InviteTrainer />
-          {invitedTrainers.length === 0 ? (
-            <p className="text-sm text-gray-500 italic">
-              No trainers invited yet.
-            </p>
-          ) : (
-            <ul className="space-y-2">
-              {invitedTrainers.map((t) => (
-                <li
-                  key={t.id}
-                  className="flex items-center justify-between rounded-lg border border-gray-100 px-4 py-2"
-                >
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-900">
-                      {t.email}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      Invited {new Date(t.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <ResendInviteButton email={t.email} />
-                </li>
-              ))}
-            </ul>
-          )}
+          <div className="px-5 py-4 space-y-4">
+            <InviteTrainer />
+            {invitedTrainers.length === 0 ? (
+              <p className="text-xs text-muted italic">
+                No trainers invited yet.
+              </p>
+            ) : (
+              <ul className="divide-y divide-surface2">
+                {invitedTrainers.map((t) => (
+                  <li
+                    key={t.id}
+                    className="flex items-center justify-between px-1 py-3 hover:bg-surface2/50 transition-all duration-150 group"
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-syne font-bold text-sm text-foreground group-hover:text-lime-green transition-colors">
+                        {t.email}
+                      </span>
+                      <span className="text-xs text-muted">
+                        Invited {new Date(t.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <ResendInviteButton email={t.email} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </section>
       )}
 
