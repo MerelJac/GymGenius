@@ -40,7 +40,7 @@ export function SyncProgramButton({
                                       title="Update with new workouts in the program."
       >
         <RefreshCcw size={14} className={loading ? "animate-spin" : ""} />
-        {loading ? "Syncing…" : "Add new workouts"}
+        {loading ? "Syncing…" : "Sync new workouts"}
         
       </button>
 

@@ -1149,7 +1149,7 @@ export default function WorkoutCard({
                 </div>
               )}
 
-              <div className="flex-1 min-w-[260px]">
+              <div className="flex flex-col  min-w-[260px]">
                 <label className={labelCls}>
                   Notes / tempo / rest
                 </label>

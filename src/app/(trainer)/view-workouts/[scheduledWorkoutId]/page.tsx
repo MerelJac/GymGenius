@@ -11,7 +11,8 @@ export default async function ViewWorkoutPage({
 }: {
   params: { scheduledWorkoutId: string };
 }) {
-  const scheduledWorkout = await prisma.scheduledWorkout.findUnique({
+  const scheduledWorkout = await prisma.scheduledWorkout.findFirst({
+    // TODO needs client ID Flag
     where: {
       id: params.scheduledWorkoutId,
     },
@@ -24,7 +25,7 @@ export default async function ViewWorkoutPage({
             },
           },
         },
-      },
+      }
     },
   });
 
@@ -50,12 +51,12 @@ export default async function ViewWorkoutPage({
 
   return (
     <div className="max-w-4xl mx-auto py-8">
-                <BackButton route="/trainer" />
-        
+      <BackButton route="/trainer" />
+
       {isCompleted && (
-          <div className="greeting">
-            <h1>Workout completed!</h1>
-          </div>
+        <div className="greeting">
+          <h1>Workout completed!</h1>
+        </div>
       )}
 
       <ExerciseLogViewer logs={logs} />

@@ -21,6 +21,7 @@ import { ClientWithWorkouts } from "@/types/client";
 import { Plus, Users } from "lucide-react";
 import { ExerciseQuickAdd } from "../(trainer)/exercises/components/ExerciseQuickAdd";
 import { SyncProgramButton } from "./programs/SyncProgramButton";
+import { useRouter } from "next/navigation";
 
 export default function ProgramBuilder({
   program,
@@ -34,7 +35,7 @@ export default function ProgramBuilder({
   clientsAssignedProgram: ClientWithWorkouts[];
 }) {
   const [error, setError] = useState<string | null | undefined>(null);
-
+  const router = useRouter();
   type WorkoutAction =
     | { type: "add"; workout: WorkoutWithSections }
     | { type: "remove"; id: string };
@@ -85,6 +86,7 @@ export default function ProgramBuilder({
     // Optional: reset form after success
     setClientId("");
     setStartDate("");
+    router.refresh();
   }
 
   async function handleAddWorkout() {

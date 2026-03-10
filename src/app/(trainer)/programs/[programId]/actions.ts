@@ -8,6 +8,7 @@ import { Prescribed } from "@/types/prescribed";
 import { Prisma } from "@prisma/client";
 import { WorkoutDay } from "@/types/enums";
 import { getNextDateForDay } from "@/app/utils/getNextDateForDay";
+import { formatDateFromInput } from "@/app/utils/format/formatDateFromInput";
 
 function runRevalidate(programId: string) {
   revalidatePath(`/trainer/programs/${programId}`);
@@ -304,16 +305,31 @@ export async function assignProgramToClient(
 ) {
   const program = await prisma.program.findUnique({
     where: { id: programId },
-    include: { workouts: true },
+    include: { workouts: { orderBy: { day: "asc" } } },
   });
 
-  if (!program) {
-    return { ok: false, error: "Program not found" };
-  }
+  if (!program) return { ok: false, error: "Program not found" };
 
-  for (const workout of program.workouts) {
-    const scheduledDate = getNextDateForDay(startDate, workout.day);
+  // const dayOrder = [
+  //   "SUNDAY",
+  //   "MONDAY",
+  //   "TUESDAY",
+  //   "WEDNESDAY",
+  //   "THURSDAY",
+  //   "FRIDAY",
+  //   "SATURDAY",
+  // ];
 
+  // Sort workouts by day of week using intended order
+  const sorted = [...program.workouts].sort((a, b) => a.order - b.order);
+
+  let cursor = formatDateFromInput(startDate);
+
+  for (const workout of sorted) {
+    const scheduledDate = getNextDateForDay(cursor, workout.day);
+    console.log("Adding schedule date:", scheduledDate);
+    console.log("For Client:", clientId);
+    console.log("For wokroutId:", workout.id);
     await prisma.scheduledWorkout.create({
       data: {
         workoutId: workout.id,
@@ -321,10 +337,14 @@ export async function assignProgramToClient(
         scheduledDate,
       },
     });
+    // Advance cursor to the day after this scheduled date
+    // so next iteration doesn't re-use the same week
+    cursor =  formatDateFromInput(scheduledDate);
+    cursor.setDate(cursor.getDate() + 1);
   }
+
   return { ok: true };
 }
-
 export async function updateWorkoutDay(
   programId: string,
   workoutId: string,
