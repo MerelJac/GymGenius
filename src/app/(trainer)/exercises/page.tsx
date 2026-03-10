@@ -129,6 +129,7 @@ export default async function ExerciseLibraryPage({
           {" "}
           {exercises.map((ex: Exercise) => {
             const canEdit = userRole === "ADMIN" || ex.trainerId === userId;
+            console.log('can edit? ', canEdit)
             return (
               <div
                 key={ex.id}

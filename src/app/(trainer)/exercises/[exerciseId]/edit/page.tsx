@@ -37,10 +37,11 @@ export default async function EditExercisePage({
   }
 
   if (
-    session.user?.role === "ADMIN" ||
-    session.user?.id === exercise.trainerId
+    session.user?.role !== "ADMIN" &&
+    session.user?.id !== exercise.trainerId
   ) {
     console.log("Not allowed to edit exercsie");
+
     redirect("/");
   }
 
