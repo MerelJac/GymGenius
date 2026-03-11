@@ -81,3 +81,20 @@ invoice.payment_failed
 
 Click Add endpoint
 Click Reveal signing secret → copy it → paste as STRIPE_WEBHOOK_SECRET
+
+
+Must-Fix Before Launch
+<!-- 1. Hardcoded personal info — This is the most urgent. There are hardcoded values that need to come out:
+coachmerel.training@gmail.com referenced on the signup page
+BCC on emails goes to your personal Gmail (email config) -->
+
+<!-- 4. Remove 100+ console.log statements — These could leak session data, user info, etc. in production browser consoles. Not a great look and potentially a privacy issue. -->
+
+High Priority (Before First Paying Clients)
+5. No pricing page — You have Stripe set up but nowhere on the app does it explain what things cost. Clients/trainers will hit a billing wall with no context.
+
+Nice to Have (Can Ship Without, But Improves Experience)
+Progress/analytics charts for clients (big differentiator for a PT app)
+Search/filter on exercise lists
+Mobile navigation (sidebar only right now)
+Loading skeleton states in more places

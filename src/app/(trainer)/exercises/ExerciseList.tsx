@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Video } from "lucide-react";
 import ExerciseModal from "@/app/components/exercise/ExerciseModal";
 import { Exercise } from "@/types/exercise";
+import { useTrack } from "@/hooks/useTrack";
 
 export default function ExerciseList({
   exercises,
@@ -14,8 +15,10 @@ export default function ExerciseList({
   userId: string;
   userRole: string;
 }) {
-  const [viewingExerciseId, setViewingExerciseId] = useState<string | null>(null);
-
+  const [viewingExerciseId, setViewingExerciseId] = useState<string | null>(
+    null,
+  );
+  const track = useTrack();
   return (
     <>
       <div className="gradient-bg border border-surface2 rounded-2xl overflow-hidden divide-y divide-surface2">
@@ -34,7 +37,12 @@ export default function ExerciseList({
                 </div>
                 <div className="text-sm text-muted mt-0.5 flex flex-row flex-wrap items-center gap-1">
                   {ex.type} • {ex.muscleGroup}
-                  {ex.videoUrl && <><span> • </span><Video size={12} /></>}
+                  {ex.videoUrl && (
+                    <>
+                      <span> • </span>
+                      <Video size={12} />
+                    </>
+                  )}
                 </div>
               </div>
               {canEdit ? (
@@ -43,7 +51,10 @@ export default function ExerciseList({
                 </Link>
               ) : (
                 <button
-                  onClick={() => setViewingExerciseId(ex.id)}
+                  onClick={() => {
+                    track("client_deleted", { clientId: userId });
+                    setViewingExerciseId(ex.id);
+                  }}
                   className="text-xs text-muted px-3 py-1.5 rounded-xl bg-surface2 border border-surface2 hover:border-lime-green/30 hover:text-lime-green transition-colors"
                 >
                   View

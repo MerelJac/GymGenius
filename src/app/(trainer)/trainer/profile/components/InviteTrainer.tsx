@@ -9,6 +9,7 @@ export default function InviteTrainer() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null | undefined>(null);
   const [saving, setSaving] = useState(false);
+  
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!email) return;
