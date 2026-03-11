@@ -359,43 +359,84 @@ export default function WorkoutCard({
         notes.trim() || undefined,
       );
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Failed to add exercise");
+        startTransition(() => {
+          updateOptimisticSections({
+            type: "remove-exercise",
+            exerciseId: optimisticExercise.id,
+          });
+        });
         return;
       }
       setNotes(""); // clear only on success
     } catch (err) {
       console.error("Failed to add exercise", err);
-      // TODO: rollback optimistic update (more advanced)
+      setError("Failed to add exercise. Please try again.");
+      startTransition(() => {
+        updateOptimisticSections({
+          type: "remove-exercise",
+          exerciseId: optimisticExercise.id,
+        });
+      });
     }
   }
 
   async function handleDeleteExercise(workoutExerciseId: string) {
+    // Capture before optimistic removal so we can restore on failure
+    let deletedExercise: SectionExercise | null = null;
+    let deletedFromSectionId: string | null = null;
+    for (const section of optimisticSections) {
+      const found = section.exercises.find((e) => e.id === workoutExerciseId);
+      if (found) {
+        deletedExercise = found;
+        deletedFromSectionId = section.id;
+        break;
+      }
+    }
+
     startTransition(() => {
       updateOptimisticSections({
         type: "remove-exercise",
         exerciseId: workoutExerciseId,
       });
     });
+
+    const revertDelete = () => {
+      if (deletedExercise && deletedFromSectionId) {
+        startTransition(() => {
+          updateOptimisticSections({
+            type: "add-exercise",
+            sectionId: deletedFromSectionId!,
+            exerciseId: deletedExercise!.exerciseId,
+            exercise: deletedExercise!,
+          });
+        });
+      }
+    };
+
     try {
       setError(null);
       const result = await deleteWorkoutExercise(programId, workoutExerciseId);
       if (!result.ok) {
-        setError(result.error);
+        setError(result.error ?? "Failed to delete exercise");
+        revertDelete();
         return;
       }
     } catch (err) {
       console.error("Delete failed", err);
-      // TODO: revert optimistic state
+      setError("Failed to delete exercise. Please try again.");
+      revertDelete();
     }
   }
 
   async function saveSectionTitle(sectionId: string, newTitle: string) {
     if (!newTitle.trim()) {
-      // Optional: revert or show error
       return;
     }
 
     const trimmed = newTitle.trim();
+    const previousTitle =
+      optimisticSections.find((s) => s.id === sectionId)?.title ?? trimmed;
 
     // Optimistic update
     startTransition(() => {
@@ -417,11 +458,25 @@ export default function WorkoutCard({
       );
       if (result && result.error) {
         setError(result.error);
+        startTransition(() => {
+          updateOptimisticSections({
+            type: "update-section-title",
+            sectionId,
+            title: previousTitle,
+          });
+        });
         return;
       }
     } catch (err) {
       console.error("Failed to update section title", err);
-      // TODO: rollback (advanced) or show toast/error
+      setError("Failed to update section title. Please try again.");
+      startTransition(() => {
+        updateOptimisticSections({
+          type: "update-section-title",
+          sectionId,
+          title: previousTitle,
+        });
+      });
     }
   }
 
