@@ -6,7 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { calculateOneRepMax } from "@/app/utils/oneRepMax/calculateOneRepMax";
 import { buildPerformedFromPrescribed } from "@/app/utils/workoutFunctions";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { sendAdditionalWorkoutEmailToTrainer } from "@/lib/email-templates/additionalWorkoutEmailToTrainer";
 import { sendCompletedWorkoutEmailToTrainer } from "@/lib/email-templates/completedWorkoutToTrainer";
 import { Prisma } from "@prisma/client";
@@ -103,7 +103,6 @@ export async function startBuildingWorkout(scheduledId: string) {
     return log.id;
   });
 }
-
 
 export async function stopWorkout(workoutLogId: string) {
   await prisma.$transaction(async (tx) => {
@@ -254,7 +253,10 @@ export async function alertTrainerOfCreateForLaterWorkout(
   }
 
   try {
-    console.log('Workout Program: ', workoutLog?.scheduled?.workout?.program?.id)
+    console.log(
+      "Workout Program: ",
+      workoutLog?.scheduled?.workout?.program?.id,
+    );
     if (workoutLog?.scheduled?.workout?.program?.id.startsWith("__")) {
       // CLINET CREATED WORKOUTS FOR LATER
       await sendCreatedWorkoutForLaterEmailToTrainer(
@@ -500,16 +502,25 @@ export async function rerunWorkout(scheduledWorkoutId: string) {
   redirect(`/workouts/${newScheduled.id}`);
 }
 
-export async function deleteClientWorkout(scheduledWorkoutId: string, workoutId: string) {
-  const session = await getServerSession();
+export async function deleteClientWorkout(
+  scheduledWorkoutId: string,
+  workoutId: string,
+) {
+  const session = await getServerSession(authOptions);
   const clientId = session?.user?.id;
-  if (!clientId) throw new Error("Unauthorized");
+  if (!clientId) {
+    console.log("Unauthorized attempt to delete workout");
+    return notFound();
+  }
 
   // Verify ownership
   const scheduled = await prisma.scheduledWorkout.findUnique({
     where: { id: scheduledWorkoutId },
   });
-  if (!scheduled || scheduled.clientId !== clientId) throw new Error("Unauthorized");
+  if (!scheduled || scheduled.clientId !== clientId) {
+    console.log("Unauthorized attempt to delete workout");
+    return notFound();
+  }
 
   // Delete in order to respect FK constraints
   await prisma.$transaction([
@@ -533,5 +544,5 @@ export async function deleteClientWorkout(scheduledWorkoutId: string, workoutId:
     }),
   ]);
 
-  redirect("/workouts");
+  redirect("/dashboard");
 }
