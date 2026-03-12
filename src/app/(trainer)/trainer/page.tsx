@@ -179,7 +179,7 @@ export default async function TrainerHomePage() {
               ✅ Recently Completed
             </h2>
             <Link
-              href="/trainer/completed-workouts"
+              href="/completed-workouts"
               className="text-xs text-muted hover:text-orange-500 transition-colors"
             >
               See all →

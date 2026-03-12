@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { Performed } from "@/types/prescribed";
 import { ExerciseLog } from "@/types/workout";
@@ -11,10 +13,19 @@ export default async function ViewWorkoutPage({
 }: {
   params: { scheduledWorkoutId: string };
 }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return notFound();
+
+  const trainerId = session.user.id;
+
   const scheduledWorkout = await prisma.scheduledWorkout.findFirst({
-    // TODO needs client ID Flag
     where: {
       id: params.scheduledWorkoutId,
+      // Only return the workout if the client belongs to the requesting trainer or themselves (client is viewing their own workout)
+      OR: [
+        { client: { trainerId } },
+        { clientId: session.user.id },
+      ],
     },
     include: {
       workoutLogs: {
@@ -25,7 +36,7 @@ export default async function ViewWorkoutPage({
             },
           },
         },
-      }
+      },
     },
   });
 

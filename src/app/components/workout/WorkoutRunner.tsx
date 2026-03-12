@@ -11,6 +11,7 @@ import {
   saveWorkoutForLater,
   alertTrainerOfCreateForLaterWorkout,
   startBuildingWorkout,
+  deleteClientWorkout,
 } from "@/app/(client)/workouts/[scheduledWorkoutId]/actions";
 import { ExerciseLogger } from "./ExerciseLogger";
 import { ExerciseLog, ScheduledWorkoutWithLogs } from "@/types/workout";
@@ -18,7 +19,7 @@ import { ExerciseLogViewer } from "./ExerciseLogViewer";
 import { useRouter } from "next/navigation";
 import { assertPrescribed } from "@/app/utils/prescriptions/assertPrescribed";
 import { AddExerciseToWorkout } from "./AddExerciseToWorkout";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Trash2 } from "lucide-react";
 
 export default function WorkoutRunner({
   scheduledWorkout,
@@ -37,6 +38,8 @@ export default function WorkoutRunner({
   const [workoutLogId, setWorkoutLogId] = useState<string | null>(
     activeLog?.id ?? null,
   );
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const [finishingText, setFinishingText] = useState("Finish Workout");
   const [isFinishing, setIsFinishing] = useState(false);
   const [isCreatingForLater, setIsCreatingForLater] = useState(false);
@@ -107,8 +110,28 @@ export default function WorkoutRunner({
 
   return (
     <div className="greeting h-full">
-      <h1 className="pb-2">{scheduledWorkout.workout.name}</h1>
-
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="pb-2">{scheduledWorkout.workout.name}</h1>
+        {scheduledWorkout.workout.programId?.startsWith("__") && (
+          <button
+            className="text-red-500 hover:text-red-700 p-1 disabled:opacity-50 flex items-center gap-1 text-sm"
+            disabled={isDeleting}
+            title="Delete the workout you made."
+            onClick={async () => {
+              if (!confirm("Delete this workout? This cannot be undone."))
+                return;
+              setIsDeleting(true);
+              await deleteClientWorkout(
+                scheduledWorkout.id,
+                scheduledWorkout.workoutId,
+              );
+            }}
+          >
+            <Trash2 size={16} />
+            {isDeleting && <span>Deleting...</span>}
+          </button>
+        )}
+      </div>
       {/* START / STOP */}
       {!isActive ? (
         <>
@@ -231,6 +254,7 @@ export default function WorkoutRunner({
           you don’t see what you need.
         </p>
       )}
+
       {/* EXERCISES */}
       <div className="space-y-6">
         {scheduledWorkout.workout.workoutSections.map((section) => (

@@ -2,6 +2,7 @@
 
 export default function TermsConditions() {
   return (
+        // TODO: consult a lawyer before
     <div className="prose prose-sm max-w-3xl mx-auto p-10">
       <strong>Terms of Service</strong>
       <p>

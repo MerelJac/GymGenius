@@ -1,12 +1,12 @@
 "use client";
-
 import { useState } from "react";
-import {  X } from "lucide-react";
+import { X } from "lucide-react";
 import { createWorkoutForLater } from "@/app/(client)/workouts/actions";
 
 export function CreateWorkoutForLater({ clientId }: { clientId: string }) {
   const [open, setOpen] = useState(false);
   const [addWorkoutName, setAddWorkoutName] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <>
@@ -19,7 +19,6 @@ export function CreateWorkoutForLater({ clientId }: { clientId: string }) {
           <button onClick={() => setOpen(true)}>+</button>
         </div>
       </div>
-
       {/* Modal */}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
@@ -31,24 +30,30 @@ export function CreateWorkoutForLater({ clientId }: { clientId: string }) {
               <X size={18} />
             </button>
             <div className="flex flex-col gap-2">
-            <h3 className="mb-2 text-lg font-semibold text-lime-green">
+              <h3 className="mb-2 text-lg font-semibold text-lime-green">
                 Name your workout.
               </h3>
-
               <input
                 className="w-full border rounded px-3 py-2"
                 value={addWorkoutName}
                 placeholder={"Workout name"}
                 onChange={(e) => setAddWorkoutName(e.target.value)}
               />
-
               <button
                 className="btn-primary"
+                disabled={isSubmitting}
                 onClick={async () => {
-                  await createWorkoutForLater(clientId, addWorkoutName);
+                  setIsSubmitting(true);
+                  try {
+                    await createWorkoutForLater(clientId, addWorkoutName);
+                    setOpen(false);
+                    setAddWorkoutName("");
+                  } finally {
+                    setIsSubmitting(false);
+                  }
                 }}
               >
-                Create Workout
+                {isSubmitting ? "Creating..." : "Create Workout"}
               </button>
             </div>
           </div>

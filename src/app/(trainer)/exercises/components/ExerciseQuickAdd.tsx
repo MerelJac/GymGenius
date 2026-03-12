@@ -13,10 +13,7 @@ export function ExerciseQuickAdd({
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-    className="btn-primary"
-      >
+      <button onClick={() => setOpen(true)} className="btn-primary">
         + Add Exercise
       </button>
 
