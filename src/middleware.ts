@@ -45,8 +45,8 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith(path),
   );
 
-  console.log("Middleware: Checking access for", pathname, "with role", token.role);
-  console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+  // console.log("Middleware: Checking access for", pathname, "with role", token.role);
+  // console.log('NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
 
   // Check access via API
   const res = await fetch(`${process.env.NEXTAUTH_URL}/api/billing/access`, {
