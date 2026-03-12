@@ -499,3 +499,39 @@ export async function rerunWorkout(scheduledWorkoutId: string) {
 
   redirect(`/workouts/${newScheduled.id}`);
 }
+
+export async function deleteClientWorkout(scheduledWorkoutId: string, workoutId: string) {
+  const session = await getServerSession();
+  const clientId = session?.user?.id;
+  if (!clientId) throw new Error("Unauthorized");
+
+  // Verify ownership
+  const scheduled = await prisma.scheduledWorkout.findUnique({
+    where: { id: scheduledWorkoutId },
+  });
+  if (!scheduled || scheduled.clientId !== clientId) throw new Error("Unauthorized");
+
+  // Delete in order to respect FK constraints
+  await prisma.$transaction([
+    prisma.exerciseLog.deleteMany({
+      where: { workoutLog: { scheduledId: scheduledWorkoutId } },
+    }),
+    prisma.workoutLog.deleteMany({
+      where: { scheduledId: scheduledWorkoutId },
+    }),
+    prisma.scheduledWorkout.deleteMany({
+      where: { workoutId },
+    }),
+    prisma.workoutExercise.deleteMany({
+      where: { workoutTemplate: { id: workoutId } },
+    }),
+    prisma.workoutSection.deleteMany({
+      where: { workoutId },
+    }),
+    prisma.workoutTemplate.delete({
+      where: { id: workoutId },
+    }),
+  ]);
+
+  redirect("/workouts");
+}
