@@ -3,7 +3,10 @@
 
 import { createAdditionalStrengthWorkout } from "@/app/(client)/workouts/actions";
 import { addAdditionalWorkout } from "@/app/actions/workout";
-import { normalizeDate, toInputDate } from "@/app/utils/format/formatDateFromInput";
+import {
+  normalizeDate,
+  toInputDate,
+} from "@/app/utils/format/formatDateFromInput";
 import { useEffect, useState, startTransition } from "react";
 
 type AdditionalWorkoutType = {
@@ -72,9 +75,7 @@ export function AddAdditionalWorkout({
     <div className="space-y-4">
       {/* Activity type */}
       <div>
-        <label className="add-sub pb-2">
-          Activity
-        </label>
+        <label className="add-sub pb-2">Activity</label>
         <select
           value={typeId}
           onChange={(e) => setTypeId(e.target.value)}
@@ -92,7 +93,9 @@ export function AddAdditionalWorkout({
       {/* 5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d */}
       {typeId == "5b4f1be3-ed4f-4704-ad79-7b7cb95bd25d" && (
         <div className="space-y-4">
-          <p className="text-center font-bold uppercase">Log your weights & reps</p>
+          <p className="text-center font-bold uppercase">
+            Log your weights & reps
+          </p>
           <input
             className="w-full border rounded px-3 py-2"
             value={addWorkoutName}
@@ -101,23 +104,29 @@ export function AddAdditionalWorkout({
           />
 
           <button
-            className="w-full bg-blue-600 text-white rounded px-4 py-2"
+            className="w-full bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+            disabled={saving}
             onClick={async () => {
-              await createAdditionalStrengthWorkout(clientId, addWorkoutName);
+              setSaving(true);
+              try {
+                await createAdditionalStrengthWorkout(clientId, addWorkoutName);
+                onSaved?.();
+              } finally {
+                setSaving(false);
+              }
             }}
           >
-            Log Workout
+            {saving ? "Logging..." : "Log Workout"}
           </button>
           <p className="text-center font-bold">OR QUICK ADD</p>
         </div>
-      ) } {typeId ? (
+      )}{" "}
+      {typeId ? (
         // 🟢 CARDIO / OTHER ACTIVITIES
         <div className="space-y-4">
           {/* Duration */}
           <div>
-            <label className="add-sub">
-              Duration (minutes)
-            </label>
+            <label className="add-sub">Duration (minutes)</label>
             <input
               type="number"
               min={0}
@@ -131,9 +140,7 @@ export function AddAdditionalWorkout({
 
           {/* Distance */}
           <div>
-            <label className="add-sub">
-              Distance (optional)
-            </label>
+            <label className="add-sub">Distance (optional)</label>
             <input
               type="number"
               step="0.01"
@@ -148,9 +155,7 @@ export function AddAdditionalWorkout({
 
           {/* Date */}
           <div>
-            <label className="add-sub">
-              Date
-            </label>
+            <label className="add-sub">Date</label>
             <input
               type="date"
               value={toInputDate(date)}
@@ -161,9 +166,7 @@ export function AddAdditionalWorkout({
 
           {/* Notes */}
           <div>
-            <label className="add-sub">
-              Notes
-            </label>
+            <label className="add-sub">Notes</label>
             <textarea
               rows={3}
               value={notes}
