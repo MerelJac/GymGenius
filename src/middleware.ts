@@ -64,7 +64,7 @@ export async function middleware(req: NextRequest) {
     isTrainerRoute &&
     (token.role !== "TRAINER" && token.role !== "ADMIN")
   ) {
-    return NextResponse.redirect(new URL("/client", req.url));
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();

@@ -24,7 +24,7 @@ export function ClientHeader() {
         {/* Brand */}
         <div className="flex items-center gap-2">
           <Link
-            href="/client"
+            href="/"
             className="text-sm font-medium text-gray-700 hover:text-gray-900 transition"
           >
             <h2 className="nav-logo">Dialed Fitness</h2>

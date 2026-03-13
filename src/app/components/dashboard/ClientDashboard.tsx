@@ -15,6 +15,7 @@ import { CreateWorkoutForLater } from "../workout/CreateWorkoutForLater";
 import { getUserAccess } from "@/lib/billing/access";
 import { UpgradeButton } from "../billing/UpgradeButton";
 import BillingStatusNotice from "../billing/BillingStatusNotice";
+import { Suspense } from "react";
 
 export function getStatusDisplay(status: string) {
   switch (status) {
@@ -49,121 +50,108 @@ export function getStatusDisplay(status: string) {
   }
 }
 
-export default async function ClientDashboard() {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return null;
+// ─── Skeletons ────────────────────────────────────────────────────────────────
 
-  const clientId = session?.user?.id;
-  const access = await getUserAccess(clientId);
-  console.log("access: ", access);
-  // 👇 Add this block
-  if (!access.hasAccess) {
-    redirect("/billing");
-  }
-  const progress = await getClientProgressSummary(clientId);
+function StatsSkeleton() {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-pulse">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="h-24 rounded-2xl bg-surface2" />
+      ))}
+    </div>
+  );
+}
+
+function WorkoutCardSkeleton() {
+  return <div className="h-40 rounded-2xl bg-surface2 animate-pulse" />;
+}
+
+function FeedSkeleton() {
+  return (
+    <div className="space-y-3 animate-pulse">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="h-16 rounded-2xl bg-surface2" />
+      ))}
+    </div>
+  );
+}
+
+function ProgressSkeleton() {
+  return <div className="h-48 rounded-2xl bg-surface2 animate-pulse" />;
+}
+
+// ─── Async data components ────────────────────────────────────────────────────
+
+async function StatsSection({ clientId }: { clientId: string }) {
   const stats = await getClientDashboardStats(clientId);
-  const now = new Date();
+  return (
+    <ClientDashboardStats
+      streak={stats.onPlanStreak}
+      completed={stats.completedThisWeek}
+      scheduled={stats.scheduledThisWeek}
+      nextWorkoutDate={stats.nextWorkoutDate}
+    />
+  );
+}
 
+async function WorkoutsSection({ clientId }: { clientId: string }) {
+  const now = new Date();
   const pstNow = new Date(
     now.toLocaleString("en-US", { timeZone: "America/Los_Angeles" }),
   );
-
   pstNow.setHours(0, 0, 0, 0);
-
   const today = pstNow;
-  console.log(today, "today's date client dashboard");
-  const profile = await prisma.profile.findUnique({
-    where: { userId: clientId },
-    include: {
-      user: {
-        include: {
-          trainer: {
-            include: {
-              profile: true,
-            },
-          },
-        },
-      },
-    },
-  });
-
-  if (!profile?.waiverSignedAt) {
-    redirect("/waiver");
-  }
-
-  const trainer = profile.user?.trainer;
-
-  if (!trainer) {
-    throw new Error("Trainer not found for client");
-  }
-
-  const trainerForContact = {
-    email: trainer.email,
-    phone: trainer.profile?.phone ?? null,
-    name:
-      trainer.profile?.firstName || trainer.profile?.lastName
-        ? `${trainer.profile?.firstName ?? ""} ${trainer.profile?.lastName ?? ""}`.trim()
-        : null,
-  };
-
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
-  const upcomingWorkouts = await prisma.scheduledWorkout.findMany({
-    where: {
-      clientId: session.user.id,
-      scheduledDate: {
-        gte: today,
+  const [upcomingWorkouts, pastWorkouts] = await Promise.all([
+    prisma.scheduledWorkout.findMany({
+      where: {
+        clientId,
+        scheduledDate: { gte: today },
       },
-    },
-    include: {
-      workout: {
-        include: {
-          workoutSections: {
-            orderBy: { order: "asc" },
-            include: {
-              exercises: {
-                orderBy: { order: "asc" },
-                include: {
-                  exercise: true,
+      include: {
+        workout: {
+          include: {
+            workoutSections: {
+              orderBy: { order: "asc" },
+              include: {
+                exercises: {
+                  orderBy: { order: "asc" },
+                  include: { exercise: true },
                 },
               },
             },
           },
         },
       },
-    },
-    orderBy: {
-      scheduledDate: "asc",
-    },
-    take: 8, // today + next few
-  });
-
-  const pastWorkouts = await prisma.scheduledWorkout.findMany({
-    where: {
-      clientId,
-      scheduledDate: { lt: today },
-    },
-    include: {
-      workout: {
-        include: {
-          workoutSections: {
-            orderBy: { order: "asc" },
-            include: {
-              exercises: {
-                orderBy: { order: "asc" },
-                include: {
-                  exercise: true,
+      orderBy: { scheduledDate: "asc" },
+      take: 8,
+    }),
+    prisma.scheduledWorkout.findMany({
+      where: {
+        clientId,
+        scheduledDate: { lt: today },
+      },
+      include: {
+        workout: {
+          include: {
+            workoutSections: {
+              orderBy: { order: "asc" },
+              include: {
+                exercises: {
+                  orderBy: { order: "asc" },
+                  include: { exercise: true },
                 },
               },
             },
           },
         },
       },
-    },
-    orderBy: { scheduledDate: "desc" },
-    take: 8,
-  });
+      orderBy: { scheduledDate: "desc" },
+      take: 8,
+    }),
+  ]);
 
   const todaysWorkout = upcomingWorkouts.find(
     (w) => w.scheduledDate < tomorrow,
@@ -174,14 +162,76 @@ export default async function ClientDashboard() {
   const completedWorkouts = pastWorkouts.filter(
     (w) => w.status === "COMPLETED",
   );
-
-  const userName = profile.firstName ?? "diehard";
-
   const overdueWorkouts = pastWorkouts.filter((w) => w.status !== "COMPLETED");
 
   return (
+    <>
+      <TodayWorkout workout={todaysWorkout} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <UpcomingWorkouts workouts={futureWorkouts} />
+        <OverdueWorkouts workouts={overdueWorkouts} />
+        <PastWorkouts workouts={completedWorkouts} />
+      </div>
+    </>
+  );
+}
+
+async function ProgressSection({ clientId }: { clientId: string }) {
+  const progress = await getClientProgressSummary(clientId);
+  return (
+    <ProgressChanges
+      clientId={clientId}
+      strength={progress.strength}
+      weight={progress.weight}
+      bodyFat={progress.bodyFat}
+    />
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
+export default async function ClientDashboard() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return null;
+  const clientId = session.user.id;
+
+  // Fast sequential gates — these must resolve before we can render anything meaningful
+  const [access, profile] = await Promise.all([
+    getUserAccess(clientId),
+    prisma.profile.findUnique({
+      where: { userId: clientId },
+      include: {
+        user: {
+          include: {
+            trainer: { include: { profile: true } },
+          },
+        },
+      },
+    }),
+  ]);
+
+  console.log("access: ", access);
+
+  if (!access.hasAccess) redirect("/billing");
+  if (!profile?.waiverSignedAt) redirect("/waiver");
+
+  const trainer = profile.user?.trainer;
+  if (!trainer) throw new Error("Trainer not found for client");
+
+  const trainerForContact = {
+    email: trainer.email,
+    phone: trainer.profile?.phone ?? null,
+    name:
+      trainer.profile?.firstName || trainer.profile?.lastName
+        ? `${trainer.profile?.firstName ?? ""} ${trainer.profile?.lastName ?? ""}`.trim()
+        : null,
+  };
+
+  const userName = profile.firstName ?? "diehard";
+
+  return (
     <div className="max-w-5xl mx-auto space-y-8">
-      {/* Greeting */}
+      {/* Greeting — instant, no data needed */}
       <div className="greeting">
         <h1>
           Hello, <span className="break-words">{userName}</span>
@@ -189,42 +239,46 @@ export default async function ClientDashboard() {
         <p>You are staying consistent — great work.</p>
       </div>
 
-      <BillingStatusNotice access={access}/>
+      <BillingStatusNotice access={access} />
 
+      {/* Stats — streams in independently */}
       <div className="space-y-6">
-        <ClientDashboardStats
-          streak={stats.onPlanStreak}
-          completed={stats.completedThisWeek}
-          scheduled={stats.scheduledThisWeek}
-          nextWorkoutDate={stats.nextWorkoutDate}
-        />
+        <Suspense fallback={<StatsSkeleton />}>
+          <StatsSection clientId={clientId} />
+        </Suspense>
       </div>
 
-      <TodayWorkout workout={todaysWorkout} />
+      {/* Workouts (today + upcoming + overdue + past) — biggest query, streams in */}
+      <Suspense
+        fallback={
+          <div className="space-y-6">
+            <WorkoutCardSkeleton />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FeedSkeleton />
+              <FeedSkeleton />
+            </div>
+          </div>
+        }
+      >
+        <WorkoutsSection clientId={clientId} />
+      </Suspense>
 
+      {/* Quick-add tools — client components, render instantly */}
       <AdditionalWorkoutQuickAdd clientId={clientId} />
       <CreateWorkoutForLater clientId={clientId} />
 
+      {/* Progress + contact — streams in last (slowest query) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <UpcomingWorkouts workouts={futureWorkouts} />
-        <OverdueWorkouts workouts={overdueWorkouts} />
-        <PastWorkouts workouts={completedWorkouts} />
-      </div>
-
-      {/* Placeholder cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <ProgressChanges
-          clientId={clientId}
-          strength={progress.strength}
-          weight={progress.weight}
-          bodyFat={progress.bodyFat}
-        />
-
+        <Suspense fallback={<ProgressSkeleton />}>
+          <ProgressSection clientId={clientId} />
+        </Suspense>
         <ContactTrainer trainer={trainerForContact} />
       </div>
     </div>
   );
 }
+
+// ─── UI components (unchanged) ───────────────────────────────────────────────
 
 function TodayWorkout({
   workout,
@@ -235,25 +289,21 @@ function TodayWorkout({
     return (
       <div className="stat-card accent-card">
         <div className="big-num">Rest day!</div>
-
         <p className="text-sm text-gray-500 mt-1">
           No workouts scheduled today.
         </p>
       </div>
     );
   }
-
   return (
     <div className="workout-card">
       <div className="wc-top">
         <span className="wc-badge">Today&apos;s Workout</span>
         <span className="wc-date">
-          {" "}
           {workout.scheduledDate.toLocaleDateString()}
         </span>
       </div>
       <div className="wc-title">
-        {" "}
         <Link href={`/workouts/${workout.id}`}>{workout.workout.name}</Link>
       </div>
       <div className="wc-sub">
@@ -265,21 +315,44 @@ function TodayWorkout({
           )}
         </ul>
       </div>
-
-      {workout.status === "COMPLETED" ? (
-        <Link href={`/workouts/${workout.id}`}>
-          <button className="btn-primary">
-            Completed <span className="btn-arrow">→</span>
-          </button>
-        </Link>
-      ) : (
-        <Link href={`/workouts/${workout.id}`}>
-          <button className="btn-primary">
-            View Workout <span className="btn-arrow">→</span>
-          </button>
-        </Link>
-      )}
+      <Link href={`/workouts/${workout.id}`}>
+        <button className="btn-primary">
+          {workout.status === "COMPLETED" ? "Completed" : "View Workout"}{" "}
+          <span className="btn-arrow">→</span>
+        </button>
+      </Link>
     </div>
+  );
+}
+
+function WorkoutFeedList({
+  workouts,
+}: {
+  workouts: ScheduledWorkoutDashboard[];
+}) {
+  return (
+    <ul className="feed">
+      {workouts.map((w) => {
+        const { icon, label, className, bgClass } = getStatusDisplay(w.status);
+        return (
+          <li key={w.id}>
+            <Link
+              href={`/workouts/${w.id}`}
+              className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
+            >
+              <div className={`feed-icon ${bgClass}`}>{icon}</div>
+              <div className="feed-info">
+                <p className="feed-name">{w.workout.name}</p>
+                <p className="feed-date">
+                  {w.scheduledDate.toLocaleDateString()}
+                </p>
+              </div>
+              <span className={`feed-status ${className}`}>{label}</span>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
@@ -289,38 +362,12 @@ function UpcomingWorkouts({
   workouts: ScheduledWorkoutDashboard[];
 }) {
   if (workouts.length === 0) return null;
-
   return (
     <div>
       <div className="flex items-center justify-between px-5 py-3">
         <h2 className="section-title">Coming Up</h2>
-        {/* <span className="text-xs text-muted">See all</span> */}
       </div>
-
-      <ul className="feed">
-        {workouts.map((w) => {
-          const { icon, label, className, bgClass } = getStatusDisplay(
-            w.status,
-          );
-          return (
-            <li key={w.id}>
-              <Link
-                href={`/workouts/${w.id}`}
-                className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
-              >
-                <div className={`feed-icon ${bgClass}`}>{icon}</div>
-                <div className="feed-info">
-                  <p className="feed-name">{w.workout.name}</p>
-                  <p className="feed-date">
-                    {w.scheduledDate.toLocaleDateString()}
-                  </p>
-                </div>
-                <span className={`feed-status ${className}`}>{label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <WorkoutFeedList workouts={workouts} />
     </div>
   );
 }
@@ -343,38 +390,13 @@ function OverdueWorkouts({
           See all →
         </Link>
       </div>
-
-      <ul className="feed">
-        {workouts.map((w) => {
-          const { icon, label, className, bgClass } = getStatusDisplay(
-            w.status,
-          );
-          return (
-            <li key={w.id}>
-              <Link
-                href={`/workouts/${w.id}`}
-                className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
-              >
-                <div className={`feed-icon ${bgClass}`}>{icon}</div>
-                <div className="feed-info">
-                  <p className="feed-name">{w.workout.name}</p>
-                  <p className="feed-date">
-                    {w.scheduledDate.toLocaleDateString()}
-                  </p>
-                </div>
-                <span className={`feed-status ${className}`}>{label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <WorkoutFeedList workouts={workouts} />
     </div>
   );
 }
 
 function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
   if (workouts.length === 0) return null;
-
   return (
     <div>
       <div className="flex items-center justify-between px-5 py-3">
@@ -386,31 +408,7 @@ function PastWorkouts({ workouts }: { workouts: ScheduledWorkoutDashboard[] }) {
           See all →
         </Link>
       </div>
-
-      <ul className="feed">
-        {workouts.map((w) => {
-          const { icon, label, className, bgClass } = getStatusDisplay(
-            w.status,
-          );
-          return (
-            <li key={w.id}>
-              <Link
-                href={`/workouts/${w.id}`}
-                className="flex items-center gap-3 bg-surface border border-surface2 rounded-2xl px-4 py-3 active:scale-[0.98] transition-transform feed-item"
-              >
-                <div className={`feed-icon ${bgClass}`}>{icon}</div>
-                <div className="feed-info">
-                  <p className="feed-name">{w.workout.name}</p>
-                  <p className="feed-date">
-                    {w.scheduledDate.toLocaleDateString()}
-                  </p>
-                </div>
-                <span className={`feed-status ${className}`}>{label}</span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      <WorkoutFeedList workouts={workouts} />
     </div>
   );
 }
