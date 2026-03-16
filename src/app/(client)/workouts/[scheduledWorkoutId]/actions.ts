@@ -503,7 +503,6 @@ export async function rerunWorkout(scheduledWorkoutId: string) {
         order: ex.order,
         prescribed: ex.prescribed as Prisma.InputJsonValue,
         performed: ex.performed as Performed,
-        order: ex.order,
         substitutedFrom: ex.substitutedFrom,
         substitutionReason: ex.substitutionReason,
       })),
