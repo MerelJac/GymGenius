@@ -64,14 +64,17 @@ export async function deleteExercise(formData: FormData) {
 
   const isAdmin = session.user.role === "ADMIN";
   const isOwner = exercise.trainerId === session.user.id;
+  if (!isAdmin && !isOwner) return notFound();
 
-  if (!isAdmin && !isOwner) {
-    return notFound();
-  }
-
-  await prisma.exercise.delete({
-    where: { id: exerciseId },
-  });
+  await prisma.$transaction([
+    prisma.exerciseOneRepMax.deleteMany({ where: { exerciseId } }),
+    prisma.exerciseSubstitution.deleteMany({
+      where: { OR: [{ exerciseId }, { substituteId: exerciseId }] },
+    }),
+    prisma.exerciseLog.deleteMany({ where: { exerciseId } }),
+    prisma.workoutExercise.deleteMany({ where: { exerciseId } }),
+    prisma.exercise.delete({ where: { id: exerciseId } }),
+  ]);
 
   redirect("/exercises");
 }
