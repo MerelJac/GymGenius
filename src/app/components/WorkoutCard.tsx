@@ -46,12 +46,16 @@ export default function WorkoutCard({
   programId,
   onDelete,
   onDuplicate,
+  onMoveUp,
+  onMoveDown,
 }: {
   workout: WorkoutWithSections;
   exercises: Exercise[];
   programId: string;
   onDelete: () => void;
   onDuplicate: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }) {
   const inputCls =
     "w-full px-3 py-2 bg-background border border-surface2 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
@@ -704,6 +708,23 @@ export default function WorkoutCard({
           </select>
 
           <div className="flex gap-3 text-sm">
+            <button
+              onClick={onMoveUp}
+              disabled={!onMoveUp}
+              className="wba-btn disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Move workout up"
+            >
+              <ChevronUp size={16} />
+            </button>
+            <button
+              onClick={onMoveDown}
+              disabled={!onMoveDown}
+              className="wba-btn disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Move workout down"
+            >
+              <ChevronDown size={16} />
+            </button>
+
             <button onClick={onDuplicate} className="wba-btn wba-duplicate">
               <Copy size={16} /> Duplicate
             </button>
@@ -1005,7 +1026,10 @@ export default function WorkoutCard({
               </select>
             </div>
 
-            <div ref={containerRef} className="flex flex-wrap gap-3 items-end pt-4">
+            <div
+              ref={containerRef}
+              className="flex flex-wrap gap-3 items-end pt-4"
+            >
               <div className="min-w-[220px] flex-1">
                 <label className={labelCls}>Exercise</label>
                 <button
@@ -1033,9 +1057,7 @@ export default function WorkoutCard({
               {showStrengthFields && (
                 <>
                   <div className="w-20">
-                    <label className={labelCls}>
-                      Sets
-                    </label>
+                    <label className={labelCls}>Sets</label>
                     <input
                       type="number"
                       value={sets}
@@ -1044,9 +1066,7 @@ export default function WorkoutCard({
                     />
                   </div>
                   <div className="w-20">
-                    <label className={labelCls}>
-                      Reps
-                    </label>
+                    <label className={labelCls}>Reps</label>
                     <input
                       type="number"
                       value={reps}
@@ -1056,9 +1076,7 @@ export default function WorkoutCard({
                   </div>
                   {selectedExercise?.type !== "BODYWEIGHT" && (
                     <div className="w-24">
-                      <label className={labelCls}>
-                        Weight
-                      </label>
+                      <label className={labelCls}>Weight</label>
                       <input
                         type="number"
                         value={weight ?? ""}
@@ -1077,9 +1095,7 @@ export default function WorkoutCard({
               {showHybridFields && (
                 <>
                   <div className="w-20">
-                    <label className={labelCls}>
-                      Sets
-                    </label>
+                    <label className={labelCls}>Sets</label>
                     <input
                       type="number"
                       value={sets}
@@ -1088,9 +1104,7 @@ export default function WorkoutCard({
                     />
                   </div>
                   <div className="w-20">
-                    <label className={labelCls}>
-                      Reps
-                    </label>
+                    <label className={labelCls}>Reps</label>
                     <input
                       type="number"
                       value={reps}
@@ -1100,9 +1114,7 @@ export default function WorkoutCard({
                   </div>
                   {selectedExercise?.type !== "BODYWEIGHT" && (
                     <div className="w-24">
-                      <label className={labelCls}>
-                        Weight
-                      </label>
+                      <label className={labelCls}>Weight</label>
                       <input
                         type="number"
                         value={weight ?? ""}
@@ -1116,9 +1128,7 @@ export default function WorkoutCard({
                     </div>
                   )}
                   <div className="w-20">
-                    <label className={labelCls}>
-                      Duration
-                    </label>
+                    <label className={labelCls}>Duration</label>
                     <input
                       type="number"
                       value={time ?? ""}
@@ -1134,9 +1144,7 @@ export default function WorkoutCard({
               {showCoreMobilityFields && (
                 <>
                   <div className="w-20">
-                    <label className={labelCls}>
-                      Sets
-                    </label>
+                    <label className={labelCls}>Sets</label>
                     <input
                       type="number"
                       value={sets}
@@ -1145,9 +1153,7 @@ export default function WorkoutCard({
                     />
                   </div>
                   <div className="w-20">
-                    <label className={labelCls}>
-                      Reps
-                    </label>
+                    <label className={labelCls}>Reps</label>
                     <input
                       type="number"
                       value={reps}
@@ -1157,9 +1163,7 @@ export default function WorkoutCard({
                   </div>
                   {selectedExercise?.type !== "BODYWEIGHT" && (
                     <div className="w-24">
-                      <label className={labelCls}>
-                        Weight
-                      </label>
+                      <label className={labelCls}>Weight</label>
                       <input
                         type="number"
                         value={weight ?? ""}
@@ -1173,9 +1177,7 @@ export default function WorkoutCard({
                     </div>
                   )}
                   <div className="w-28">
-                    <label className={labelCls}>
-                      Duration (s)
-                    </label>
+                    <label className={labelCls}>Duration (s)</label>
                     <input
                       type="number"
                       value={time ?? ""}
@@ -1190,9 +1192,7 @@ export default function WorkoutCard({
 
               {showTimedFields && (
                 <div className="w-28">
-                  <label className={labelCls}>
-                    Duration (s)
-                  </label>
+                  <label className={labelCls}>Duration (s)</label>
                   <input
                     type="number"
                     value={time ?? ""}
@@ -1205,9 +1205,7 @@ export default function WorkoutCard({
               )}
 
               <div className="flex flex-col  min-w-[260px]">
-                <label className={labelCls}>
-                  Notes / tempo / rest
-                </label>
+                <label className={labelCls}>Notes / tempo / rest</label>
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}

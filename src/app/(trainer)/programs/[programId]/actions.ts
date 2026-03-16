@@ -87,6 +87,19 @@ export async function addWorkoutExercise(
   runRevalidate(programId);
   return { ok: true };
 }
+
+export async function reorderWorkouts(programId: string, orderedIds: string[]) {
+  await prisma.$transaction(
+    orderedIds.map((id, index) =>
+      prisma.workoutTemplate.update({
+        where: { id },
+        data: { order: index },
+      }),
+    ),
+  );
+    revalidatePath(`/trainer/programs/${programId}`);
+  return { ok: true };
+}
 export async function updateWorkoutName(
   programId: string,
   workoutId: string,

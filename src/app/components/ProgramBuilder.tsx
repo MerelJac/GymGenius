@@ -6,6 +6,7 @@ import {
   createWorkout,
   deleteWorkout,
   duplicateWorkout,
+  reorderWorkouts,
 } from "../(trainer)/programs/[programId]/actions";
 import WorkoutCard from "./WorkoutCard";
 import { ProgramWithWorkouts, WorkoutWithSections } from "@/types/workout";
@@ -38,7 +39,8 @@ export default function ProgramBuilder({
   const router = useRouter();
   type WorkoutAction =
     | { type: "add"; workout: WorkoutWithSections }
-    | { type: "remove"; id: string };
+    | { type: "remove"; id: string }
+    | { type: "reorder"; orderedIds: string[] };
 
   const [optimisticWorkouts, updateOptimisticWorkouts] = useOptimistic<
     WorkoutWithSections[],
@@ -49,6 +51,11 @@ export default function ProgramBuilder({
         return [...state, action.workout];
       case "remove":
         return state.filter((w) => w.id !== action.id);
+      case "reorder":
+        return action.orderedIds.map((id, index) => ({
+          ...state.find((w) => w.id === id)!,
+          order: index,
+        }));
       default:
         return state;
     }
@@ -133,6 +140,38 @@ export default function ProgramBuilder({
       setError(result.error);
       return;
     }
+  }
+
+  function handleMoveWorkoutUp(workoutId: string) {
+    console.log("move up", workoutId);
+    const index = optimisticWorkouts.findIndex((w) => w.id === workoutId);
+    if (index <= 0) return;
+    const reordered = [...optimisticWorkouts];
+    [reordered[index - 1], reordered[index]] = [
+      reordered[index],
+      reordered[index - 1],
+    ];
+    const ids = reordered.map((w) => w.id);
+    startTransition(() => {
+      updateOptimisticWorkouts({ type: "reorder", orderedIds: ids });
+    });
+    reorderWorkouts(program.id, ids);
+  }
+
+  function handleMoveWorkoutDown(workoutId: string) {
+    console.log("move down", workoutId);
+    const index = optimisticWorkouts.findIndex((w) => w.id === workoutId);
+    if (index === -1 || index >= optimisticWorkouts.length - 1) return;
+    const reordered = [...optimisticWorkouts];
+    [reordered[index], reordered[index + 1]] = [
+      reordered[index + 1],
+      reordered[index],
+    ];
+    const ids = reordered.map((w) => w.id);
+    startTransition(() => {
+      updateOptimisticWorkouts({ type: "reorder", orderedIds: ids });
+    });
+    reorderWorkouts(program.id, ids);
   }
 
   async function handleDuplicateWorkout(workout: WorkoutWithSections) {
@@ -315,9 +354,7 @@ export default function ProgramBuilder({
 
         {optimisticWorkouts.length === 0 ? (
           <div className="gradient-bg border border-gray-200 rounded-xl p-10 text-center">
-            <p className="text-text mb-4">
-              No workouts in this program yet
-            </p>
+            <p className="text-text mb-4">No workouts in this program yet</p>
             <button onClick={handleAddWorkout} className="btn-secondary">
               <Plus size={18} />
               Create your first workout
@@ -325,7 +362,7 @@ export default function ProgramBuilder({
           </div>
         ) : (
           <div className="space-y-6">
-            {optimisticWorkouts.map((workout) => (
+            {optimisticWorkouts.map((workout, index) => (
               <WorkoutCard
                 key={workout.id}
                 workout={workout}
@@ -333,6 +370,14 @@ export default function ProgramBuilder({
                 programId={program.id}
                 onDelete={() => handleDeleteWorkout(workout)}
                 onDuplicate={() => handleDuplicateWorkout(workout)}
+                onMoveUp={
+                  index > 0 ? () => handleMoveWorkoutUp(workout.id) : undefined
+                }
+                onMoveDown={
+                  index < optimisticWorkouts.length - 1
+                    ? () => handleMoveWorkoutDown(workout.id)
+                    : undefined
+                }
               />
             ))}
           </div>
