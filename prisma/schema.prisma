@@ -216,6 +216,7 @@ model ExerciseLog {
   exerciseId String
   exercise   Exercise @relation("ExerciseToLogs", fields: [exerciseId], references: [id])
   sectionId  String?
+  order      Int      @default(0)
   prescribed Json
   performed  Json
 

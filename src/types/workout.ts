@@ -116,7 +116,7 @@ export type ExerciseLog = {
   exerciseName: string;
   prescribed: Prescribed | JsonValue | null;
   performed: Performed | null;
-
+  order: number;
   substitutedFrom?: string | null;
   substitutionReason?: string | null;
 };

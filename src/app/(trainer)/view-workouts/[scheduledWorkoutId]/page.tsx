@@ -31,6 +31,7 @@ export default async function ViewWorkoutPage({
       workoutLogs: {
         include: {
           exercises: {
+            orderBy: { order: "asc" },  // order by the order defined in the workout
             include: {
               exercise: true,
             },
@@ -55,6 +56,7 @@ export default async function ViewWorkoutPage({
         exerciseName: log.exercise.name,
         prescribed: assertPrescribed(log.prescribed),
         performed: log.performed as Performed,
+        order: log.order,
         substitutedFrom: log.substitutedFrom ?? null,
         substitutionReason: log.substitutionReason ?? null,
       }))
