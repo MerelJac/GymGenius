@@ -42,6 +42,7 @@ export default async function ClientWorkoutPage({
         take: 1,
         include: {
           exercises: {
+            orderBy: { order: "desc" },  // order by the order defined in the workout
             include: {
               exercise: true,
             },

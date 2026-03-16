@@ -10,7 +10,7 @@ import {
 } from "@/app/utils/workoutFunctions";
 import { Exercise } from "@/types/exercise";
 import { Performed, Prescribed } from "@/types/prescribed";
-import { Ellipsis, Trash2 } from "lucide-react";
+import { Ellipsis } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import SubstitutionModal from "../exercise/SubstitutionModal";
@@ -23,6 +23,7 @@ export function ExerciseLogger({
   clientId,
   sectionId,
   disabled,
+  order,
   notes,
   status,
   isClientAdded = false,
@@ -36,6 +37,7 @@ export function ExerciseLogger({
   clientId: string;
   sectionId?: string | undefined;
   disabled: boolean;
+  order: number;
   notes?: string | null;
   status?: string;
   isClientAdded?: boolean;

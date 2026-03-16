@@ -65,16 +65,26 @@ export default function WorkoutRunner({
   const autoSaveFns = useRef<(() => Promise<void>)[]>([]);
 
   const logs: ExerciseLog[] = activeLog
-    ? activeLog.exercises.map((log) => ({
-        id: log.id,
-        workoutLogId: activeLog.id,
-        exerciseId: log.exerciseId,
-        exerciseName: log.exercise.name,
-        prescribed: assertPrescribed(log.prescribed),
-        performed: log.performed as Performed,
-        substitutedFrom: log.substitutedFrom ?? null,
-        substitutionReason: log.substitutionReason ?? null,
-      }))
+    ? activeLog.exercises
+        .slice()
+        .sort((a, b) => {
+          // sort by sectionId first, then order within section
+          if (a.sectionId !== b.sectionId) {
+            return (a.sectionId ?? "").localeCompare(b.sectionId ?? "");
+          }
+          return a.order - b.order;
+        })
+        .map((log) => ({
+          id: log.id,
+          workoutLogId: activeLog.id,
+          exerciseId: log.exerciseId,
+          exerciseName: log.exercise.name,
+          prescribed: assertPrescribed(log.prescribed),
+          performed: log.performed as Performed,
+          order: log.order,
+          substitutedFrom: log.substitutedFrom ?? null,
+          substitutionReason: log.substitutionReason ?? null,
+        }))
     : [];
 
   console.log("schedueld logs:", scheduledWorkout);
@@ -287,6 +297,7 @@ export default function WorkoutRunner({
                       sectionId={section.id}
                       disabled={!isActive}
                       notes={we.notes}
+                      order={we.order}
                       status={activeLog?.status}
                       onChange={(data) => {
                         setExerciseStates((prev) => {
@@ -314,6 +325,7 @@ export default function WorkoutRunner({
               {/* CLIENT-ADDED EXERCISES */}
               {activeLog?.exercises
                 .filter((el) => el.sectionId === section.id)
+                .sort((a, b) => a.order - b.order)
                 .map((el) => (
                   <ExerciseLogger
                     key={el.id}
@@ -326,6 +338,7 @@ export default function WorkoutRunner({
                     sectionId={section.id}
                     notes={el.substitutionReason}
                     status={activeLog?.status}
+                    order={el.order}
                     isClientAdded // 👈 ADD THIS FLAG
                     exerciseLogId={el.id} // 👈 PASS LOG ID
                     onChange={(data) => {

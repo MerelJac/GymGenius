@@ -1,3 +1,4 @@
+// src/app/api/workouts/complete/[workoutId]/add.ts
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 

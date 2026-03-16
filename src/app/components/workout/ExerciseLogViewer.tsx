@@ -8,6 +8,7 @@ const setValCls = "text-sm text-foreground";
 const setUnitCls = "text-xs text-muted";
 
 export function ExerciseLogViewer({ logs }: { logs: ExerciseLog[] }) {
+  console.log("logs", logs);
   return (
     <ul className="space-y-3">
       {logs.map((log, index) => (

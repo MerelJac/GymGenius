@@ -331,6 +331,9 @@ export async function logExercise(
         performed,
         substitutionReason: note || null,
         sectionId,
+        order: await prisma.exerciseLog.count({
+          where: { workoutLogId, sectionId: sectionId ?? null },
+        }),
       },
     });
   }
@@ -393,6 +396,11 @@ export async function addExerciseToWorkout(
 ) {
   const performed = buildPerformedFromPrescribed(prescribed);
 
+  // Count existing logs in this section to determine order
+  const count = await prisma.exerciseLog.count({
+    where: { workoutLogId, sectionId: sectionId ?? null },
+  });
+
   console.log(
     "workoutLogId",
     workoutLogId,
@@ -410,6 +418,7 @@ export async function addExerciseToWorkout(
       workoutLogId,
       exerciseId,
       sectionId,
+      order: count,
       prescribed,
       performed,
       substitutionReason: "Client added exercise",
@@ -491,6 +500,7 @@ export async function rerunWorkout(scheduledWorkoutId: string) {
         workoutLogId: newLog.id,
         exerciseId: ex.exerciseId,
         sectionId: ex.sectionId,
+        order: ex.order,
         prescribed: ex.prescribed as Prisma.InputJsonValue,
         performed: ex.performed as Performed,
         substitutedFrom: ex.substitutedFrom,
