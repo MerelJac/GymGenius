@@ -1,11 +1,17 @@
+// src/app/(trainer)/programs/[programId]/page.tsx
 import { prisma } from "@/lib/prisma";
 import ProgramBuilder from "@/app/components/ProgramBuilder";
+import notFound from "@/app/not-found";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
 export default async function ProgramBuilderPage({
   params,
 }: {
-  params:   Promise<{ programId: string }>;
+  params: Promise<{ programId: string }>;
 }) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return notFound();
   const { programId } = await params;
   console.log("Program ID:", programId);
   const program = await prisma.program.findUnique({
@@ -37,7 +43,7 @@ export default async function ProgramBuilderPage({
     orderBy: { name: "asc" },
   });
 
-  if (!program) return <div>Program not found</div>;
+  if (!program) return notFound();
 
   const clients = await prisma.user.findMany({
     where: {
@@ -81,12 +87,19 @@ export default async function ProgramBuilderPage({
     orderBy: { createdAt: "desc" },
   });
 
+  const allPrograms = await prisma.program.findMany({
+    where: { trainerId: session.user.id },
+    select: { id: true, name: true },
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
     <ProgramBuilder
       program={program}
       exercises={exercises}
       clients={clients}
       clientsAssignedProgram={clientsAssignedProgram}
+      allPrograms={allPrograms}
     />
   );
 }

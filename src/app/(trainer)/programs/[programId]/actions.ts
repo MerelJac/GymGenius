@@ -100,6 +100,64 @@ export async function reorderWorkouts(programId: string, orderedIds: string[]) {
     revalidatePath(`/trainer/programs/${programId}`);
   return { ok: true };
 }
+
+export async function copyWorkoutToProgram(
+  workoutId: string,
+  targetProgramId: string,
+) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) return { ok: false, error: "Unauthorized" };
+
+  // Get the source workout with all its sections and exercises
+  const source = await prisma.workoutTemplate.findUnique({
+    where: { id: workoutId },
+    include: {
+      workoutSections: {
+        orderBy: { order: "asc" },
+        include: {
+          exercises: {
+            orderBy: { order: "asc" },
+          },
+        },
+      },
+    },
+  });
+
+  if (!source) return { ok: false, error: "Workout not found" };
+
+  // Get current workout count in target program for ordering
+  const existingCount = await prisma.workoutTemplate.count({
+    where: { programId: targetProgramId },
+  });
+
+  // Create the workout copy with sections and exercises
+  await prisma.workoutTemplate.create({
+    data: {
+      programId: targetProgramId,
+      name: source.name,
+      order: existingCount,
+      day: source.day,
+      workoutSections: {
+        create: source.workoutSections.map((section) => ({
+          title: section.title,
+          order: section.order,
+          exercises: {
+            create: section.exercises.map((ex) => ({
+              exerciseId: ex.exerciseId,
+              order: ex.order,
+              prescribed: ex.prescribed ?? {},
+              notes: ex.notes,
+            })),
+          },
+        })),
+      },
+    },
+  });
+
+    revalidatePath(`/trainer/programs/${targetProgramId}`);
+  return { ok: true };
+}
+
 export async function updateWorkoutName(
   programId: string,
   workoutId: string,

@@ -29,11 +29,13 @@ export default function ProgramBuilder({
   exercises,
   clients,
   clientsAssignedProgram,
+  allPrograms
 }: {
   program: ProgramWithWorkouts;
   exercises: Exercise[];
   clients: User[];
   clientsAssignedProgram: ClientWithWorkouts[];
+  allPrograms: { id: string; name: string }[];
 }) {
   const [error, setError] = useState<string | null | undefined>(null);
   const router = useRouter();
@@ -378,6 +380,7 @@ export default function ProgramBuilder({
                     ? () => handleMoveWorkoutDown(workout.id)
                     : undefined
                 }
+                  allPrograms={allPrograms} 
               />
             ))}
           </div>

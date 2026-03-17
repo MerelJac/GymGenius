@@ -39,6 +39,7 @@ import {
 } from "lucide-react";
 import ExerciseModal from "./exercise/ExerciseModal";
 import { ExerciseSearch } from "./workout/ExerciseSearch";
+import { CopyWorkoutToProgramButton } from "../(trainer)/programs/[programId]/CopyWorkoutToProgramModal";
 
 export default function WorkoutCard({
   workout,
@@ -48,6 +49,7 @@ export default function WorkoutCard({
   onDuplicate,
   onMoveUp,
   onMoveDown,
+  allPrograms,
 }: {
   workout: WorkoutWithSections;
   exercises: Exercise[];
@@ -56,6 +58,7 @@ export default function WorkoutCard({
   onDuplicate: () => void;
   onMoveUp?: () => void;
   onMoveDown?: () => void;
+  allPrograms: { id: string; name: string }[];
 }) {
   const inputCls =
     "w-full px-3 py-2 bg-background border border-surface2 rounded-xl text-foreground text-sm placeholder:text-muted focus:border-lime-green/50 focus:ring-1 focus:ring-lime-green/30 outline-none transition";
@@ -724,6 +727,13 @@ export default function WorkoutCard({
             >
               <ChevronDown size={16} />
             </button>
+
+            <CopyWorkoutToProgramButton
+              workoutId={workout.id}
+              workoutName={workout.name}
+              currentProgramId={programId}
+              allPrograms={allPrograms}
+            />
 
             <button onClick={onDuplicate} className="wba-btn wba-duplicate">
               <Copy size={16} /> Duplicate
