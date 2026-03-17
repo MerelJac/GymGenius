@@ -206,7 +206,7 @@ export function ExerciseLogger({
                         </span>
                         <input
                           type="number"
-                          value={set.reps}
+                          value={set.reps || ""}
                           className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
                           onChange={(e) => {
                             setHasSaved(false);
@@ -219,6 +219,19 @@ export function ExerciseLogger({
                               };
                               return { ...prev, sets };
                             });
+                          }}
+                          onBlur={(e) => {
+                            if (
+                              e.target.value === "" ||
+                              e.target.value === "0"
+                            ) {
+                              setPerformedState((prev) => {
+                                if (prev.kind !== "strength") return prev;
+                                const sets = [...prev.sets];
+                                sets[index] = { ...sets[index], reps: 0 }; 
+                                return { ...prev, sets };
+                              });
+                            }
                           }}
                         />
                       </div>
@@ -268,6 +281,20 @@ export function ExerciseLogger({
                               return { ...prev, sets };
                             });
                           }}
+                          onBlur={(e) => {
+                            // If the field is empty on blur, explicitly null it out
+                            if (
+                              e.target.value === "" ||
+                              e.target.value === "0"
+                            ) {
+                              setPerformedState((prev) => {
+                                if (prev.kind !== "strength") return prev;
+                                const sets = [...prev.sets];
+                                sets[index] = { ...sets[index], weight: null };
+                                return { ...prev, sets };
+                              });
+                            }
+                          }}
                         />
                       </div>
                     </div>
@@ -304,7 +331,7 @@ export function ExerciseLogger({
                         </span>
                         <input
                           type="number"
-                          value={set.reps}
+                          value={set.reps || ""}
                           className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
                           onChange={(e) => {
                             setHasSaved(false);
@@ -317,6 +344,20 @@ export function ExerciseLogger({
                               };
                               return { ...prev, sets };
                             });
+                          }}
+                          onBlur={(e) => {
+                            // If the field is empty on blur, explicitly null it out
+                            if (
+                              e.target.value === "" ||
+                              e.target.value === "0"
+                            ) {
+                              setPerformedState((prev) => {
+                                if (prev.kind !== "hybrid") return prev;
+                                const sets = [...prev.sets];
+                                sets[index] = { ...sets[index], reps: 0 };
+                                return { ...prev, sets };
+                              });
+                            }
                           }}
                         />
                       </div>
@@ -361,6 +402,20 @@ export function ExerciseLogger({
                               return { ...prev, sets };
                             });
                           }}
+                          onBlur={(e) => {
+                            // If the field is empty on blur, explicitly null it out
+                            if (
+                              e.target.value === "" ||
+                              e.target.value === "0"
+                            ) {
+                              setPerformedState((prev) => {
+                                if (prev.kind !== "hybrid") return prev;
+                                const sets = [...prev.sets];
+                                sets[index] = { ...sets[index], weight: null };
+                                return { ...prev, sets };
+                              });
+                            }
+                          }}
                         />
                       </div>
 
@@ -387,6 +442,20 @@ export function ExerciseLogger({
                               };
                               return { ...prev, sets };
                             });
+                          }}
+                          onBlur={(e) => {
+                            // If the field is empty on blur, explicitly null it out
+                            if (
+                              e.target.value === "" ||
+                              e.target.value === "0"
+                            ) {
+                              setPerformedState((prev) => {
+                                if (prev.kind !== "hybrid") return prev;
+                                const sets = [...prev.sets];
+                                sets[index] = { ...sets[index], duration: null };
+                                return { ...prev, sets };
+                              });
+                            }
                           }}
                         />
                       </div>
@@ -449,6 +518,27 @@ export function ExerciseLogger({
                                 return { ...prev, sets };
                               });
                             }}
+                            onBlur={(e) => {
+                              // If the field is empty on blur, explicitly null it out
+                              if (
+                                e.target.value === "" ||
+                                e.target.value === "0"
+                              ) {
+                                setPerformedState((prev) => {
+                                  if (
+                                    prev.kind !== "mobility" &&
+                                    prev.kind !== "core"
+                                  )
+                                    return prev;
+                                  const sets = [...prev.sets];
+                                  sets[index] = {
+                                    ...sets[index],
+                                    reps: 0,
+                                  };
+                                  return { ...prev, sets };
+                                });
+                              }
+                            }}
                           />
                         </div>
 
@@ -479,6 +569,27 @@ export function ExerciseLogger({
                                 };
                                 return { ...prev, sets };
                               });
+                            }}
+                            onBlur={(e) => {
+                              // If the field is empty on blur, explicitly null it out
+                              if (
+                                e.target.value === "" ||
+                                e.target.value === "0"
+                              ) {
+                                setPerformedState((prev) => {
+                                  if (
+                                    prev.kind !== "core" &&
+                                    prev.kind !== "mobility"
+                                  )
+                                    return prev;
+                                  const sets = [...prev.sets];
+                                  sets[index] = {
+                                    ...sets[index],
+                                    weight: null,
+                                  };
+                                  return { ...prev, sets };
+                                });
+                              }
                             }}
                           />
                         </div>
@@ -511,6 +622,7 @@ export function ExerciseLogger({
                                 return { ...prev, sets };
                               });
                             }}
+                            
                           />
                         </div>
                       </div>
@@ -540,7 +652,7 @@ export function ExerciseLogger({
                       </span>
                       <input
                         type="number"
-                        value={set.reps}
+                        value={set.reps || ""}
                         className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
                         onChange={(e) => {
                           setHasSaved(false);
