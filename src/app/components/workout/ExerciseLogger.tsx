@@ -14,6 +14,7 @@ import { Ellipsis } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import SubstitutionModal from "../exercise/SubstitutionModal";
+import { SetInput, SetRow } from "./WorkoutComponents";
 
 export function ExerciseLogger({
   exercise,
@@ -104,11 +105,11 @@ export function ExerciseLogger({
     loadOneRepMax();
   }, [clientId, exercise.id]);
 
-  console.log("building status: ", status);
-  console.log("isBuilding status: ", isBuilding);
-  console.log("disabled status: ", disabled);
-
-  console.log("isdisabled status: ", isInputDisabled);
+  // console.log("building status: ", status);
+  // console.log("isBuilding status: ", isBuilding);
+  // console.log("disabled status: ", disabled);
+  // console.log("isdisabled status: ", isInputDisabled);
+  
   return (
     <div className="card">
       <div className="card-header">
@@ -183,284 +184,132 @@ export function ExerciseLogger({
           {performedState.kind === "strength" && (
             <div className="space-y-2">
               {performedState.sets.map((set, index) => {
-                const reps = set.reps;
                 const recommendedWeight =
-                  oneRepMax && reps
-                    ? Math.round(oneRepMax * getPercentageForReps(reps))
+                  oneRepMax && set.reps
+                    ? Math.round(oneRepMax * getPercentageForReps(set.reps))
                     : null;
-
                 return (
-                  <div
-                    key={index}
-                    className="bg-bg rounded-xl px-3 py-3 space-y-2"
-                  >
-                    <span className="text-xs font-semibold text-muted">
-                      Set {index + 1}
-                    </span>
-
+                  <SetRow key={index} index={index}>
                     <div className="grid grid-cols-2 gap-2">
-                      {/* Reps */}
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                          Reps
-                        </span>
-                        <input
-                          type="number"
-                          value={set.reps || ""}
-                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                          onChange={(e) => {
+                      <SetInput
+                        label="Reps"
+                        value={set.reps}
+                        onChange={(val) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (prev.kind !== "strength") return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { ...sets[index], reps: val ?? 0 };
+                            return { ...prev, sets };
+                          });
+                        }}
+                      />
+                      <SetInput
+                        label={`lb${recommendedWeight ? ` (rec: ${recommendedWeight})` : ""}`}
+                        value={set.weight}
+                        placeholder={
+                          recommendedWeight ? `${recommendedWeight}` : "—"
+                        }
+                        onFocus={() => {
+                          if (!set.weight && recommendedWeight) {
                             setHasSaved(false);
                             setPerformedState((prev) => {
                               if (prev.kind !== "strength") return prev;
                               const sets = [...prev.sets];
                               sets[index] = {
                                 ...sets[index],
-                                reps: Number(e.target.value),
+                                weight: recommendedWeight,
                               };
                               return { ...prev, sets };
                             });
-                          }}
-                          onBlur={(e) => {
-                            if (
-                              e.target.value === "" ||
-                              e.target.value === "0"
-                            ) {
-                              setPerformedState((prev) => {
-                                if (prev.kind !== "strength") return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = { ...sets[index], reps: 0 }; 
-                                return { ...prev, sets };
-                              });
-                            }
-                          }}
-                        />
-                      </div>
-
-                      {/* Weight */}
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                          lb{" "}
-                          {recommendedWeight && (
-                            <span className="normal-case tracking-normal font-normal text-muted/60">
-                              (rec: {recommendedWeight})
-                            </span>
-                          )}
-                        </span>
-                        <input
-                          type="number"
-                          value={set.weight ?? ""}
-                          placeholder={
-                            recommendedWeight ? `${recommendedWeight}` : "—"
                           }
-                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                          onFocus={() => {
-                            if (!set.weight && recommendedWeight) {
-                              setHasSaved(false);
-                              setPerformedState((prev) => {
-                                if (prev.kind !== "strength") return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = {
-                                  ...sets[index],
-                                  weight: recommendedWeight,
-                                };
-                                return { ...prev, sets };
-                              });
-                            }
-                          }}
-                          onChange={(e) => {
-                            setHasSaved(false);
-                            setPerformedState((prev) => {
-                              if (prev.kind !== "strength") return prev;
-                              const sets = [...prev.sets];
-                              sets[index] = {
-                                ...sets[index],
-                                weight: e.target.value
-                                  ? Number(e.target.value)
-                                  : null,
-                              };
-                              return { ...prev, sets };
-                            });
-                          }}
-                          onBlur={(e) => {
-                            // If the field is empty on blur, explicitly null it out
-                            if (
-                              e.target.value === "" ||
-                              e.target.value === "0"
-                            ) {
-                              setPerformedState((prev) => {
-                                if (prev.kind !== "strength") return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = { ...sets[index], weight: null };
-                                return { ...prev, sets };
-                              });
-                            }
-                          }}
-                        />
-                      </div>
+                        }}
+                        onChange={(val) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (prev.kind !== "strength") return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { ...sets[index], weight: val };
+                            return { ...prev, sets };
+                          });
+                        }}
+                      />
                     </div>
-                  </div>
+                  </SetRow>
                 );
               })}
             </div>
           )}
 
-          {/* Hybrid */}
           {performedState.kind === "hybrid" && (
             <div className="space-y-2">
               {performedState.sets.map((set, index) => {
-                const reps = set.reps;
                 const recommendedWeight =
-                  oneRepMax && reps
-                    ? Math.round(oneRepMax * getPercentageForReps(reps))
+                  oneRepMax && set.reps
+                    ? Math.round(oneRepMax * getPercentageForReps(set.reps))
                     : null;
-
                 return (
-                  <div
-                    key={index}
-                    className="bg-bg rounded-xl px-3 py-3 space-y-2"
-                  >
-                    <span className="text-xs font-semibold text-muted">
-                      Set {index + 1}
-                    </span>
-
+                  <SetRow key={index} index={index}>
                     <div className="grid grid-cols-3 gap-2">
-                      {/* Reps */}
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                          Reps
-                        </span>
-                        <input
-                          type="number"
-                          value={set.reps || ""}
-                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                          onChange={(e) => {
+                      <SetInput
+                        label="Reps"
+                        value={set.reps}
+                        onChange={(val) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (prev.kind !== "hybrid") return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { ...sets[index], reps: val ?? 0 };
+                            return { ...prev, sets };
+                          });
+                        }}
+                      />
+                      <SetInput
+                        label={`lb${recommendedWeight ? ` (rec: ${recommendedWeight})` : ""}`}
+                        value={set.weight}
+                        placeholder={
+                          recommendedWeight ? `${recommendedWeight}` : "—"
+                        }
+                        onFocus={() => {
+                          if (!set.weight && recommendedWeight) {
                             setHasSaved(false);
                             setPerformedState((prev) => {
                               if (prev.kind !== "hybrid") return prev;
                               const sets = [...prev.sets];
                               sets[index] = {
                                 ...sets[index],
-                                reps: Number(e.target.value),
+                                weight: recommendedWeight,
                               };
                               return { ...prev, sets };
                             });
-                          }}
-                          onBlur={(e) => {
-                            // If the field is empty on blur, explicitly null it out
-                            if (
-                              e.target.value === "" ||
-                              e.target.value === "0"
-                            ) {
-                              setPerformedState((prev) => {
-                                if (prev.kind !== "hybrid") return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = { ...sets[index], reps: 0 };
-                                return { ...prev, sets };
-                              });
-                            }
-                          }}
-                        />
-                      </div>
-
-                      {/* Weight */}
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                          lb
-                        </span>
-                        <input
-                          type="number"
-                          value={set.weight ?? ""}
-                          placeholder={
-                            recommendedWeight ? `${recommendedWeight}` : "—"
                           }
-                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                          onFocus={() => {
-                            if (!set.weight && recommendedWeight) {
-                              setHasSaved(false);
-                              setPerformedState((prev) => {
-                                if (prev.kind !== "hybrid") return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = {
-                                  ...sets[index],
-                                  weight: recommendedWeight,
-                                };
-                                return { ...prev, sets };
-                              });
-                            }
-                          }}
-                          onChange={(e) => {
-                            setHasSaved(false);
-                            setPerformedState((prev) => {
-                              if (prev.kind !== "hybrid") return prev;
-                              const sets = [...prev.sets];
-                              sets[index] = {
-                                ...sets[index],
-                                weight: e.target.value
-                                  ? Number(e.target.value)
-                                  : null,
-                              };
-                              return { ...prev, sets };
-                            });
-                          }}
-                          onBlur={(e) => {
-                            // If the field is empty on blur, explicitly null it out
-                            if (
-                              e.target.value === "" ||
-                              e.target.value === "0"
-                            ) {
-                              setPerformedState((prev) => {
-                                if (prev.kind !== "hybrid") return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = { ...sets[index], weight: null };
-                                return { ...prev, sets };
-                              });
-                            }
-                          }}
-                        />
-                      </div>
-
-                      {/* Duration */}
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                          Sec
-                        </span>
-                        <input
-                          type="number"
-                          value={set.duration ?? ""}
-                          placeholder="—"
-                          className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                          onChange={(e) => {
-                            setHasSaved(false);
-                            setPerformedState((prev) => {
-                              if (prev.kind !== "hybrid") return prev;
-                              const sets = [...prev.sets];
-                              sets[index] = {
-                                ...sets[index],
-                                duration: e.target.value
-                                  ? Number(e.target.value)
-                                  : 0,
-                              };
-                              return { ...prev, sets };
-                            });
-                          }}
-                          onBlur={(e) => {
-                            // If the field is empty on blur, explicitly null it out
-                            if (
-                              e.target.value === "" ||
-                              e.target.value === "0"
-                            ) {
-                              setPerformedState((prev) => {
-                                if (prev.kind !== "hybrid") return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = { ...sets[index], duration: null };
-                                return { ...prev, sets };
-                              });
-                            }
-                          }}
-                        />
-                      </div>
+                        }}
+                        onChange={(val) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (prev.kind !== "hybrid") return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { ...sets[index], weight: val };
+                            return { ...prev, sets };
+                          });
+                        }}
+                      />
+                      <SetInput
+                        label="Sec"
+                        value={set.duration}
+                        placeholder="—"
+                        onChange={(val) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (prev.kind !== "hybrid") return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { ...sets[index], duration: val };
+                            return { ...prev, sets };
+                          });
+                        }}
+                      />
                     </div>
-                  </div>
+                  </SetRow>
                 );
               })}
             </div>
@@ -469,205 +318,115 @@ export function ExerciseLogger({
           {/* CORE & MOBILITY */}
           {(performedState.kind === "core" ||
             performedState.kind === "mobility") && (
-            <div className="space-y-3">
-              {/* Sets */}
-              <div className="space-y-2">
-                {(() => {
-                  const firstDuration = performedState.sets[0]?.duration;
-                  const sameDuration =
-                    firstDuration != null &&
-                    performedState.sets.every(
-                      (s) => s.duration === firstDuration,
-                    );
-
-                  return performedState.sets.map((set, index) => (
-                    <div
-                      key={index}
-                      className="bg-bg rounded-xl px-3 py-3 space-y-2"
-                    >
-                      <span className="text-xs font-semibold text-muted">
-                        Set {index + 1}
-                      </span>
-
-                      <div className="grid grid-cols-3 gap-2">
-                        {/* Reps */}
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                            Reps
-                          </span>
-                          <input
-                            type="number"
-                            value={set.reps ?? ""}
-                            placeholder="—"
-                            className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                            onChange={(e) => {
-                              setHasSaved(false);
-                              setPerformedState((prev) => {
-                                if (
-                                  prev.kind !== "core" &&
-                                  prev.kind !== "mobility"
-                                )
-                                  return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = {
-                                  ...sets[index],
-                                  reps: e.target.value
-                                    ? Number(e.target.value)
-                                    : 0,
-                                };
-                                return { ...prev, sets };
-                              });
-                            }}
-                            onBlur={(e) => {
-                              // If the field is empty on blur, explicitly null it out
+            <div className="space-y-2">
+              {performedState.sets.map((set, index) => {
+                const recommendedWeight =
+                  oneRepMax && set.reps
+                    ? Math.round(oneRepMax * getPercentageForReps(set.reps))
+                    : null;
+                return (
+                  <SetRow key={index} index={index}>
+                    <div className="grid grid-cols-3 gap-2">
+                      <SetInput
+                        label="Reps"
+                        value={set.reps}
+                        onChange={(val) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (
+                              prev.kind !== "core" &&
+                              prev.kind !== "mobility"
+                            )
+                              return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { ...sets[index], reps: val ?? 0 };
+                            return { ...prev, sets };
+                          });
+                        }}
+                      />
+                      <SetInput
+                        label={`lb${recommendedWeight ? ` (rec: ${recommendedWeight})` : ""}`}
+                        value={set.weight}
+                        placeholder={
+                          recommendedWeight ? `${recommendedWeight}` : "—"
+                        }
+                        onFocus={() => {
+                          if (!set.weight && recommendedWeight) {
+                            setHasSaved(false);
+                            setPerformedState((prev) => {
                               if (
-                                e.target.value === "" ||
-                                e.target.value === "0"
-                              ) {
-                                setPerformedState((prev) => {
-                                  if (
-                                    prev.kind !== "mobility" &&
-                                    prev.kind !== "core"
-                                  )
-                                    return prev;
-                                  const sets = [...prev.sets];
-                                  sets[index] = {
-                                    ...sets[index],
-                                    reps: 0,
-                                  };
-                                  return { ...prev, sets };
-                                });
-                              }
-                            }}
-                          />
-                        </div>
-
-                        {/* Weight */}
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                            lb
-                          </span>
-                          <input
-                            type="number"
-                            value={set.weight ?? ""}
-                            placeholder="bw"
-                            className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                            onChange={(e) => {
-                              setHasSaved(false);
-                              setPerformedState((prev) => {
-                                if (
-                                  prev.kind !== "core" &&
-                                  prev.kind !== "mobility"
-                                )
-                                  return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = {
-                                  ...sets[index],
-                                  weight: e.target.value
-                                    ? Number(e.target.value)
-                                    : null,
-                                };
-                                return { ...prev, sets };
-                              });
-                            }}
-                            onBlur={(e) => {
-                              // If the field is empty on blur, explicitly null it out
-                              if (
-                                e.target.value === "" ||
-                                e.target.value === "0"
-                              ) {
-                                setPerformedState((prev) => {
-                                  if (
-                                    prev.kind !== "core" &&
-                                    prev.kind !== "mobility"
-                                  )
-                                    return prev;
-                                  const sets = [...prev.sets];
-                                  sets[index] = {
-                                    ...sets[index],
-                                    weight: null,
-                                  };
-                                  return { ...prev, sets };
-                                });
-                              }
-                            }}
-                          />
-                        </div>
-
-                        {/* Duration */}
-                        <div className="flex flex-col gap-1">
-                          <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                            Sec
-                          </span>
-                          <input
-                            type="number"
-                            value={set.duration ?? ""}
-                            placeholder="—"
-                            className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                            onChange={(e) => {
-                              setHasSaved(false);
-                              setPerformedState((prev) => {
-                                if (
-                                  prev.kind !== "core" &&
-                                  prev.kind !== "mobility"
-                                )
-                                  return prev;
-                                const sets = [...prev.sets];
-                                sets[index] = {
-                                  ...sets[index],
-                                  duration: e.target.value
-                                    ? Number(e.target.value)
-                                    : 0,
-                                };
-                                return { ...prev, sets };
-                              });
-                            }}
-                            
-                          />
-                        </div>
-                      </div>
+                                prev.kind !== "core" &&
+                                prev.kind !== "mobility"
+                              )
+                                return prev;
+                              const sets = [...prev.sets];
+                              sets[index] = {
+                                ...sets[index],
+                                weight: recommendedWeight,
+                              };
+                              return { ...prev, sets };
+                            });
+                          }
+                        }}
+                        onChange={(val) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (
+                              prev.kind !== "core" &&
+                              prev.kind !== "mobility"
+                            )
+                              return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { ...sets[index], weight: val };
+                            return { ...prev, sets };
+                          });
+                        }}
+                      />
+                      <SetInput
+                        label="Sec"
+                        value={set.duration}
+                        placeholder="—"
+                        onChange={(val) => {
+                          setHasSaved(false);
+                          setPerformedState((prev) => {
+                            if (prev.kind !== "hybrid") return prev;
+                            const sets = [...prev.sets];
+                            sets[index] = { ...sets[index], duration: val };
+                            return { ...prev, sets };
+                          });
+                        }}
+                      />
                     </div>
-                  ));
-                })()}
-              </div>
+                  </SetRow>
+                );
+              })}
             </div>
           )}
 
           {/* Bodyweight */}
           {performedState.kind === "bodyweight" && (
             <div className="space-y-2">
-              {performedState.sets.map((set, index) => (
-                <div
-                  key={index}
-                  className="bg-bg rounded-xl px-3 py-3 space-y-2"
-                >
-                  <span className="text-xs font-semibold text-muted">
-                    Set {index + 1}
-                  </span>
-
-                  <div className="grid grid-cols-1 gap-2 max-w-[120px]">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                        Reps
-                      </span>
-                      <input
-                        type="number"
-                        value={set.reps || ""}
-                        className="w-full bg-surface2 border border-surface2 rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted focus:border-lime-green/50 outline-none"
-                        onChange={(e) => {
+              {performedState.sets.map((set, index) => {
+                return (
+                  <SetRow key={index} index={index}>
+                    <div className="grid grid-cols-2 gap-2">
+                      <SetInput
+                        label="Reps"
+                        value={set.reps}
+                        onChange={(val) => {
                           setHasSaved(false);
                           setPerformedState((prev) => {
                             if (prev.kind !== "bodyweight") return prev;
                             const sets = [...prev.sets];
-                            sets[index] = { reps: Number(e.target.value) };
-                            return { kind: "bodyweight", sets };
+                            sets[index] = { ...sets[index], reps: val ?? 0 };
+                            return { ...prev, sets };
                           });
                         }}
                       />
                     </div>
-                  </div>
-                </div>
-              ))}
+                  </SetRow>
+                );
+              })}
             </div>
           )}
 
