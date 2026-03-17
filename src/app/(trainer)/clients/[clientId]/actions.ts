@@ -35,34 +35,39 @@ export async function deleteClient(clientId: string) {
     return { ok: false, error: "Unauthorized" };
   }
 
-  // Ensure this client belongs to the trainer
-  const client = await prisma.user.findFirst({
-    where: {
-      id: clientId,
-      trainerId: session.user.id,
-      role: "CLIENT",
-    },
-    select: { id: true },
-  });
+  try {
+    // Ensure this client belongs to the trainer
+    const client = await prisma.user.findFirst({
+      where: {
+        id: clientId,
+        trainerId: session.user.id,
+        role: "CLIENT",
+      },
+      select: { id: true },
+    });
 
-  if (!client) {
-    return { ok: false, error: "Client not found or unauthorized" };
+    if (!client) {
+      return { ok: false, error: "Client not found or unauthorized" };
+    }
+
+    // Delete dependent data first
+    await prisma.$transaction([
+      prisma.bodyMetric.deleteMany({ where: { clientId } }),
+      prisma.additionalWorkout.deleteMany({ where: { clientId } }),
+      prisma.workoutLog.deleteMany({ where: { clientId } }),
+      prisma.scheduledWorkout.deleteMany({ where: { clientId } }),
+      prisma.profile.deleteMany({ where: { userId: clientId } }),
+      prisma.subscription.deleteMany({ where: { userId: clientId } }),
+      // finally, delete the user
+      prisma.user.delete({ where: { id: clientId } }),
+    ]);
+
+    revalidatePath("/clients");
+    return { ok: true };
+  } catch (error) {
+    console.error("Error deleting client:", error);
+    return { ok: false, error: "An error occurred while deleting the client" };
   }
-
-  // Delete dependent data first
-  await prisma.$transaction([
-    prisma.bodyMetric.deleteMany({ where: { clientId } }),
-    prisma.additionalWorkout.deleteMany({ where: { clientId } }),
-    prisma.workoutLog.deleteMany({ where: { clientId } }),
-    prisma.scheduledWorkout.deleteMany({ where: { clientId } }),
-    prisma.profile.deleteMany({ where: { userId: clientId } }),
-
-    // finally, delete the user
-    prisma.user.delete({ where: { id: clientId } }),
-  ]);
-
-  revalidatePath("/clients");
-  return { ok: true };
 }
 export async function updateClientProfile(
   clientId: string,
@@ -82,11 +87,9 @@ export async function updateClientProfile(
     return { ok: false, error: "Unauthorized" };
   }
 
-
   if (!clientId) {
     return { ok: false, error: "Missing client ID" };
   }
-
 
   let normalizedPhone;
   if (data.phone) {
@@ -128,7 +131,7 @@ export async function updateClientProfile(
       },
     }),
   ]);
-    return { ok: true };
+  return { ok: true };
 }
 export async function rescheduleWorkout(
   scheduledWorkoutId: string,
