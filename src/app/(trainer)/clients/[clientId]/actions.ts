@@ -50,21 +50,27 @@ export async function deleteClient(clientId: string) {
       return { ok: false, error: "Client not found or unauthorized" };
     }
 
-    // Delete dependent data first
     await prisma.$transaction([
+      prisma.exerciseLog.deleteMany({
+        where: { workoutLog: { clientId } },
+      }),
+      prisma.exerciseOneRepMax.deleteMany({ where: { clientId } }),
       prisma.bodyMetric.deleteMany({ where: { clientId } }),
       prisma.additionalWorkout.deleteMany({ where: { clientId } }),
       prisma.workoutLog.deleteMany({ where: { clientId } }),
       prisma.scheduledWorkout.deleteMany({ where: { clientId } }),
+      prisma.message.deleteMany({
+        where: { OR: [{ senderId: clientId }, { recipientId: clientId }] },
+      }),
       prisma.profile.deleteMany({ where: { userId: clientId } }),
       prisma.subscription.deleteMany({ where: { userId: clientId } }),
-      // finally, delete the user
       prisma.user.delete({ where: { id: clientId } }),
     ]);
 
     revalidatePath("/clients");
     return { ok: true };
   } catch (error) {
+    process.stdout.write(`deleteClient error: ${JSON.stringify(error)}\n`);
     console.error("Error deleting client:", error);
     return { ok: false, error: "An error occurred while deleting the client" };
   }
