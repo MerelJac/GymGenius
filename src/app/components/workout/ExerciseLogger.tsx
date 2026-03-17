@@ -109,7 +109,7 @@ export function ExerciseLogger({
   // console.log("isBuilding status: ", isBuilding);
   // console.log("disabled status: ", disabled);
   // console.log("isdisabled status: ", isInputDisabled);
-  
+
   return (
     <div className="card">
       <div className="card-header">
@@ -389,9 +389,16 @@ export function ExerciseLogger({
                         onChange={(val) => {
                           setHasSaved(false);
                           setPerformedState((prev) => {
-                            if (prev.kind !== "core" && prev.kind !== "mobility") return prev;
+                            if (
+                              prev.kind !== "core" &&
+                              prev.kind !== "mobility"
+                            )
+                              return prev;
                             const sets = [...prev.sets];
-                            sets[index] = { ...sets[index], duration: val ?? 0};
+                            sets[index] = {
+                              ...sets[index],
+                              duration: val ?? 0,
+                            };
                             return { ...prev, sets };
                           });
                         }}
@@ -427,6 +434,31 @@ export function ExerciseLogger({
                   </SetRow>
                 );
               })}
+            </div>
+          )}
+          {/* Times */}
+          {performedState.kind === "timed" && (
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium w-24 text-muted">
+                Time
+              </label>
+              <input
+                type="number"
+                className="w-28 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                value={performedState.duration || ""}
+                onChange={(e) =>
+                  updatePerformed(() => ({
+                    kind: "timed",
+                    duration: Number(e.target.value),
+                  }))
+                }
+                onBlur={(e) => {
+                  if (e.target.value === "" || e.target.value === "0") {
+                    updatePerformed(() => ({ kind: "timed", duration: 0 }));
+                  }
+                }}
+              />
+              <span className="text-sm text-muted">seconds</span>
             </div>
           )}
 
