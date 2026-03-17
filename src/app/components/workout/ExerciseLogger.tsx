@@ -389,9 +389,9 @@ export function ExerciseLogger({
                         onChange={(val) => {
                           setHasSaved(false);
                           setPerformedState((prev) => {
-                            if (prev.kind !== "hybrid") return prev;
+                            if (prev.kind !== "core" && prev.kind !== "mobility") return prev;
                             const sets = [...prev.sets];
-                            sets[index] = { ...sets[index], duration: val };
+                            sets[index] = { ...sets[index], duration: val ?? 0};
                             return { ...prev, sets };
                           });
                         }}
