@@ -27,7 +27,6 @@ export async function approveExercise(id: string) {
     },
   });
 }
-
 export async function mergeExercises(sourceId: string, targetId: string) {
   const [source, target] = await Promise.all([
     prisma.exercise.findUniqueOrThrow({ where: { id: sourceId } }),
@@ -35,44 +34,53 @@ export async function mergeExercises(sourceId: string, targetId: string) {
   ]);
 
   if (source.type !== target.type) {
-    throw new Error("Cannot merge exercises of different types.");
+    return { success: false, message: "Cannot merge exercises of different types." };
+  }
+await prisma.$transaction(async (tx) => {
+  await tx.exerciseLog.updateMany({
+    where: { exerciseId: sourceId },
+    data: { exerciseId: targetId },
+  });
+
+  await tx.workoutExercise.updateMany({
+    where: { exerciseId: sourceId },
+    data: { exerciseId: targetId },
+  });
+
+  await tx.exerciseOneRepMax.updateMany({
+    where: { exerciseId: sourceId },
+    data: { exerciseId: targetId },
+  });
+
+  await tx.exerciseSubstitution.updateMany({
+    where: { exerciseId: sourceId },
+    data: { exerciseId: targetId },
+  });
+
+  await tx.exerciseSubstitution.updateMany({
+    where: { substituteId: sourceId },
+    data: { substituteId: targetId },
+  });
+
+  await tx.exerciseSubstitution.deleteMany({
+    where: { exerciseId: targetId, substituteId: targetId },
+  });
+
+  // Verify nothing still points to sourceId before deleting
+  const remainingLogs = await tx.exerciseLog.count({
+    where: { exerciseId: sourceId },
+  });
+  const remainingWorkoutExercises = await tx.workoutExercise.count({
+    where: { exerciseId: sourceId },
+  });
+  const remaining1RMs = await tx.exerciseOneRepMax.count({
+    where: { exerciseId: sourceId },
+  });
+
+  if (remainingLogs > 0 || remainingWorkoutExercises > 0 || remaining1RMs > 0) {
+    return { success: false, message: "Merge failed due to remaining references to source exercise." };
   }
 
-  await prisma.$transaction([
-    // Repoint all exercise logs
-    prisma.exerciseLog.updateMany({
-      where: { exerciseId: sourceId },
-      data: { exerciseId: targetId },
-    }),
-    // Repoint workout exercises
-    prisma.workoutExercise.updateMany({
-      where: { exerciseId: sourceId },
-      data: { exerciseId: targetId },
-    }),
-    // Repoint 1RM records
-    prisma.exerciseOneRepMax.updateMany({
-      where: { exerciseId: sourceId },
-      data: { exerciseId: targetId },
-    }),
-    // Repoint substitutions (both sides)
-    prisma.exerciseSubstitution.updateMany({
-      where: { exerciseId: sourceId },
-      data: { exerciseId: targetId },
-    }),
-    prisma.exerciseSubstitution.updateMany({
-      where: { substituteId: sourceId },
-      data: { substituteId: targetId },
-    }),
-    // Delete duplicate substitutions that now have exerciseId === substituteId
-    // or violate the unique constraint — safest to delete source's remaining refs
-    prisma.exerciseSubstitution.deleteMany({
-      where: {
-        OR: [
-          { exerciseId: targetId, substituteId: targetId },
-        ],
-      },
-    }),
-    // Delete the source exercise
-    prisma.exercise.delete({ where: { id: sourceId } }),
-  ]);
+  await tx.exercise.delete({ where: { id: sourceId } });
+});
 }

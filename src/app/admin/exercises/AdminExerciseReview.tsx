@@ -15,14 +15,51 @@ export default function AdminExerciseReview({
   exercises: ExerciseWithTrainer[];
 }) {
   const [isPending, startTransition] = useTransition();
-  const [mergeSource, setMergeSource] = useState<ExerciseWithTrainer | null>(null);
+  const [mergeSource, setMergeSource] = useState<ExerciseWithTrainer | null>(
+    null,
+  );
   const router = useRouter();
 
   const mergeCompatible = mergeSource
     ? exercises.filter(
-        (e) => e.id !== mergeSource.id && e.type === mergeSource.type
+        (e) => e.id !== mergeSource.id && e.type === mergeSource.type,
       )
     : [];
+
+  const [mergeTargetSearch, setMergeTargetSearch] = useState("");
+  const [searchResults, setSearchResults] = useState<ExerciseWithTrainer[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  async function handleSearch(query: string) {
+    setMergeTargetSearch(query);
+    if (query.length < 2) return setSearchResults([]);
+    setIsSearching(true);
+    const res = await fetch(
+      `/api/exercises/search?q=${encodeURIComponent(query)}&type=${mergeSource?.type ?? ""}`,
+    );
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.message || "Search failed");
+      setIsSearching(false);
+      return;
+    }
+    setSearchResults(data);
+    setIsSearching(false);
+  }
+
+  function handleMerge(sourceId: string, targetId: string) {
+    startTransition(async () => {
+      const result = await mergeExercises(sourceId, targetId);
+      if (!result || !result.success) {
+        alert(result?.message || "Merge failed");
+        return;
+      }
+      setMergeSource(null);
+      setMergeTargetSearch("");
+      setSearchResults([]);
+      router.refresh();
+    });
+  }
 
   return (
     <div className="space-y-8">
@@ -30,41 +67,65 @@ export default function AdminExerciseReview({
 
       {/* Merge banner */}
       {mergeSource && (
-        <div className="border border-yellow-400/30 bg-yellow-400/5 rounded-2xl px-5 py-4 space-y-2">
+        <div className="border border-yellow-400/30 bg-yellow-400/5 rounded-2xl px-5 py-4 space-y-4">
           <p className="text-sm font-semibold text-yellow-300">
             Merging: <span className="text-foreground">{mergeSource.name}</span>
-            <span className="text-muted font-normal"> → select a target below</span>
           </p>
-          {mergeCompatible.length === 0 ? (
-            <p className="text-xs text-muted">No compatible exercises to merge into.</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {mergeCompatible.map((target) => (
-                <button
-                  key={target.id}
-                  disabled={isPending}
-                  onClick={() => {
-                    if (
-                      !confirm(
-                        `Merge "${mergeSource.name}" INTO "${target.name}"?\n\nAll logs, 1RM records, and workout references will be repointed to "${target.name}". This cannot be undone.`
-                      )
-                    )
-                      return;
-                    startTransition(async () => {
-                      await mergeExercises(mergeSource.id, target.id);
-                      setMergeSource(null);
-                      router.refresh();
-                    });
-                  }}
-                  className="px-3 py-1.5 text-sm font-semibold bg-yellow-400 text-black rounded-lg hover:opacity-90 transition disabled:opacity-50"
-                >
-                  → {target.name}
-                </button>
-              ))}
+
+          {/* Merge into another pending exercise */}
+          {mergeCompatible.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs text-muted uppercase tracking-wider">
+                Pending exercises
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {mergeCompatible.map((target) => (
+                  <MergeTargetButton
+                    key={target.id}
+                    name={target.name}
+                    type={target.type}    
+                    onConfirm={() => handleMerge(mergeSource.id, target.id)}
+                    isPending={isPending}
+                  />
+                ))}
+              </div>
             </div>
           )}
+
+          {/* Merge into global library exercise */}
+          <div className="space-y-2">
+            <p className="text-xs text-muted uppercase tracking-wider">
+              Search global library
+            </p>
+            <input
+              type="text"
+              value={mergeTargetSearch}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder={`Search ${mergeSource.type.toLowerCase()} exercises...`}
+              className="w-full px-3 py-2 text-sm rounded-lg bg-surface2 border border-surface2 focus:border-yellow-400/50 focus:outline-none"
+            />
+            {isSearching && <p className="text-xs text-muted">Searching...</p>}
+            {searchResults.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {searchResults.map((target) => (
+                  <MergeTargetButton
+                    key={target.id}
+                    name={target.name}
+                    type={target.type}
+                    onConfirm={() => handleMerge(mergeSource.id, target.id)}
+                    isPending={isPending}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
           <button
-            onClick={() => setMergeSource(null)}
+            onClick={() => {
+              setMergeSource(null);
+              setMergeTargetSearch("");
+              setSearchResults([]);
+            }}
             className="text-xs text-muted hover:text-foreground transition"
           >
             Cancel
@@ -117,7 +178,7 @@ export default function AdminExerciseReview({
                 <button
                   onClick={() =>
                     setMergeSource(
-                      mergeSource?.id === exercise.id ? null : exercise
+                      mergeSource?.id === exercise.id ? null : exercise,
                     )
                   }
                   className={`px-3 py-1.5 text-sm font-semibold rounded-lg border transition ${
@@ -128,7 +189,10 @@ export default function AdminExerciseReview({
                 >
                   Merge
                 </button>
-                <Link href={`/exercises/${exercise.id}/edit`} className="btn-primary">
+                <Link
+                  href={`/exercises/${exercise.id}/edit`}
+                  className="btn-primary"
+                >
                   Edit
                 </Link>
               </div>
@@ -137,5 +201,35 @@ export default function AdminExerciseReview({
         </div>
       )}
     </div>
+  );
+}
+
+function MergeTargetButton({
+  name,
+  type,
+  onConfirm,
+  isPending,
+}: {
+  name: string;
+  type: string;
+  onConfirm: () => void;
+  isPending: boolean;
+}) {
+  return (
+    <button
+      disabled={isPending}
+      onClick={() => {
+        if (
+          !confirm(
+            `Merge into "${name}"? All logs, 1RM records, and workout references will be repointed. This cannot be undone.`,
+          )
+        )
+          return;
+        onConfirm();
+      }}
+      className="px-3 py-1.5 text-sm font-semibold bg-yellow-400 text-black rounded-lg hover:opacity-90 transition disabled:opacity-50"
+    >
+      → {name} ({type})
+    </button>
   );
 }
