@@ -105,6 +105,29 @@ export function ExerciseLogger({
     loadOneRepMax();
   }, [clientId, exercise.id]);
 
+  const handleAddSet = () => {
+    updatePerformed((prev) => {
+      if (prev.kind === "strength") {
+        return { ...prev, sets: [...prev.sets, { reps: 0, weight: null }] };
+      }
+      if (prev.kind === "hybrid") {
+        return {
+          ...prev,
+          sets: [...prev.sets, { reps: 0, weight: null, duration: null }],
+        };
+      }
+      if (prev.kind === "core" || prev.kind === "mobility") {
+        return {
+          ...prev,
+          sets: [...prev.sets, { reps: 0, weight: null, duration: 0 }],
+        };
+      }
+      if (prev.kind === "bodyweight") {
+        return { ...prev, sets: [...prev.sets, { reps: 0 }] };
+      }
+      return prev;
+    });
+  };
   // console.log("building status: ", status);
   // console.log("isBuilding status: ", isBuilding);
   // console.log("disabled status: ", disabled);
@@ -462,13 +485,18 @@ export function ExerciseLogger({
             </div>
           )}
 
-          {/* Notes */}
-          <input
-            placeholder="Notes (optional)"
-            className="notes-input"
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-          />
+          <div className="flex flex-row ">
+            {/* Notes */}
+            <input
+              placeholder="Notes (optional)"
+              className="notes-input"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+            />
+            {performedState.kind !== "timed" && (
+              <button onClick={handleAddSet}>Add set +</button>
+            )}{" "}
+          </div>
 
           {notes && (
             <div className="coach-notes">
