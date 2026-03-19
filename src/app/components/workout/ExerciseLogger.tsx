@@ -182,27 +182,6 @@ export function ExerciseLogger({
       {/* Logging UI */}
       {!isInputDisabled && (
         <div className="space-y-4">
-          {/* Timed */}
-          {prescribed.kind === "timed" && performedState.kind === "timed" && (
-            <div className="flex items-center gap-3">
-              <label className="text-sm font-medium w-24 text-muted">
-                Time
-              </label>
-              <input
-                type="number"
-                className="w-28 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                value={performedState.duration}
-                onChange={(e) =>
-                  updatePerformed(() => ({
-                    kind: "timed",
-                    duration: Number(e.target.value),
-                  }))
-                }
-              />
-              <span className="text-sm text-muted">seconds</span>
-            </div>
-          )}
-
           {/* Strength  */}
           {performedState.kind === "strength" && (
             <div className="space-y-2">
@@ -263,7 +242,6 @@ export function ExerciseLogger({
               })}
             </div>
           )}
-
           {performedState.kind === "hybrid" && (
             <div className="space-y-2">
               {performedState.sets.map((set, index) => {
@@ -337,7 +315,6 @@ export function ExerciseLogger({
               })}
             </div>
           )}
-
           {/* CORE & MOBILITY */}
           {(performedState.kind === "core" ||
             performedState.kind === "mobility") && (
@@ -432,7 +409,6 @@ export function ExerciseLogger({
               })}
             </div>
           )}
-
           {/* Bodyweight */}
           {performedState.kind === "bodyweight" && (
             <div className="space-y-2">
@@ -484,27 +460,27 @@ export function ExerciseLogger({
               <span className="text-sm text-muted">seconds</span>
             </div>
           )}
-
-          <div className="flex flex-row ">
-            {/* Notes */}
-            <input
-              placeholder="Notes (optional)"
-              className="notes-input"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-            />
-            {performedState.kind !== "timed" && (
-              <button onClick={handleAddSet}>Add set +</button>
-            )}{" "}
-          </div>
-
+          {performedState.kind !== "timed" && (
+            <button
+              className="text-[10px] uppercase tracking-widest font-semibold text-muted text-right w-full"
+              onClick={handleAddSet}
+            >
+              + Add set
+            </button>
+          )}{" "}
+          {/* Notes */}
+          <input
+            placeholder="Notes (optional)"
+            className="notes-input"
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+          />
           {notes && (
             <div className="coach-notes">
               <span className="cn-label">Coach</span>
               <span className="cn-text">{notes}</span>
             </div>
           )}
-
           {/* Save */}
           <div className="pt-1">
             <button

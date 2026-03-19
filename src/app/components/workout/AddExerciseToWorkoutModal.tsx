@@ -40,6 +40,47 @@ export function AddExerciseToWorkoutModal({
     router.refresh();
   }
 
+  function handleSelectExercise(ex: Exercise) {
+    setExercise(ex);
+    setPrescribed(getDefaultPrescribed(ex));
+  }
+
+  function getDefaultPrescribed(exercise: Exercise): Prescribed {
+    switch (exercise.type) {
+      case "TIMED":
+        return { kind: "timed", duration: 30 };
+      case "HYBRID":
+        return {
+          kind: "hybrid",
+          sets: 3,
+          reps: 10,
+          weight: null,
+          duration: null,
+        };
+      case "BODYWEIGHT":
+        return { kind: "bodyweight", sets: 3, reps: 10 };
+      case "CORE":
+        return {
+          kind: "core",
+          sets: 3,
+          reps: 10,
+          weight: null,
+          duration: null,
+        };
+      case "MOBILITY":
+        return {
+          kind: "mobility",
+          sets: 3,
+          reps: 10,
+          weight: null,
+          duration: null,
+        };
+      case "STRENGTH":
+      default:
+        return { kind: "strength", sets: 3, reps: 10, weight: null };
+    }
+  }
+
   return (
     <>
       <Modal open={open} onClose={onClose} title="Add Exercise">
@@ -47,7 +88,7 @@ export function AddExerciseToWorkoutModal({
           {/* Search + Create row */}
           <div className="flex gap-2 items-center flex-col">
             <div className="flex-1">
-              <ExerciseSearch onSelect={setExercise} />
+              <ExerciseSearch onSelect={handleSelectExercise} />
             </div>
             <button
               onClick={() => setShowCreateExerciseModal(true)}

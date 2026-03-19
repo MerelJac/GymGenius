@@ -19,7 +19,7 @@ import { ExerciseLogViewer } from "./ExerciseLogViewer";
 import { useRouter } from "next/navigation";
 import { assertPrescribed } from "@/app/utils/prescriptions/assertPrescribed";
 import { AddExerciseToWorkout } from "./AddExerciseToWorkout";
-import { RotateCcw, Trash2 } from "lucide-react";
+import { Edit, Ellipsis, RotateCcw, Trash2 } from "lucide-react";
 
 export default function WorkoutRunner({
   scheduledWorkout,
@@ -39,7 +39,8 @@ export default function WorkoutRunner({
     activeLog?.id ?? null,
   );
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const [isEditingWorkoutName, setIsEditingWorkoutName] = useState(false);
+  const [workoutName, setWorkoutName] = useState(scheduledWorkout.workout.name);
   const [finishingText, setFinishingText] = useState("Finish Workout");
   const [isFinishing, setIsFinishing] = useState(false);
   const [isCreatingForLater, setIsCreatingForLater] = useState(false);
@@ -121,26 +122,58 @@ export default function WorkoutRunner({
   return (
     <div className="greeting h-full">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="pb-2">{scheduledWorkout.workout.name}</h1>
-        {scheduledWorkout.workout.programId?.startsWith("__") && (
-          <button
-            className="text-red-500 hover:text-red-700 p-1 disabled:opacity-50 flex items-center gap-1 text-sm"
-            disabled={isDeleting}
-            title="Delete the workout you made."
-            onClick={async () => {
-              if (!confirm("Delete this workout? This cannot be undone."))
-                return;
-              setIsDeleting(true);
-              await deleteClientWorkout(
-                scheduledWorkout.id,
-                scheduledWorkout.workoutId,
-              );
+        {isEditingWorkoutName ? (
+          <input
+            autoFocus
+            className="text-xl font-bold border-b border-gray-300 focus:outline-none focus:border-blue-500 bg-transparent"
+            value={workoutName}
+            onChange={(e) => setWorkoutName(e.target.value)}
+            onBlur={async () => {
+              setIsEditingWorkoutName(false);
+              // TODO: persist workoutName if needed
             }}
-          >
-            <Trash2 size={16} />
-            {isDeleting && <span>Deleting...</span>}
-          </button>
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setIsEditingWorkoutName(false);
+                // TODO: persist workoutName if needed
+              }
+              if (e.key === "Escape") {
+                setWorkoutName(scheduledWorkout.workout.name);
+                setIsEditingWorkoutName(false);
+              }
+            }}
+          />
+        ) : (
+          <h1 className="pb-2">{workoutName}</h1>
         )}
+        <div className="flex items-center gap-1">
+          <button
+            className="p-1 text-gray-500 hover:text-gray-700"
+            title="Edit workout name"
+            onClick={() => setIsEditingWorkoutName(true)}
+          >
+            <Edit size={16} />
+          </button>
+          {scheduledWorkout.workout.programId?.startsWith("__") && (
+            <button
+              className="text-red-500 hover:text-red-700 p-1 disabled:opacity-50 flex items-center gap-1 text-sm"
+              disabled={isDeleting}
+              title="Delete the workout you made."
+              onClick={async () => {
+                if (!confirm("Delete this workout? This cannot be undone."))
+                  return;
+                setIsDeleting(true);
+                await deleteClientWorkout(
+                  scheduledWorkout.id,
+                  scheduledWorkout.workoutId,
+                );
+              }}
+            >
+              <Trash2 size={16} />
+              {isDeleting && <span>Deleting...</span>}
+            </button>
+          )}
+        </div>
       </div>
       {/* START / STOP */}
       {!isActive ? (
