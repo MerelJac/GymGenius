@@ -16,6 +16,7 @@ import { getUserAccess } from "@/lib/billing/access";
 import { UpgradeButton } from "../billing/UpgradeButton";
 import BillingStatusNotice from "../billing/BillingStatusNotice";
 import { Suspense } from "react";
+import { CreateWorkoutForNow } from "../workout/CreateWorkoutForNow";
 
 export function getStatusDisplay(status: string) {
   switch (status) {
@@ -264,8 +265,9 @@ export default async function ClientDashboard() {
       </Suspense>
 
       {/* Quick-add tools — client components, render instantly */}
-      <AdditionalWorkoutQuickAdd clientId={clientId} />
+<CreateWorkoutForNow clientId={clientId} />
       <CreateWorkoutForLater clientId={clientId} />
+      <AdditionalWorkoutQuickAdd clientId={clientId} />
 
       {/* Progress + contact — streams in last (slowest query) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

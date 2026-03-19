@@ -99,7 +99,7 @@ export function AddAdditionalWorkout({
           <input
             className="w-full border rounded px-3 py-2"
             value={addWorkoutName}
-            placeholder={"Workout name"}
+            placeholder={" Name your workout."}
             onChange={(e) => setAddWorkoutName(e.target.value)}
           />
 
