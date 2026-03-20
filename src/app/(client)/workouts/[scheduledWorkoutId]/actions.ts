@@ -9,7 +9,7 @@ import { buildPerformedFromPrescribed } from "@/app/utils/workoutFunctions";
 import { notFound, redirect } from "next/navigation";
 import { sendAdditionalWorkoutEmailToTrainer } from "@/lib/email-templates/additionalWorkoutEmailToTrainer";
 import { sendCompletedWorkoutEmailToTrainer } from "@/lib/email-templates/completedWorkoutToTrainer";
-import { Prisma, WorkoutLog } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { sendCreatedWorkoutForLaterEmailToTrainer } from "@/lib/email-templates/createdWorkoutForLaterEmailToTrainer";
 
 export async function startWorkout(scheduledId: string) {
@@ -362,15 +362,6 @@ export async function logExercise(
       });
 
       // Only track if 1RM is better than before
-      track1RMifBetter(workoutLog as WorkoutLog, exerciseId, oneRepMax);
-    }
-  }
-
-  return exerciseLog;
-}
-// PRIVATE helper for 1RM tracking - used elsewhere too
-export async function track1RMifBetter( workoutLog: WorkoutLog, exerciseId: string, oneRepMax: number) {
-        // Only track if 1RM is better than before
       if (workoutLog?.clientId) {
         const latest = await prisma.exerciseOneRepMax.findFirst({
           where: {
@@ -390,7 +381,12 @@ export async function track1RMifBetter( workoutLog: WorkoutLog, exerciseId: stri
           });
         }
       }
+    }
+  }
+
+  return exerciseLog;
 }
+
 // app/(client)/workouts/[scheduledWorkoutId]/addExercise.ts
 export async function addExerciseToWorkout(
   workoutLogId: string,
