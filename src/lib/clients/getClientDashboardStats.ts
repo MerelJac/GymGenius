@@ -15,6 +15,7 @@ export async function getClientDashboardStats(clientId: string) {
     orderBy: { scheduledDate: "asc" },
   });
 
+  // console.log("Workouts in last 30 days:", workouts.slice(0, 5)); // Log the first 5 workouts for debugging
   
   // ---------- ON-PLAN STREAK ----------
   let streak = 0;
