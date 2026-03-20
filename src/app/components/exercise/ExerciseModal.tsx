@@ -5,6 +5,7 @@ import { ExerciseDetail, OneRMPoint } from "@/types/exercise";
 import { getEmbedUrl } from "@/lib/video";
 import { OneRMLineChart } from "../clients/OneRmLineChart";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 
 export default function ExerciseModal({
   exerciseId,
@@ -112,7 +113,10 @@ export default function ExerciseModal({
                     </p>
                   </div>
                 )}
-
+                <Link href={`/client/${clientId}/exercises/${exercise.id}/view`}
+                  className="text-sm text-lime-green hover:underline transition text-right w-full">
+                  View exercise
+                </Link>
                 {/* 1RM Progress */}
                 {clientId && oneRMHistory.length > 0 && (
                   <div className="bg-surface2 rounded-xl px-4 py-3.5">
