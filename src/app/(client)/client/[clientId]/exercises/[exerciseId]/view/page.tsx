@@ -258,7 +258,7 @@ export default async function ExerciseDetailPage({
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c6f135] mb-2">
             Last 6 months
           </p>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+          <h1 className="big-num">
             Exercise History
           </h1>
           <div className="flex flex-row gap-2">

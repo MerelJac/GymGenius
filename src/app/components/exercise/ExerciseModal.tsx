@@ -113,10 +113,12 @@ export default function ExerciseModal({
                     </p>
                   </div>
                 )}
+                <div className="flex items-center justify-end gap-3">
                 <Link href={`/client/${clientId}/exercises/${exercise.id}/view`}
                           className="text-xs font-semibold text-muted hover:text-lime-green transition-colors px-3 py-1.5 rounded-xl bg-surface2 border border-transparent hover:border-lime-green/20 flex justify-end">
                   View →
                 </Link>
+                </div>
                 {/* 1RM Progress */}
                 {clientId && oneRMHistory.length > 0 && (
                   <div className="bg-surface2 rounded-xl px-2 py-3.5">

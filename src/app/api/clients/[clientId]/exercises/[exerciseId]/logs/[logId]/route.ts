@@ -12,7 +12,7 @@ import { NextResponse } from "next/server";
 function bestOneRepMax(performed: StrengthPerformed | HybridPerformed): number {
   return performed.sets.reduce((best, set) => {
     if (!set.reps || !set.weight) return best;
-    const orm = calculateOneRepMax(set.reps, set.weight);
+    const orm = calculateOneRepMax(set.weight, set.reps);
     return orm > best ? orm : best;
   }, 0);
 }

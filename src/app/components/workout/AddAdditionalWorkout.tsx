@@ -104,7 +104,7 @@ export function AddAdditionalWorkout({
           />
 
           <button
-            className="w-full bg-blue-600 text-white rounded px-4 py-2 disabled:opacity-50"
+            className="w-full bg-blue-600 text-white rounded-xl px-4 py-2 disabled:opacity-50"
             disabled={saving}
             onClick={async () => {
               setSaving(true);
