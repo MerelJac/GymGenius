@@ -20,7 +20,7 @@ export function ClientDashboardStats({
             <span className="label-light">On-Plan Streak</span>
           </div>
 
-          <div className="big-num">
+          <div className="big-num shake">
             {streak}
             <span className="small-text"> days</span>
           </div>
