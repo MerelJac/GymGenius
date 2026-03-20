@@ -1,21 +1,16 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Performed } from "@/types/prescribed";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { EditableSetsTable } from "./ExerciseEditLogTable";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
-type SetLog = {
+type ExerciseLogRow = {
   id: string;
-  setNumber: number;
-  reps: number;
-  weight: number;
-  unit?: string | null;
-};
-
-type ExerciseLog = {
-  id: string;
-  workoutLog: { endedAt: Date | null };
-  sets: SetLog[];
+  workoutLog: { endedAt: Date | null; scheduledId: string | null };
+  performed: Performed;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -28,32 +23,204 @@ function fmt(date: Date | null) {
   }).format(new Date(date));
 }
 
-function totalVolume(sets: SetLog[]) {
-  return sets.reduce((acc, s) => acc + s.reps * (s.weight ?? 0), 0);
+function fmtDuration(seconds: number) {
+  if (seconds < 60) return `${seconds}s`;
+  return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
 }
 
-function bestSet(sets: SetLog[]) {
-  if (!sets.length) return null;
-  return sets.reduce((best, s) => (s.weight > best.weight ? s : best));
+/** Total volume across all sets that have weight × reps */
+function totalVolume(performed: Performed): number {
+  if (performed.kind === "timed") return 0;
+  return performed.sets.reduce((acc, s) => {
+    const w = "weight" in s ? (s.weight ?? 0) : 0;
+    const r = "reps" in s ? (s.reps ?? 0) : 0;
+    return acc + w * r;
+  }, 0);
+}
+
+/** Best set = highest weight, or most reps for bodyweight */
+function bestSetLabel(performed: Performed): string | null {
+  if (performed.kind === "timed") return null;
+
+  if (performed.kind === "bodyweight") {
+    const best = performed.sets.reduce(
+      (b, s) => (s.reps > b.reps ? s : b),
+      performed.sets[0],
+    );
+    return best ? `${best.reps} reps` : null;
+  }
+
+  // strength / hybrid / core / mobility
+  const withWeight = performed.sets.filter(
+    (s) => "weight" in s && s.weight !== null,
+  );
+  if (!withWeight.length) return null;
+  const best = withWeight.reduce((b, s) =>
+    (s as { weight: number }).weight > (b as { weight: number }).weight ? s : b,
+  );
+  const w = (best as { weight: number }).weight;
+  const r = "reps" in best ? best.reps : null;
+  return r !== null ? `${w}lbs × ${r}` : `${w}lbs`;
+}
+
+// ─── Per-kind table renderers ─────────────────────────────────────────────────
+function SetsTable({ performed }: { performed: Performed }) {
+  if (performed.kind === "timed") {
+    return (
+      <div className="px-5 py-4 text-sm text-zinc-400">
+        Duration:{" "}
+        <span className="text-white font-semibold">
+          {fmtDuration(performed.duration)}
+        </span>
+      </div>
+    );
+  }
+
+  const headers: string[] = (() => {
+    switch (performed.kind) {
+      case "strength":
+        return ["Set", "Weight", "Reps", "Volume"];
+      case "hybrid":
+        return ["Set", "Weight", "Reps", "Duration"];
+      case "bodyweight":
+        return ["Set", "Reps"];
+      case "core":
+      case "mobility":
+        return ["Set", "Reps", "Weight", "Duration"];
+    }
+  })();
+
+  return (
+    <div className="px-5 py-4">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="text-zinc-600 text-xs uppercase tracking-widest">
+            {headers.map((h) => (
+              <th
+                key={h}
+                className={`pb-2 font-medium ${h === "Set" ? "text-left" : "text-right"}`}
+              >
+                {h}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-zinc-800/60">
+          {performed.sets.map((set, i) => (
+            <tr key={i}>
+              <td className="py-2 text-zinc-500">{i + 1}</td>
+
+              {performed.kind === "strength" && (
+                <>
+                  <td className="py-2 text-right text-zinc-300 font-medium">
+                    {"weight" in set && set.weight !== null ? (
+                      <>
+                        {set.weight}
+                        <span className="text-zinc-600 text-xs ml-0.5">
+                          lbs
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-zinc-600">—</span>
+                    )}
+                  </td>
+                  <td className="py-2 text-right text-zinc-300 font-medium">
+                    {"reps" in set ? set.reps : "—"}
+                  </td>
+                  <td className="py-2 text-right text-zinc-500">
+                    {"weight" in set && set.weight && "reps" in set ? (
+                      <>
+                        {(set.weight * set.reps).toLocaleString()}
+                        <span className="text-zinc-700 text-xs ml-0.5">
+                          lbs
+                        </span>
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                </>
+              )}
+
+              {performed.kind === "hybrid" && (
+                <>
+                  <td className="py-2 text-right text-zinc-300 font-medium">
+                    {"weight" in set && set.weight !== null ? (
+                      <>
+                        {set.weight}
+                        <span className="text-zinc-600 text-xs ml-0.5">
+                          lbs
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-zinc-600">—</span>
+                    )}
+                  </td>
+                  <td className="py-2 text-right text-zinc-300 font-medium">
+                    {"reps" in set ? set.reps : "—"}
+                  </td>
+                  <td className="py-2 text-right text-zinc-500">
+                    {"duration" in set && set.duration !== null
+                      ? fmtDuration(set.duration)
+                      : "—"}
+                  </td>
+                </>
+              )}
+
+              {performed.kind === "bodyweight" && (
+                <td className="py-2 text-right text-zinc-300 font-medium">
+                  {"reps" in set ? set.reps : "—"}
+                </td>
+              )}
+
+              {(performed.kind === "core" || performed.kind === "mobility") && (
+                <>
+                  <td className="py-2 text-right text-zinc-300 font-medium">
+                    {"reps" in set ? set.reps : "—"}
+                  </td>
+                  <td className="py-2 text-right text-zinc-300 font-medium">
+                    {"weight" in set && set.weight !== null ? (
+                      <>
+                        {set.weight}
+                        <span className="text-zinc-600 text-xs ml-0.5">
+                          lbs
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-zinc-600">—</span>
+                    )}
+                  </td>
+                  <td className="py-2 text-right text-zinc-500">
+                    {"duration" in set && set.duration !== null
+                      ? fmtDuration(set.duration)
+                      : "—"}
+                  </td>
+                </>
+              )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default async function ExerciseDetailPage({
   params,
 }: {
-  params: { exerciseId: string };
+  params: Promise<{ clientId: string; exerciseId: string }>;
 }) {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
+  const { exerciseId } = await params;
   const clientId = session.user.id;
-  const { exerciseId } = params;
 
   const sixMonthsAgo = new Date();
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-  // Direct DB call — safe in a server component, no relative fetch needed
-  const exerciseLogs: ExerciseLog[] = await prisma.exerciseLog.findMany({
+  const rawLogs = await prisma.exerciseLog.findMany({
     where: {
       exerciseId,
       workoutLog: {
@@ -62,26 +229,30 @@ export default async function ExerciseDetailPage({
       },
     },
     include: {
-      sets: { orderBy: { setNumber: "asc" } },
-      workoutLog: { select: { endedAt: true } },
+      workoutLog: { select: { endedAt: true, scheduledId: true } },
     },
     orderBy: { workoutLog: { endedAt: "desc" } },
   });
 
+  console.log("Fetched exercise logs:", rawLogs.slice(0, 5)); // Log only the first 5 logs for debugging
+
+  const exercise = await prisma.exercise.findUnique({
+    where: { id: exerciseId },
+  });
+  const exerciseName = exercise?.name ?? "Exercise";
+  // `performed` comes back as Prisma's JsonValue — cast to our typed union
+  const exerciseLogs: ExerciseLogRow[] = rawLogs.map((log) => ({
+    ...log,
+    performed: log.performed as unknown as Performed,
+  }));
+
   const hasLogs = exerciseLogs.length > 0;
 
   return (
-    <div className="min-h-screen bg-[#0e0f11] text-white">
-      {/* subtle grid overlay */}
-      <div
-        className="pointer-events-none fixed inset-0 opacity-[0.025]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
-        }}
-      />
+    <div className="min-h-screen text-white">
+      <div className="pointer-events-none fixed inset-0 opacity-[0.025]" />
 
       <div className="relative mx-auto max-w-3xl px-4 py-10 sm:px-6">
-
         {/* ── Header ── */}
         <div className="mb-10">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c6f135] mb-2">
@@ -90,11 +261,14 @@ export default async function ExerciseDetailPage({
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
             Exercise History
           </h1>
-          <p className="mt-2 text-sm text-zinc-500">
-            {hasLogs
-              ? `${exerciseLogs.length} session${exerciseLogs.length !== 1 ? "s" : ""} logged`
-              : "No sessions recorded yet"}
-          </p>
+          <div className="flex flex-row gap-2">
+            <p className="mt-2 text-sm text-zinc-500">{exerciseName} •</p>
+            <p className="mt-2 text-sm text-zinc-500">
+              {hasLogs
+                ? `${exerciseLogs.length} session${exerciseLogs.length !== 1 ? "s" : ""} logged`
+                : "No sessions recorded yet"}
+            </p>
+          </div>
         </div>
 
         {/* ── Empty state ── */}
@@ -121,8 +295,8 @@ export default async function ExerciseDetailPage({
         {hasLogs && (
           <div className="space-y-5">
             {exerciseLogs.map((log, i) => {
-              const best = bestSet(log.sets);
-              const volume = totalVolume(log.sets);
+              const best = bestSetLabel(log.performed);
+              const isTimed = log.performed.kind === "timed";
 
               return (
                 <div
@@ -135,73 +309,60 @@ export default async function ExerciseDetailPage({
                       <span className="w-8 h-8 rounded-full bg-[#c6f135]/10 border border-[#c6f135]/25 flex items-center justify-center text-[#c6f135] text-xs font-bold">
                         {exerciseLogs.length - i}
                       </span>
-                      <span className="font-semibold text-sm">
-                        {fmt(log.workoutLog.endedAt)}
-                      </span>
+                      <div>
+                        <p className="font-semibold text-sm">
+                          {fmt(log.workoutLog.endedAt)}
+                        </p>
+                        <p className="text-[11px] text-zinc-600 capitalize">
+                          {log.performed.kind}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* summary pills */}
                     <div className="flex items-center gap-2 text-xs text-zinc-400">
-                      {best && (
+                      {isTimed ? (
                         <span className="bg-zinc-800 border border-zinc-700 px-2.5 py-1 rounded-full">
-                          Best&nbsp;
                           <span className="text-white font-semibold">
-                            {best.weight}
-                            {best.unit ?? "kg"} × {best.reps}
+                            {fmtDuration(
+                              (
+                                log.performed as {
+                                  kind: "timed";
+                                  duration: number;
+                                }
+                              ).duration,
+                            )}
                           </span>
                         </span>
+                      ) : (
+                        <>
+                          {best && (
+                            <span className="bg-zinc-800 border border-zinc-700 px-2.5 py-1 rounded-full">
+                              Best&nbsp;
+                              <span className="text-white font-semibold">
+                                {best}
+                              </span>
+                            </span>
+                          )}
+                          {log.workoutLog.scheduledId && (
+                            <Link
+                              href={`/workouts/${log.workoutLog.scheduledId}`}
+                              className="bg-zinc-800 border border-zinc-700 px-2.5 py-1 rounded-full"
+                            >
+                              View Workout →
+                            </Link>
+                          )}
+                        </>
                       )}
-                      <span className="bg-zinc-800 border border-zinc-700 px-2.5 py-1 rounded-full">
-                        Vol&nbsp;
-                        <span className="text-white font-semibold">
-                          {volume.toLocaleString()}
-                          {log.sets[0]?.unit ?? "kg"}
-                        </span>
-                      </span>
                     </div>
                   </div>
 
-                  {/* sets table */}
-                  <div className="px-5 py-4">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="text-zinc-600 text-xs uppercase tracking-widest">
-                          <th className="text-left pb-2 font-medium">Set</th>
-                          <th className="text-right pb-2 font-medium">
-                            Weight
-                          </th>
-                          <th className="text-right pb-2 font-medium">Reps</th>
-                          <th className="text-right pb-2 font-medium">
-                            Volume
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-zinc-800/60">
-                        {log.sets.map((set) => (
-                          <tr key={set.id}>
-                            <td className="py-2 text-zinc-500">
-                              {set.setNumber}
-                            </td>
-                            <td className="py-2 text-right text-zinc-300 font-medium">
-                              {set.weight}
-                              <span className="text-zinc-600 text-xs ml-0.5">
-                                {set.unit ?? "kg"}
-                              </span>
-                            </td>
-                            <td className="py-2 text-right text-zinc-300 font-medium">
-                              {set.reps}
-                            </td>
-                            <td className="py-2 text-right text-zinc-500">
-                              {(set.reps * set.weight).toLocaleString()}
-                              <span className="text-zinc-700 text-xs ml-0.5">
-                                {set.unit ?? "kg"}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  {/* per-kind table */}
+                  <EditableSetsTable
+                    logId={log.id}
+                    clientId={clientId}
+                    exerciseId={exerciseId}
+                    initialPerformed={log.performed}
+                  />
                 </div>
               );
             })}

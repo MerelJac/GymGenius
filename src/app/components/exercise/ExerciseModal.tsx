@@ -82,7 +82,7 @@ export default function ExerciseModal({
                 </button>
               </div>
 
-              <div className="p-5 space-y-5">
+              <div className="p-5 space-y-5 flex flex-col w-full">
 
                 {/* Video */}
                 {embedUrl && (
@@ -104,7 +104,7 @@ export default function ExerciseModal({
 
                 {/* Notes */}
                 {exercise.notes && (
-                  <div className="bg-surface2 rounded-xl px-4 py-3.5">
+                  <div className="bg-surface2 rounded-xl px-2 py-3.5">
                     <p className="text-[10px] font-semibold tracking-widest uppercase text-muted mb-1.5">
                       Notes
                     </p>
@@ -114,12 +114,12 @@ export default function ExerciseModal({
                   </div>
                 )}
                 <Link href={`/client/${clientId}/exercises/${exercise.id}/view`}
-                  className="text-sm text-lime-green hover:underline transition text-right w-full">
-                  View exercise
+                          className="text-xs font-semibold text-muted hover:text-lime-green transition-colors px-3 py-1.5 rounded-xl bg-surface2 border border-transparent hover:border-lime-green/20 flex justify-end">
+                  View →
                 </Link>
                 {/* 1RM Progress */}
                 {clientId && oneRMHistory.length > 0 && (
-                  <div className="bg-surface2 rounded-xl px-4 py-3.5">
+                  <div className="bg-surface2 rounded-xl px-2 py-3.5">
                     <div className="flex items-center gap-2 mb-3">
                       <TrendingUp size={13} className="text-lime-green" />
                       <p className="text-[10px] font-semibold tracking-widest uppercase text-muted">
@@ -141,7 +141,7 @@ export default function ExerciseModal({
                     <ul className="flex flex-col gap-2">
                       {exercise.substitutions.map((sub) => (
                         <li key={sub.id}
-                          className="flex items-start gap-3 bg-surface2 border border-surface2 rounded-xl px-4 py-3">
+                          className="flex items-start gap-3 bg-surface2 border border-surface2 rounded-xl px-2 py-3">
                           <div className="w-1.5 h-1.5 rounded-full bg-lime-green mt-2 flex-shrink-0" />
                           <div>
                             <p className="text-sm font-medium text-foreground">{sub.name}</p>
