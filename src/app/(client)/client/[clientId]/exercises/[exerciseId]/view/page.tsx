@@ -252,13 +252,13 @@ export default async function ExerciseDetailPage({
     <div className="min-h-screen text-white">
       <div className="pointer-events-none fixed inset-0 opacity-[0.025]" />
 
-      <div className="relative mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <div className="relative mx-auto max-w-3xl px-4 pb-10">
         {/* ── Header ── */}
         <div className="mb-10">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c6f135] mb-2">
             Last 6 months
           </p>
-          <h1 className="big-num">
+          <h1 className="nav-logo">
             Exercise History
           </h1>
           <div className="flex flex-row gap-2">
@@ -304,7 +304,7 @@ export default async function ExerciseDetailPage({
                   className="rounded-2xl bg-zinc-900/60 border border-zinc-800 overflow-hidden"
                 >
                   {/* card header */}
-                  <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-800">
+                  <div className="flex items-start justify-between flex-col px-5 py-4 border-b border-zinc-800 gap-2">
                     <div className="flex items-center gap-3">
                       <span className="w-8 h-8 rounded-full bg-[#c6f135]/10 border border-[#c6f135]/25 flex items-center justify-center text-[#c6f135] text-xs font-bold">
                         {exerciseLogs.length - i}
@@ -319,7 +319,7 @@ export default async function ExerciseDetailPage({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-zinc-400">
+                    <div className="flex justify-between gap-2 text-xs text-zinc-400 w-full">
                       {isTimed ? (
                         <span className="bg-zinc-800 border border-zinc-700 px-2.5 py-1 rounded-full">
                           <span className="text-white font-semibold">

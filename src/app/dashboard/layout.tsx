@@ -1,18 +1,26 @@
 import { Suspense } from "react";
 import { BillingToast } from "../components/billing/BillingToast";
-import { ClientHeader } from "../components/clients/ClientHeader";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import ClientLayout from "../(client)/layout";
 
 // src/app/dashboard/layout.tsx
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+
+  const session = await getServerSession(authOptions);
+  if (!session) redirect("/login");
+
   return (
     <div className="min-h-screen bg-black">
-      <ClientHeader />
+      <ClientLayout>
+        {children}
+      </ClientLayout>
 
-      <main className="p-6 max-w-6xl mx-auto bg-black">{children}</main>
       <Suspense>
         <BillingToast />
       </Suspense>

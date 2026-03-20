@@ -141,7 +141,7 @@ export function AddExerciseToWorkoutModal({
         open={showCreateExerciseModal}
         onClose={() => setShowCreateExerciseModal(false)}
         onCreated={(newExercise) => {
-          setExercise(newExercise);
+          handleSelectExercise(newExercise);
           setShowCreateExerciseModal(false);
         }}
       />
